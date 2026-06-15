@@ -1,0 +1,80 @@
+name: PipelineOS CI
+
+on:
+  push:
+    branches: [main, dev, develop]
+  pull_request:
+    branches: [main]
+
+jobs:
+  test:
+    runs-on: ubuntu-latest
+    timeout-minutes: 15
+
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Set up Python
+        if: hashFiles('requirements.txt') != '' || hashFiles('pyproject.toml') != ''
+        uses: actions/setup-python@v5
+        with:
+          python-version: '3.11'
+
+      - name: Set up Node.js
+        if: hashFiles('package.json') != ''
+        uses: actions/setup-node@v4
+        with:
+          node-version: '20'
+          cache: 'npm'
+
+      - name: Run tests
+        id: tests
+        run: |
+          set +e
+          TEST_OUTPUT=$(echo 'No test runner detected — add your test command here' && exit 0)
+          TEST_EXIT_CODE=$?
+          echo "output<<EOF" >> $GITHUB_OUTPUT
+          echo "$TEST_OUTPUT" >> $GITHUB_OUTPUT
+          echo "EOF" >> $GITHUB_OUTPUT
+          echo "exit_code=$TEST_EXIT_CODE" >> $GITHUB_OUTPUT
+          exit $TEST_EXIT_CODE
+
+      - name: Report SUCCESS to PipelineOS
+        if: success()
+        env:
+          PIPELINE_OS_SECRET: ${{ secrets.PIPELINE_OS_SECRET }}
+        run: |
+          curl -s -X POST https://pipeline-os-nine.vercel.app/api/ci-webhook \
+            -H "Content-Type: application/json" \
+            -d '{
+              "pipelineId": "jtfnyz8ij3qxlknkcb0l4929",
+              "secret": "'$PIPELINE_OS_SECRET'",
+              "status": "success",
+              "branch": "${{ github.ref_name }}",
+              "commit": "${{ github.sha }}",
+              "commitMessage": "${{ github.event.head_commit.message }}",
+              "workflowName": "PipelineOS CI",
+              "runUrl": "${{ github.server_url }}/${{ github.repository }}/actions/runs/${{ github.run_id }}"
+            }'
+          echo "✅ PipelineOS에 성공 보고 완료"
+
+      - name: Report FAILURE to PipelineOS
+        if: failure()
+        env:
+          PIPELINE_OS_SECRET: ${{ secrets.PIPELINE_OS_SECRET }}
+        run: |
+          TEST_OUTPUT="${{ steps.tests.outputs.output }}"
+          curl -s -X POST https://pipeline-os-nine.vercel.app/api/ci-webhook \
+            -H "Content-Type: application/json" \
+            -d "{
+              \"pipelineId\": \"jtfnyz8ij3qxlknkcb0l4929\",
+              \"secret\": \"$PIPELINE_OS_SECRET\",
+              \"status\": \"failure\",
+              \"branch\": \"${{ github.ref_name }}\",
+              \"commit\": \"${{ github.sha }}\",
+              \"commitMessage\": \"${{ github.event.head_commit.message }}\",
+              \"testSummary\": \"${TEST_OUTPUT:0:300}\",
+              \"workflowName\": \"PipelineOS CI\",
+              \"runUrl\": \"${{ github.server_url }}/${{ github.repository }}/actions/runs/${{ github.run_id }}\"
+            }"
+          echo "❌ PipelineOS에 실패 보고 완료 (블로킹 이슈 자동 등록됨)"
