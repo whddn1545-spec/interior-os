@@ -47,7 +47,7 @@ jobs:
           curl -s -X POST https://pipeline-os-nine.vercel.app/api/ci-webhook \
             -H "Content-Type: application/json" \
             -d '{
-              "pipelineId": "f4cn62pylns75ucfj2rv1rd6",
+              "pipelineId": "iawa1wgfpl7os4j3bzk8h414",
               "secret": "'$PIPELINE_OS_SECRET'",
               "status": "success",
               "branch": "${{ github.ref_name }}",
@@ -67,7 +67,7 @@ jobs:
           curl -s -X POST https://pipeline-os-nine.vercel.app/api/ci-webhook \
             -H "Content-Type: application/json" \
             -d "{
-              \"pipelineId\": \"f4cn62pylns75ucfj2rv1rd6\",
+              \"pipelineId\": \"iawa1wgfpl7os4j3bzk8h414\",
               \"secret\": \"$PIPELINE_OS_SECRET\",
               \"status\": \"failure\",
               \"branch\": \"${{ github.ref_name }}\",
