@@ -20,6 +20,9 @@
     ],
     "paths": {
       "@/*": ["./src/*"],
+      "@interior-os/core/pricing": ["../../packages/core/src/pricing/index.ts"],
+      "@interior-os/core/state": ["../../packages/core/src/state/index.ts"],
+      "@interior-os/core/validation": ["../../packages/core/src/validation/index.ts"],
       "@interior-os/db": ["../../packages/db/src/index.ts"],
       "@interior-os/db/*": ["../../packages/db/src/*.ts"]
     }
