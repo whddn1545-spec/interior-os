@@ -19,7 +19,9 @@
       }
     ],
     "paths": {
-      "@/*": ["./src/*"]
+      "@/*": ["./src/*"],
+      "@interior-os/db": ["../../packages/db/src/index.ts"],
+      "@interior-os/db/*": ["../../packages/db/src/*.ts"]
     }
   },
   "include": [
