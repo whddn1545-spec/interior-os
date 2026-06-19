@@ -1,0 +1,285 @@
+"use client";
+
+import { useState, useTransition } from "react";
+import { useRouter } from "next/navigation";
+import { PlusIcon, TrashIcon, CheckIcon } from "lucide-react";
+import { upsertTradePrice, deactivateTradePrice, seedDefaultPrices } from "./actions";
+
+interface Trade { id: string; code: string; name_ko: string; unit: string }
+interface Price {
+  id: string; trade_id: string; item_name: string;
+  material_unit_price: number; labor_day_rate: number; default_days_per_unit: number;
+}
+
+interface Props {
+  trades: Trade[];
+  prices: Price[];
+  showSeedButton: boolean;
+}
+
+const UNIT_LABEL: Record<string, string> = {
+  pyeong: "평", m2: "㎡", m: "m", ea: "개", set: "식", day: "일",
+};
+
+export function PriceEditor({ trades, prices, showSeedButton }: Props) {
+  const router = useRouter();
+  const [isPending, startTransition] = useTransition();
+  const [editingId, setEditingId] = useState<string | null>(null);
+  const [addingTradeId, setAddingTradeId] = useState<string | null>(null);
+  const [error, setError] = useState<string | null>(null);
+  const [success, setSuccess] = useState<string | null>(null);
+
+  // form state
+  const [form, setForm] = useState({
+    itemName: "", materialUnitPrice: "", laborDayRate: "", defaultDaysPerUnit: "",
+  });
+
+  function startEdit(price: Price) {
+    setEditingId(price.id);
+    setAddingTradeId(null);
+    setForm({
+      itemName: price.item_name,
+      materialUnitPrice: String(price.material_unit_price),
+      laborDayRate: String(price.labor_day_rate),
+      defaultDaysPerUnit: String(price.default_days_per_unit),
+    });
+  }
+
+  function startAdd(tradeId: string) {
+    setAddingTradeId(tradeId);
+    setEditingId(null);
+    setForm({ itemName: "", materialUnitPrice: "", laborDayRate: "", defaultDaysPerUnit: "0.1" });
+  }
+
+  function cancel() {
+    setEditingId(null);
+    setAddingTradeId(null);
+  }
+
+  function handleSave(tradeId: string) {
+    startTransition(async () => {
+      setError(null);
+      const result = await upsertTradePrice({
+        id: editingId ?? undefined,
+        tradeId,
+        itemName: form.itemName.trim(),
+        materialUnitPrice: Number(form.materialUnitPrice),
+        laborDayRate: Number(form.laborDayRate),
+        defaultDaysPerUnit: Number(form.defaultDaysPerUnit),
+      });
+      if (!result.ok) {
+        setError(result.error);
+      } else {
+        setEditingId(null);
+        setAddingTradeId(null);
+        setSuccess("저장됐어요");
+        setTimeout(() => setSuccess(null), 2000);
+        router.refresh();
+      }
+    });
+  }
+
+  function handleDelete(id: string) {
+    startTransition(async () => {
+      await deactivateTradePrice(id);
+      router.refresh();
+    });
+  }
+
+  function handleSeedDefaults() {
+    startTransition(async () => {
+      setError(null);
+      const result = await seedDefaultPrices();
+      if (!result.ok) {
+        setError(result.error);
+      } else {
+        setSuccess(`기본 단가 ${result.data.count}개를 불러왔어요. 내 사업에 맞게 수정해주세요.`);
+        router.refresh();
+      }
+    });
+  }
+
+  // 공종별 단가 그룹
+  const priceByTrade = new Map<string, Price[]>();
+  for (const p of prices) {
+    const arr = priceByTrade.get(p.trade_id) ?? [];
+    arr.push(p);
+    priceByTrade.set(p.trade_id, arr);
+  }
+
+  return (
+    <div>
+      {error && (
+        <div className="bg-red-50 border border-red-200 rounded-xl px-4 py-3 text-red-700 mb-4">{error}</div>
+      )}
+      {success && (
+        <div className="bg-green-50 border border-green-200 rounded-xl px-4 py-3 text-green-700 mb-4 flex items-center gap-2">
+          <CheckIcon size={18} /> {success}
+        </div>
+      )}
+
+      {showSeedButton && (
+        <button
+          onClick={handleSeedDefaults}
+          disabled={isPending}
+          className="w-full bg-blue-600 text-white rounded-2xl py-4 text-lg font-bold mb-6 disabled:opacity-50"
+        >
+          {isPending ? "불러오는 중..." : "📥 업계 기본 단가 불러오기"}
+        </button>
+      )}
+
+      <div className="space-y-4">
+        {trades.map((trade) => {
+          const tradePrices = priceByTrade.get(trade.id) ?? [];
+          const unit = UNIT_LABEL[trade.unit] ?? trade.unit;
+
+          return (
+            <div key={trade.id} className="bg-white rounded-2xl border border-gray-200 overflow-hidden">
+              <div className="flex items-center justify-between px-4 py-3 bg-gray-50 border-b border-gray-100">
+                <span className="text-lg font-bold text-gray-900">{trade.name_ko}</span>
+                <span className="text-sm text-gray-500">단위: {unit}</span>
+              </div>
+
+              <div className="p-4">
+                {/* 기존 단가들 */}
+                {tradePrices.map((price) => (
+                  <div key={price.id}>
+                    {editingId === price.id ? (
+                      <PriceForm
+                        form={form}
+                        setForm={setForm}
+                        unit={unit}
+                        onSave={() => handleSave(trade.id)}
+                        onCancel={cancel}
+                        isPending={isPending}
+                      />
+                    ) : (
+                      <div className="flex items-start justify-between mb-3">
+                        <div className="flex-1">
+                          <p className="text-base font-semibold text-gray-900">{price.item_name}</p>
+                          <p className="text-sm text-gray-500">
+                            자재 {price.material_unit_price.toLocaleString("ko-KR")}원/{unit} ·
+                            일당 {price.labor_day_rate.toLocaleString("ko-KR")}원 ·
+                            {unit}당 {price.default_days_per_unit}일
+                          </p>
+                        </div>
+                        <div className="flex gap-2 shrink-0">
+                          <button
+                            onClick={() => startEdit(price)}
+                            className="px-3 py-2 bg-gray-100 text-gray-700 rounded-lg text-sm font-medium"
+                          >
+                            수정
+                          </button>
+                          <button
+                            onClick={() => handleDelete(price.id)}
+                            disabled={isPending}
+                            className="p-2 bg-red-50 text-red-500 rounded-lg"
+                          >
+                            <TrashIcon size={16} />
+                          </button>
+                        </div>
+                      </div>
+                    )}
+                  </div>
+                ))}
+
+                {/* 추가 폼 */}
+                {addingTradeId === trade.id && (
+                  <PriceForm
+                    form={form}
+                    setForm={setForm}
+                    unit={unit}
+                    onSave={() => handleSave(trade.id)}
+                    onCancel={cancel}
+                    isPending={isPending}
+                  />
+                )}
+
+                {addingTradeId !== trade.id && (
+                  <button
+                    onClick={() => startAdd(trade.id)}
+                    className="flex items-center gap-1.5 text-blue-600 font-medium text-base mt-1"
+                  >
+                    <PlusIcon size={18} />
+                    단가 추가
+                  </button>
+                )}
+              </div>
+            </div>
+          );
+        })}
+      </div>
+    </div>
+  );
+}
+
+function PriceForm({
+  form, setForm, unit, onSave, onCancel, isPending
+}: {
+  form: { itemName: string; materialUnitPrice: string; laborDayRate: string; defaultDaysPerUnit: string };
+  setForm: (f: typeof form) => void;
+  unit: string;
+  onSave: () => void;
+  onCancel: () => void;
+  isPending: boolean;
+}) {
+  return (
+    <div className="bg-blue-50 rounded-xl p-3 mb-3 space-y-2">
+      <input
+        type="text"
+        placeholder="자재명 (예: 강마루, 실크벽지)"
+        value={form.itemName}
+        onChange={(e) => setForm({ ...form, itemName: e.target.value })}
+        className="w-full border border-gray-200 rounded-lg px-3 py-2.5 text-base bg-white focus:outline-none focus:border-blue-400"
+      />
+      <div className="grid grid-cols-2 gap-2">
+        <div>
+          <label className="text-xs text-gray-500 mb-1 block">자재 단가 (원/{unit})</label>
+          <input
+            type="number"
+            placeholder="30000"
+            value={form.materialUnitPrice}
+            onChange={(e) => setForm({ ...form, materialUnitPrice: e.target.value })}
+            className="w-full border border-gray-200 rounded-lg px-3 py-2.5 text-base bg-white focus:outline-none focus:border-blue-400"
+          />
+        </div>
+        <div>
+          <label className="text-xs text-gray-500 mb-1 block">일당 (원/일)</label>
+          <input
+            type="number"
+            placeholder="250000"
+            value={form.laborDayRate}
+            onChange={(e) => setForm({ ...form, laborDayRate: e.target.value })}
+            className="w-full border border-gray-200 rounded-lg px-3 py-2.5 text-base bg-white focus:outline-none focus:border-blue-400"
+          />
+        </div>
+      </div>
+      <div>
+        <label className="text-xs text-gray-500 mb-1 block">{unit}당 작업일수</label>
+        <input
+          type="number"
+          step="0.01"
+          placeholder="0.12"
+          value={form.defaultDaysPerUnit}
+          onChange={(e) => setForm({ ...form, defaultDaysPerUnit: e.target.value })}
+          className="w-full border border-gray-200 rounded-lg px-3 py-2.5 text-base bg-white focus:outline-none focus:border-blue-400"
+        />
+      </div>
+      <div className="flex gap-2">
+        <button
+          onClick={onSave}
+          disabled={isPending || !form.itemName}
+          className="flex-1 bg-blue-600 text-white rounded-lg py-2.5 text-base font-semibold disabled:opacity-50"
+        >
+          {isPending ? "저장 중..." : "저장"}
+        </button>
+        <button
+          onClick={onCancel}
+          className="flex-1 bg-white text-gray-700 rounded-lg py-2.5 text-base font-medium border border-gray-200"
+        >
+          취소
+        </button>
+      </div>
+    </div>
+  );
+}

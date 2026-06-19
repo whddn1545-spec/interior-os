@@ -1,0 +1,293 @@
+"use client";
+
+import { useState, useTransition } from "react";
+import { AlertTriangleIcon, SendIcon, CheckCircleIcon } from "lucide-react";
+import { previewMessage, sendMessage } from "./actions";
+
+interface Worker { id: string; name: string; phone: string; tradesKo: string }
+interface Site { id: string; name: string; trades: { id: string; name_ko: string }[] }
+
+interface Props {
+  workers: Worker[];
+  sites: Site[];
+}
+
+type Step = "target" | "site" | "preview" | "done";
+type MessageType = "worker_notify" | "customer_progress" | "custom";
+
+export function MessageWizard({ workers, sites }: Props) {
+  const [step, setStep] = useState<Step>("target");
+  const [targetType, setTargetType] = useState<"worker" | "customer">("worker");
+  const [selectedWorkerId, setSelectedWorkerId] = useState("");
+  const [selectedSiteId, setSelectedSiteId] = useState("");
+  const [selectedTradeId, setSelectedTradeId] = useState("");
+  const [workDate, setWorkDate] = useState(() => {
+    const d = new Date(); d.setDate(d.getDate() + 1);
+    return d.toISOString().split("T")[0];
+  });
+  const [messageType, setMessageType] = useState<MessageType>("worker_notify");
+  const [customBody, setCustomBody] = useState("");
+  const [preview, setPreview] = useState<{ body: string; maskedBody: string; targetName: string; targetPhone: string } | null>(null);
+  const [error, setError] = useState<string | null>(null);
+  const [isPending, startTransition] = useTransition();
+
+  const selectedSite = sites.find((s) => s.id === selectedSiteId);
+
+  async function loadPreview() {
+    setError(null);
+    const workerId = targetType === "worker" ? selectedWorkerId : "";
+    const customerId = targetType === "customer" ? selectedWorkerId : ""; // reuse field
+
+    const result = await previewMessage({
+      targetType,
+      targetId: workerId || customerId,
+      siteId: selectedSiteId,
+      messageType,
+      customBody,
+      workDate: messageType === "worker_notify" ? workDate : undefined,
+      tradeId: selectedTradeId || undefined,
+    });
+
+    if (!result.ok) {
+      setError(result.error);
+    } else {
+      setPreview(result.data);
+      setStep("preview");
+    }
+  }
+
+  function handleSend() {
+    if (!preview) return;
+    startTransition(async () => {
+      const key = `${selectedWorkerId}-${selectedSiteId}-${Date.now()}`;
+      const result = await sendMessage({
+        targetType,
+        targetId: selectedWorkerId,
+        siteId: selectedSiteId || undefined,
+        body: preview.body,
+        maskedBody: preview.maskedBody,
+        channel: "sms",
+        idempotencyKey: key,
+        targetPhone: preview.targetPhone,
+      });
+      if (!result.ok) {
+        setError(result.error);
+      } else {
+        setStep("done");
+      }
+    });
+  }
+
+  function reset() {
+    setStep("target");
+    setSelectedWorkerId("");
+    setSelectedSiteId("");
+    setSelectedTradeId("");
+    setPreview(null);
+    setError(null);
+  }
+
+  if (step === "done") {
+    return (
+      <div className="text-center py-12">
+        <CheckCircleIcon size={64} className="mx-auto text-green-500 mb-4" />
+        <h2 className="text-2xl font-bold text-gray-900 mb-2">문자를 보냈어요!</h2>
+        <p className="text-base text-gray-500 mb-6">{preview?.targetName}님에게 발송 완료</p>
+        <button
+          onClick={reset}
+          className="bg-blue-600 text-white rounded-2xl px-8 py-4 text-lg font-semibold"
+        >
+          또 보내기
+        </button>
+      </div>
+    );
+  }
+
+  return (
+    <div className="bg-white rounded-2xl border border-gray-200 overflow-hidden">
+      {/* 스텝 1: 대상 선택 */}
+      <div className={`p-5 ${step !== "target" ? "opacity-50" : ""}`}>
+        <h2 className="text-xl font-bold text-gray-900 mb-4">① 누구에게 보낼까요?</h2>
+
+        <div className="grid grid-cols-2 gap-3 mb-4">
+          <button
+            onClick={() => { setTargetType("worker"); setSelectedWorkerId(""); }}
+            className={`py-4 rounded-xl text-lg font-semibold border-2 ${
+              targetType === "worker" ? "border-blue-600 bg-blue-50 text-blue-700" : "border-gray-200 text-gray-700"
+            }`}
+          >
+            👷 작업자
+          </button>
+          <button
+            onClick={() => { setTargetType("customer"); setSelectedWorkerId(""); }}
+            className={`py-4 rounded-xl text-lg font-semibold border-2 ${
+              targetType === "customer" ? "border-blue-600 bg-blue-50 text-blue-700" : "border-gray-200 text-gray-700"
+            }`}
+          >
+            👤 고객
+          </button>
+        </div>
+
+        {targetType === "worker" && (
+          <select
+            value={selectedWorkerId}
+            onChange={(e) => setSelectedWorkerId(e.target.value)}
+            className="w-full border border-gray-200 rounded-xl px-4 py-4 text-lg text-gray-900 focus:outline-none focus:border-blue-400"
+          >
+            <option value="">작업자 선택...</option>
+            {workers.map((w) => (
+              <option key={w.id} value={w.id}>{w.name} ({w.tradesKo || "다능"})</option>
+            ))}
+          </select>
+        )}
+
+        {step === "target" && selectedWorkerId && (
+          <div className="mt-4">
+            <h3 className="text-lg font-semibold text-gray-800 mb-3">메시지 종류</h3>
+            <div className="space-y-2">
+              {([
+                ["worker_notify", "섭외·안내 문자", "작업 일정, 주소, 비번 포함"],
+                ["customer_progress", "공사 진행 알림", "고객에게 진행 상황 안내"],
+                ["custom", "직접 입력", "내용을 직접 작성"],
+              ] as const).map(([type, label, desc]) => (
+                <button
+                  key={type}
+                  onClick={() => setMessageType(type)}
+                  className={`w-full text-left p-4 rounded-xl border-2 ${
+                    messageType === type ? "border-blue-600 bg-blue-50" : "border-gray-200"
+                  }`}
+                >
+                  <p className="text-base font-semibold text-gray-900">{label}</p>
+                  <p className="text-sm text-gray-500">{desc}</p>
+                </button>
+              ))}
+            </div>
+
+            <button
+              onClick={() => setStep("site")}
+              className="mt-4 w-full bg-blue-600 text-white rounded-2xl py-4 text-lg font-semibold"
+            >
+              다음 →
+            </button>
+          </div>
+        )}
+      </div>
+
+      {/* 스텝 2: 현장 & 날짜 */}
+      {step === "site" && (
+        <div className="border-t border-gray-100 p-5">
+          <h2 className="text-xl font-bold text-gray-900 mb-4">② 어느 현장인가요?</h2>
+
+          <div className="space-y-3">
+            <select
+              value={selectedSiteId}
+              onChange={(e) => setSelectedSiteId(e.target.value)}
+              className="w-full border border-gray-200 rounded-xl px-4 py-4 text-lg text-gray-900 focus:outline-none focus:border-blue-400"
+            >
+              <option value="">현장 선택...</option>
+              {sites.map((s) => (
+                <option key={s.id} value={s.id}>{s.name}</option>
+              ))}
+            </select>
+
+            {selectedSite && selectedSite.trades.length > 0 && (
+              <select
+                value={selectedTradeId}
+                onChange={(e) => setSelectedTradeId(e.target.value)}
+                className="w-full border border-gray-200 rounded-xl px-4 py-4 text-lg text-gray-900 focus:outline-none focus:border-blue-400"
+              >
+                <option value="">공종 선택 (선택)...</option>
+                {selectedSite.trades.map((t) => (
+                  <option key={t.id} value={t.id}>{t.name_ko}</option>
+                ))}
+              </select>
+            )}
+
+            {messageType === "worker_notify" && (
+              <input
+                type="date"
+                value={workDate}
+                onChange={(e) => setWorkDate(e.target.value)}
+                className="w-full border border-gray-200 rounded-xl px-4 py-4 text-lg text-gray-900 focus:outline-none focus:border-blue-400"
+              />
+            )}
+
+            {messageType === "custom" && (
+              <textarea
+                value={customBody}
+                onChange={(e) => setCustomBody(e.target.value)}
+                placeholder="보낼 내용을 입력하세요..."
+                rows={4}
+                maxLength={300}
+                className="w-full border border-gray-200 rounded-xl px-4 py-3 text-base resize-none focus:outline-none focus:border-blue-400"
+              />
+            )}
+          </div>
+
+          {error && (
+            <div className="mt-3 bg-red-50 border border-red-200 rounded-xl px-4 py-3 text-red-700">
+              {error}
+            </div>
+          )}
+
+          <div className="mt-4 space-y-2">
+            <button
+              onClick={loadPreview}
+              disabled={!selectedSiteId}
+              className="w-full bg-blue-600 text-white rounded-2xl py-4 text-lg font-semibold disabled:opacity-50"
+            >
+              미리보기 →
+            </button>
+            <button
+              onClick={() => setStep("target")}
+              className="w-full bg-gray-100 text-gray-700 rounded-2xl py-3 text-base font-medium"
+            >
+              ← 이전
+            </button>
+          </div>
+        </div>
+      )}
+
+      {/* 스텝 3: 미리보기 + 발송 */}
+      {step === "preview" && preview && (
+        <div className="border-t border-gray-100 p-5">
+          <h2 className="text-xl font-bold text-gray-900 mb-1">③ 보낼 내용 확인</h2>
+          <p className="text-base text-gray-500 mb-4">받는 사람: {preview.targetName} ({preview.targetPhone})</p>
+
+          <div className="bg-gray-50 rounded-xl p-4 mb-4">
+            <p className="text-base text-gray-800 whitespace-pre-line">{preview.maskedBody}</p>
+            {preview.body !== preview.maskedBody && (
+              <div className="flex items-center gap-2 mt-3 pt-3 border-t border-gray-200">
+                <AlertTriangleIcon size={16} className="text-orange-500 shrink-0" />
+                <p className="text-sm text-orange-700">실제 발송 시 비번이 포함됩니다</p>
+              </div>
+            )}
+          </div>
+
+          {error && (
+            <div className="mb-4 bg-red-50 border border-red-200 rounded-xl px-4 py-3 text-red-700">
+              {error}
+            </div>
+          )}
+
+          <div className="space-y-2">
+            <button
+              onClick={handleSend}
+              disabled={isPending}
+              className="flex items-center justify-center gap-2 w-full bg-green-600 text-white rounded-2xl py-5 text-xl font-bold disabled:opacity-50"
+            >
+              <SendIcon size={22} />
+              {isPending ? "발송 중..." : `${preview.targetName}님에게 보내기`}
+            </button>
+            <button
+              onClick={() => setStep("site")}
+              className="w-full bg-gray-100 text-gray-700 rounded-2xl py-3 text-base font-medium"
+            >
+              ← 수정하기
+            </button>
+          </div>
+        </div>
+      )}
+    </div>
+  );
+}
