@@ -5,4 +5,4 @@ export {
   type QuoteStatus,
   type ContractStatus,
   type MessageStatus,
-} from "./quoteMachine.js";
+} from "./quoteMachine";

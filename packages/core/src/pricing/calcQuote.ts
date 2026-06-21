@@ -2,7 +2,7 @@ import type {
   QuoteItemInput,
   LineResult,
   QuoteResult,
-} from "./types.js";
+} from "./types";
 
 /**
  * 견적 항목 1개 계산.

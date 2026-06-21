@@ -1,3 +1,7 @@
+export const dynamic = "force-dynamic";
+
+import { ReloadButton } from "./reload-button";
+
 export default function OfflinePage() {
   return (
     <div className="min-h-screen flex flex-col items-center justify-center px-4 text-center bg-gray-50">
@@ -6,12 +10,7 @@ export default function OfflinePage() {
       <p className="text-lg text-gray-500 mb-6">
         네트워크 연결을 확인한 후 다시 시도해주세요.
       </p>
-      <button
-        onClick={() => window.location.reload()}
-        className="bg-blue-600 text-white px-6 py-3 rounded-2xl text-lg font-semibold"
-      >
-        다시 시도
-      </button>
+      <ReloadButton />
     </div>
   );
 }

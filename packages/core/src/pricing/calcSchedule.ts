@@ -1,4 +1,4 @@
-import type { ScheduleItemInput, ScheduleResult } from "./types.js";
+import type { ScheduleItemInput, ScheduleResult } from "./types";
 
 /**
  * 선후행 의존 관계를 기반으로 공사 일정 오프셋 계산.

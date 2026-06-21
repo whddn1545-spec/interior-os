@@ -1,4 +1,4 @@
-import type { TradePriceInput } from "./types.js";
+import type { TradePriceInput } from "./types";
 
 /**
  * 온보딩용 기본 단가 시드.

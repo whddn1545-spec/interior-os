@@ -7,4 +7,4 @@ export {
   type CreateSiteInput,
   type QuoteItemDraftInput,
   type SendMessageInput,
-} from "./schemas.js";
+} from "./schemas";

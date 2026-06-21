@@ -93,9 +93,13 @@ export async function retagPhoto(
   const { data: { user } } = await supabase.auth.getUser();
   if (!user) return { ok: false, error: "로그인이 필요합니다" };
 
+  const dbUpdate: Record<string, unknown> = { status: "reviewed" };
+  if (updates.phase !== undefined) dbUpdate.phase = updates.phase;
+  if ("tradeId" in updates) dbUpdate.trade_id = updates.tradeId;
+
   // eslint-disable-next-line @typescript-eslint/no-explicit-any
   const { error } = await (supabase.from("photos") as any)
-    .update({ ...updates, status: "reviewed" })
+    .update(dbUpdate)
     .eq("id", photoId);
 
   if (error) return { ok: false, error: error.message };
