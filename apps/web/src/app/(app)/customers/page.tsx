@@ -1,6 +1,7 @@
 import Link from "next/link";
 import { PlusIcon, UploadIcon, ChevronRightIcon } from "lucide-react";
 import { createClient } from "@/lib/supabase/server";
+import { GradeClassifier } from "./grade-classifier";
 
 const GRADE_LABEL: Record<string, string> = { vip: "VIP", gold: "골드", normal: "일반", dormant: "휴면" };
 const GRADE_COLOR: Record<string, string> = {
@@ -34,6 +35,7 @@ export default async function CustomersPage() {
       <div className="flex items-center justify-between mb-6">
         <h1 className="text-2xl font-bold text-gray-900">고객</h1>
         <div className="flex gap-2">
+          <GradeClassifier />
           <Link
             href="/customers/import"
             className="flex items-center gap-1.5 bg-gray-100 text-gray-700 px-3 py-2.5 rounded-xl text-base font-semibold"

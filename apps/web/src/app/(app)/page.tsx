@@ -177,6 +177,9 @@ export default async function HomePage() {
             { href: "/workers", label: "작업자", emoji: "🔧" },
             { href: "/finance", label: "매출 관리", emoji: "💰" },
             { href: "/photos", label: "사진 관리", emoji: "📷" },
+            { href: "/instagram", label: "인스타", emoji: "📸" },
+            { href: "/materials", label: "자재산출", emoji: "🧮" },
+            { href: "/moodboard", label: "무드보드", emoji: "🎨" },
             { href: "/settings/prices", label: "단가표", emoji: "⚙️" },
           ].map((item) => (
             <Link

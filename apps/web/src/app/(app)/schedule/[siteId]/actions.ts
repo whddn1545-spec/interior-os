@@ -152,6 +152,42 @@ export async function updateTaskDates(
   return { ok: true, data: undefined };
 }
 
+/** 작업자 배정 */
+export async function assignWorker(
+  siteId: string,
+  taskId: string,
+  workerId: string,
+  tradeId: string | null,
+  startDate: string,
+  endDate: string
+): Promise<ActionResult<void>> {
+  const supabase = await createClient();
+  const { data: { user } } = await supabase.auth.getUser();
+  if (!user) return { ok: false, error: "로그인이 필요합니다" };
+
+  const tenantId = (user.user_metadata?.tenant_id ?? user.id) as string;
+
+  // 기존 배정 삭제(같은 task에 한 명만)
+  await supabase.from("assignments").delete().eq("site_id", siteId).eq("worker_id", workerId);
+
+  // eslint-disable-next-line @typescript-eslint/no-explicit-any
+  const { error } = await (supabase.from("assignments") as any).insert({
+    tenant_id: tenantId,
+    site_id: siteId,
+    worker_id: workerId,
+    trade_id: tradeId,
+    start_date: startDate,
+    end_date: endDate,
+    status: "proposed",
+  });
+
+  if (error) return { ok: false, error: error.message };
+
+  // schedule_task에 assignment_id 업데이트는 조회 후 처리 (단순화)
+  revalidatePath(`/schedule/${siteId}`);
+  return { ok: true, data: undefined };
+}
+
 /** 작업 상태 변경 */
 export async function updateTaskStatus(
   taskId: string,

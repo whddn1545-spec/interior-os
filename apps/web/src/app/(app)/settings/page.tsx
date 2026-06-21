@@ -1,10 +1,11 @@
 import Link from "next/link";
-import { ChevronRightIcon, TagIcon, MapPinIcon, SmartphoneIcon, LogOutIcon } from "lucide-react";
+import { ChevronRightIcon, TagIcon, MapPinIcon, SmartphoneIcon, CreditCardIcon, LogOutIcon } from "lucide-react";
 import { createClient } from "@/lib/supabase/server";
 
 const MENU = [
   { href: "/settings/prices", icon: TagIcon, label: "단가표", desc: "공종별 자재비·인건비 단가" },
   { href: "/settings/factors", icon: MapPinIcon, label: "거리·난이도 계수", desc: "견적 계수 설정" },
+  { href: "/pricing", icon: CreditCardIcon, label: "요금제 업그레이드", desc: "Pro/Team 플랜으로 더 많은 기능" },
   { href: "/settings/pwa", icon: SmartphoneIcon, label: "홈 화면에 추가", desc: "태블릿·폰 홈에 설치하기" },
 ];
 
