@@ -38,7 +38,9 @@ export default async function WorkersPage() {
             const rating = wAny.rating as number | null;
             return (
               <li key={wAny.id as string}>
-                <div className="flex items-center gap-3 bg-white border border-gray-200 rounded-2xl px-4 py-4">
+                <Link
+                  href={`/workers/${wAny.id as string}`}
+                  className="flex items-center gap-3 bg-white border border-gray-200 rounded-2xl px-4 py-4">
                   <div className="w-12 h-12 bg-gray-100 rounded-full flex items-center justify-center text-xl font-bold text-gray-600 shrink-0">
                     {(wAny.name as string).charAt(0)}
                   </div>
@@ -56,12 +58,13 @@ export default async function WorkersPage() {
                   </div>
                   <a
                     href={`tel:${wAny.phone as string}`}
+                    onClick={(e) => e.stopPropagation()}
                     className="flex items-center gap-1 bg-green-100 text-green-700 px-3 py-2 rounded-xl text-sm font-medium shrink-0"
                   >
                     <PhoneIcon size={16} />
                     전화
                   </a>
-                </div>
+                </Link>
               </li>
             );
           })}

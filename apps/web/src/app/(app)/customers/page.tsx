@@ -1,5 +1,5 @@
 import Link from "next/link";
-import { PlusIcon, SearchIcon, ChevronRightIcon } from "lucide-react";
+import { PlusIcon, UploadIcon, ChevronRightIcon } from "lucide-react";
 import { createClient } from "@/lib/supabase/server";
 
 const GRADE_LABEL: Record<string, string> = { vip: "VIP", gold: "골드", normal: "일반", dormant: "휴면" };
@@ -33,13 +33,22 @@ export default async function CustomersPage() {
     <div className="px-4 pt-6 pb-24">
       <div className="flex items-center justify-between mb-6">
         <h1 className="text-2xl font-bold text-gray-900">고객</h1>
-        <Link
-          href="/customers/new"
-          className="flex items-center gap-1.5 bg-blue-600 text-white px-4 py-2.5 rounded-xl text-base font-semibold"
-        >
-          <PlusIcon size={18} />
-          추가
-        </Link>
+        <div className="flex gap-2">
+          <Link
+            href="/customers/import"
+            className="flex items-center gap-1.5 bg-gray-100 text-gray-700 px-3 py-2.5 rounded-xl text-base font-semibold"
+          >
+            <UploadIcon size={18} />
+            가져오기
+          </Link>
+          <Link
+            href="/customers/new"
+            className="flex items-center gap-1.5 bg-blue-600 text-white px-4 py-2.5 rounded-xl text-base font-semibold"
+          >
+            <PlusIcon size={18} />
+            추가
+          </Link>
+        </div>
       </div>
 
       {/* 통계 */}
