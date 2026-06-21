@@ -29,13 +29,30 @@ export async function proxy(request: NextRequest) {
     data: { user },
   } = await supabase.auth.getUser();
 
-  const isAuthPage = request.nextUrl.pathname.startsWith("/login") ||
-    request.nextUrl.pathname.startsWith("/signup") ||
-    request.nextUrl.pathname.startsWith("/onboarding");
+  const { pathname } = request.nextUrl;
 
+  const isAuthPage =
+    pathname.startsWith("/login") ||
+    pathname.startsWith("/signup") ||
+    pathname.startsWith("/onboarding");
+
+  // 비로그인 → 로그인 페이지
   if (!user && !isAuthPage) {
     const url = request.nextUrl.clone();
     url.pathname = "/login";
+    return NextResponse.redirect(url);
+  }
+
+  // 로그인 됐지만 온보딩 미완료 → /onboarding (앱 페이지 접근 시)
+  if (
+    user &&
+    !isAuthPage &&
+    !user.user_metadata?.onboarded &&
+    pathname.startsWith("/") &&
+    !pathname.startsWith("/api")
+  ) {
+    const url = request.nextUrl.clone();
+    url.pathname = "/onboarding";
     return NextResponse.redirect(url);
   }
 

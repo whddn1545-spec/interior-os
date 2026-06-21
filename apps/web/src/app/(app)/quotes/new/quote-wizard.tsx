@@ -1,6 +1,6 @@
 "use client";
 
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import { Step1Customer } from "./steps/step-1-customer";
 import { Step2Site } from "./steps/step-2-site";
 import { Step3Trades } from "./steps/step-3-trades";
@@ -22,14 +22,64 @@ interface WizardState {
 }
 
 const STEP_LABELS = ["고객", "현장", "공종", "확인", "완료"];
+const DRAFT_KEY = "quote_wizard_draft";
+
+function loadDraft(): { step: Step; state: WizardState } {
+  try {
+    const raw = localStorage.getItem(DRAFT_KEY);
+    if (!raw) return { step: 1, state: {} };
+    const parsed = JSON.parse(raw) as { step: Step; state: WizardState };
+    // 완료 단계 draft는 버림
+    if (parsed.step === 5) return { step: 1, state: {} };
+    return parsed;
+  } catch {
+    return { step: 1, state: {} };
+  }
+}
+
+function saveDraft(step: Step, state: WizardState) {
+  try {
+    if (step === 5) {
+      localStorage.removeItem(DRAFT_KEY);
+    } else {
+      localStorage.setItem(DRAFT_KEY, JSON.stringify({ step, state }));
+    }
+  } catch {
+    // 스토리지 꽉 찬 경우 무시
+  }
+}
 
 export function QuoteWizard() {
   const [step, setStep] = useState<Step>(1);
   const [state, setState] = useState<WizardState>({});
+  const [hydrated, setHydrated] = useState(false);
+
+  // SSR 후 클라이언트에서 draft 복원
+  useEffect(() => {
+    const { step: savedStep, state: savedState } = loadDraft();
+    setStep(savedStep);
+    setState(savedState);
+    setHydrated(true);
+  }, []);
 
   function updateState(patch: Partial<WizardState>) {
-    setState((prev) => ({ ...prev, ...patch }));
+    setState((prev) => {
+      const next = { ...prev, ...patch };
+      saveDraft(step, next);
+      return next;
+    });
   }
+
+  function goToStep(next: Step, patch?: Partial<WizardState>) {
+    setState((prev) => {
+      const nextState = patch ? { ...prev, ...patch } : prev;
+      saveDraft(next, nextState);
+      return nextState;
+    });
+    setStep(next);
+  }
+
+  if (!hydrated) return null;
 
   return (
     <div className="max-w-lg mx-auto">
@@ -54,37 +104,57 @@ export function QuoteWizard() {
                   >
                     {isDone ? "✓" : num}
                   </div>
-                  <span className={`text-xs ${isActive ? "text-blue-600 font-semibold" : "text-gray-400"}`}>
+                  <span
+                    className={`text-xs ${
+                      isActive ? "text-blue-600 font-semibold" : "text-gray-400"
+                    }`}
+                  >
                     {label}
                   </span>
                   {i < STEP_LABELS.length - 1 && (
-                    <div className={`h-0.5 flex-1 ${isDone ? "bg-green-400" : "bg-gray-200"}`} />
+                    <div
+                      className={`h-0.5 flex-1 ${isDone ? "bg-green-400" : "bg-gray-200"}`}
+                    />
                   )}
                 </div>
               );
             })}
           </div>
+
+          {/* 이어쓰기 중 표시 */}
+          {step > 1 && (
+            <div className="mt-2 flex items-center justify-between">
+              <p className="text-xs text-gray-400">임시저장 복원됨</p>
+              <button
+                onClick={() => {
+                  localStorage.removeItem(DRAFT_KEY);
+                  setStep(1);
+                  setState({});
+                }}
+                className="text-xs text-red-400 underline"
+              >
+                처음부터
+              </button>
+            </div>
+          )}
         </div>
       )}
 
       {/* 스텝 렌더링 */}
       {step === 1 && (
         <Step1Customer
-          onNext={(customer) => {
-            updateState({ customer });
-            setStep(2);
-          }}
+          initialCustomer={state.customer}
+          onNext={(customer) => goToStep(2, { customer })}
         />
       )}
 
       {step === 2 && state.customer && (
         <Step2Site
           customerId={state.customer.id}
-          onNext={(siteId, distanceFactor, difficultyFactor) => {
-            updateState({ siteId, distanceFactor, difficultyFactor });
-            setStep(3);
-          }}
-          onBack={() => setStep(1)}
+          onNext={(siteId, distanceFactor, difficultyFactor) =>
+            goToStep(3, { siteId, distanceFactor, difficultyFactor })
+          }
+          onBack={() => goToStep(1)}
         />
       )}
 
@@ -93,11 +163,8 @@ export function QuoteWizard() {
           distanceFactor={state.distanceFactor ?? 1.0}
           difficultyFactor={state.difficultyFactor ?? 1.1}
           defaultAreaPyeong={state.areaPyeong ?? 33}
-          onNext={(items) => {
-            updateState({ items });
-            setStep(4);
-          }}
-          onBack={() => setStep(2)}
+          onNext={(items) => goToStep(4, { items })}
+          onBack={() => goToStep(2)}
         />
       )}
 
@@ -107,11 +174,8 @@ export function QuoteWizard() {
           items={state.items}
           distanceFactor={state.distanceFactor ?? 1.0}
           difficultyFactor={state.difficultyFactor ?? 1.1}
-          onConfirmed={(quoteId, total) => {
-            updateState({ quoteId, total });
-            setStep(5);
-          }}
-          onBack={() => setStep(3)}
+          onConfirmed={(quoteId, total) => goToStep(5, { quoteId, total })}
+          onBack={() => goToStep(3)}
         />
       )}
 

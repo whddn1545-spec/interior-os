@@ -12,9 +12,10 @@ interface CustomerOption {
 
 interface Props {
   onNext: (customer: CustomerOption) => void;
+  initialCustomer?: CustomerOption;
 }
 
-export function Step1Customer({ onNext }: Props) {
+export function Step1Customer({ onNext, initialCustomer }: Props) {
   const [query, setQuery] = useState("");
   const [results, setResults] = useState<CustomerOption[]>([]);
   const [showNewForm, setShowNewForm] = useState(false);

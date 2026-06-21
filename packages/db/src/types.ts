@@ -134,6 +134,13 @@ export type AuditLogRow = {
   action: string; entity_type: string; entity_id: string;
   before_data: Json | null; after_data: Json | null; created_at: string;
 };
+export type PaymentRecordRow = {
+  id: string; tenant_id: string; user_id: string;
+  order_id: string; payment_key: string | null;
+  plan_id: "pro" | "team"; amount: number;
+  status: "pending" | "confirmed" | "failed";
+  created_at: string; updated_at: string;
+};
 
 // Nullable 필드를 optional로 변환 (Supabase CLI 생성 타입과 동일한 패턴)
 type NullableToOptional<T> =
@@ -169,8 +176,9 @@ export type Database = {
       photos:         T<PhotoRow>;
       message_logs:   T<MessageLogRow>;
       instagram_posts:T<InstagramPostRow>;
-      ai_invocations: T<AiInvocationRow, InsertBase<AiInvocationRow>, never>;
-      audit_logs:     T<AuditLogRow,     InsertBase<AuditLogRow>,     never>;
+      ai_invocations:   T<AiInvocationRow, InsertBase<AiInvocationRow>, never>;
+      audit_logs:       T<AuditLogRow,     InsertBase<AuditLogRow>,     never>;
+      payment_records:  T<PaymentRecordRow>;
     };
     Views: { [_ in never]: never };
     Functions: { [_ in never]: never };
