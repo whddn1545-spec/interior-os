@@ -2,6 +2,7 @@ import { notFound } from "next/navigation";
 import Link from "next/link";
 import { ArrowLeftIcon, ChevronRightIcon, MessageSquareIcon } from "lucide-react";
 import { createClient } from "@/lib/supabase/server";
+import { CustomerEditForm } from "./customer-edit-form";
 
 export default async function CustomerDetailPage({ params }: { params: Promise<{ id: string }> }) {
   const { id } = await params;
@@ -35,13 +36,25 @@ export default async function CustomerDetailPage({ params }: { params: Promise<{
           <ArrowLeftIcon size={24} />
         </Link>
         <h1 className="text-xl font-bold text-gray-900 flex-1">{c.name as string}</h1>
-        <Link
-          href={`/messages?customerId=${id}`}
-          className="flex items-center gap-1 bg-green-100 text-green-700 px-3 py-2 rounded-xl text-sm font-medium"
-        >
-          <MessageSquareIcon size={16} />
-          문자
-        </Link>
+        <div className="flex items-center gap-2">
+          <CustomerEditForm
+            customerId={id}
+            initial={{
+              name: c.name as string,
+              phone: c.phone as string,
+              address: (c.address as string | null) ?? "",
+              source: (c.source as string | null) ?? "etc",
+              memo: (c.memo as string | null) ?? "",
+            }}
+          />
+          <Link
+            href={`/messages?customerId=${id}`}
+            className="flex items-center gap-1 bg-green-100 text-green-700 px-3 py-2 rounded-xl text-sm font-medium"
+          >
+            <MessageSquareIcon size={16} />
+            문자
+          </Link>
+        </div>
       </header>
 
       <div className="max-w-lg mx-auto px-4 pt-6 space-y-4">

@@ -3,6 +3,7 @@ import { ArrowLeftIcon } from "lucide-react";
 import Link from "next/link";
 import { createClient } from "@/lib/supabase/server";
 import { PhotoUploader } from "./photo-uploader";
+import { PhotoCard } from "./photo-card";
 
 export default async function SitePhotosPage({ params }: { params: Promise<{ siteId: string }> }) {
   const { siteId } = await params;
@@ -16,18 +17,19 @@ export default async function SitePhotosPage({ params }: { params: Promise<{ sit
 
   if (!site) notFound();
 
-  const { data: photos } = await supabase
-    .from("photos")
-    .select("id, storage_path, phase, trade_id, quality_score, ai_tags, taken_at, status, trades(name_ko)")
-    .eq("site_id", siteId)
-    .order("taken_at", { ascending: false });
+  const [{ data: photos }, { data: trades }] = await Promise.all([
+    supabase
+      .from("photos")
+      .select("id, storage_path, phase, trade_id, quality_score, ai_tags, status, trades(id, name_ko, code)")
+      .eq("site_id", siteId)
+      .order("taken_at", { ascending: false }),
+    supabase.from("trades").select("id, code, name_ko").order("name_ko"),
+  ]);
 
-  const PHASE_LABEL: Record<string, string> = {
-    before: "착공 전", during: "시공 중", after: "완공 후",
-  };
-
-  const s = site as unknown as Record<string, unknown>;
+  const tradeList = (trades as { id: string; code: string; name_ko: string }[] | null) ?? [];
+  const supabaseUrl = process.env.NEXT_PUBLIC_SUPABASE_URL ?? "";
   const photoList = (photos as unknown as Record<string, unknown>[]) ?? [];
+  const s = site as unknown as Record<string, unknown>;
 
   return (
     <div className="px-4 pt-6 pb-24">
@@ -41,10 +43,8 @@ export default async function SitePhotosPage({ params }: { params: Promise<{ sit
         </div>
       </div>
 
-      {/* 업로드 영역 */}
       <PhotoUploader siteId={siteId} />
 
-      {/* 사진 그리드 */}
       {photoList.length === 0 ? (
         <div className="text-center py-12 text-gray-400">
           <p className="text-lg">사진을 올려주세요</p>
@@ -53,46 +53,25 @@ export default async function SitePhotosPage({ params }: { params: Promise<{ sit
       ) : (
         <div className="grid grid-cols-2 gap-3 mt-4">
           {photoList.map((photo) => {
-            const phase = photo.phase as string | null;
-            const tradeName = (photo.trades as { name_ko: string } | null)?.name_ko ?? null;
-            const qualityScore = photo.quality_score as number | null;
+            const tradeMeta = photo.trades as { id: string; name_ko: string; code: string } | null;
             const aiTags = photo.ai_tags as Record<string, unknown> | null;
-            const captionHint = aiTags?.captionHint as string | null;
-            const isTagged = photo.status === "auto_tagged" || photo.status === "reviewed";
-
             return (
-              <div
+              <PhotoCard
                 key={photo.id as string}
-                className="bg-white border border-gray-200 rounded-2xl overflow-hidden"
-              >
-                <div className="aspect-square bg-gray-100 relative">
-                  {/* eslint-disable-next-line @next/next/no-img-element */}
-                  <img
-                    src={`${process.env.NEXT_PUBLIC_SUPABASE_URL}/storage/v1/object/public/photos/${photo.storage_path as string}`}
-                    alt={captionHint ?? "현장 사진"}
-                    className="w-full h-full object-cover"
-                  />
-                  {isTagged && (
-                    <div className="absolute top-2 right-2 bg-green-500 text-white text-xs px-2 py-0.5 rounded-full">
-                      AI 분석
-                    </div>
-                  )}
-                </div>
-                <div className="p-2">
-                  {phase && (
-                    <p className="text-xs font-medium text-blue-700">{PHASE_LABEL[phase] ?? phase}</p>
-                  )}
-                  {tradeName && (
-                    <p className="text-xs text-gray-600">{tradeName}</p>
-                  )}
-                  {captionHint && (
-                    <p className="text-xs text-gray-500 truncate">{captionHint}</p>
-                  )}
-                  {qualityScore !== null && (
-                    <p className="text-xs text-amber-500">품질 {Math.round(qualityScore * 100)}%</p>
-                  )}
-                </div>
-              </div>
+                siteId={siteId}
+                supabaseUrl={supabaseUrl}
+                trades={tradeList.map((t) => ({ id: t.id, code: t.code, nameKo: t.name_ko }))}
+                photo={{
+                  id: photo.id as string,
+                  storagePath: photo.storage_path as string,
+                  phase: photo.phase as string | null,
+                  tradeId: photo.trade_id as string | null,
+                  tradeName: tradeMeta?.name_ko ?? null,
+                  qualityScore: photo.quality_score as number | null,
+                  captionHint: aiTags?.captionHint as string | null,
+                  isTagged: photo.status === "auto_tagged" || photo.status === "reviewed",
+                }}
+              />
             );
           })}
         </div>

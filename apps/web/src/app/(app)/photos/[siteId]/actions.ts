@@ -83,3 +83,22 @@ export async function uploadAndTagPhoto(
   revalidatePath(`/photos/${siteId}`);
   return { ok: true };
 }
+
+export async function retagPhoto(
+  photoId: string,
+  siteId: string,
+  updates: { phase?: string; tradeId?: string | null }
+): Promise<{ ok: boolean; error?: string }> {
+  const supabase = await createClient();
+  const { data: { user } } = await supabase.auth.getUser();
+  if (!user) return { ok: false, error: "로그인이 필요합니다" };
+
+  // eslint-disable-next-line @typescript-eslint/no-explicit-any
+  const { error } = await (supabase.from("photos") as any)
+    .update({ ...updates, status: "reviewed" })
+    .eq("id", photoId);
+
+  if (error) return { ok: false, error: error.message };
+  revalidatePath(`/photos/${siteId}`);
+  return { ok: true };
+}

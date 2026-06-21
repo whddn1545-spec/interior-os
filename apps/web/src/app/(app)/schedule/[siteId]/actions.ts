@@ -188,6 +188,23 @@ export async function assignWorker(
   return { ok: true, data: undefined };
 }
 
+/** 현장 상태 변경 */
+export async function updateSiteStatus(
+  siteId: string,
+  status: "contracted" | "in_progress" | "done" | "canceled"
+): Promise<ActionResult<void>> {
+  const supabase = await createClient();
+  const { error } = await supabase
+    .from("sites")
+    .update({ status })
+    .eq("id", siteId);
+
+  if (error) return { ok: false, error: error.message };
+  revalidatePath(`/schedule/${siteId}`);
+  revalidatePath("/");
+  return { ok: true, data: undefined };
+}
+
 /** 작업 상태 변경 */
 export async function updateTaskStatus(
   taskId: string,

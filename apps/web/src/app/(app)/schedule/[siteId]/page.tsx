@@ -5,6 +5,7 @@ import { createClient } from "@/lib/supabase/server";
 import { GanttChart } from "./gantt-chart";
 import { ScheduleSetup } from "./schedule-setup";
 import { WorkerAssign } from "./worker-assign";
+import { SiteStatusButton } from "./site-status";
 
 export default async function SchedulePage({ params }: { params: Promise<{ siteId: string }> }) {
   const { siteId } = await params;
@@ -87,14 +88,17 @@ export default async function SchedulePage({ params }: { params: Promise<{ siteI
           <h1 className="text-xl font-bold text-gray-900 truncate">{siteAny.name as string}</h1>
           <p className="text-sm text-gray-500">{customer?.name ?? ""} · 공사 일정</p>
         </div>
-        {hasTasks && (
-          <WorkerAssign
-            siteId={siteId}
-            tasks={taskList}
-            workers={workerList}
-            assignments={assignmentList}
-          />
-        )}
+        <div className="flex items-center gap-2 shrink-0">
+          <SiteStatusButton siteId={siteId} currentStatus={siteAny.status as string} />
+          {hasTasks && (
+            <WorkerAssign
+              siteId={siteId}
+              tasks={taskList}
+              workers={workerList}
+              assignments={assignmentList}
+            />
+          )}
+        </div>
       </header>
 
       <div className="px-4 pt-6">
