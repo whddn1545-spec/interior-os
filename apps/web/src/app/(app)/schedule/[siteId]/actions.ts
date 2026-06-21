@@ -167,7 +167,10 @@ export async function assignWorker(
 
   const tenantId = (user.user_metadata?.tenant_id ?? user.id) as string;
 
-  // 기존 배정 삭제(같은 task에 한 명만)
+  // trade_id가 없으면 배정 불가 (assignments.trade_id NOT NULL)
+  if (!tradeId) return { ok: false, error: "공종 정보가 없어 배정할 수 없어요" };
+
+  // 같은 현장에 동일 작업자가 이미 배정된 경우 교체
   await supabase.from("assignments").delete().eq("site_id", siteId).eq("worker_id", workerId);
 
   // eslint-disable-next-line @typescript-eslint/no-explicit-any
