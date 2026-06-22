@@ -31,7 +31,7 @@ export async function GET(req: NextRequest) {
   }
 
   const supabase = await createClient();
-  const { data: tenants } = await supabase.from("tenants").select("id, name");
+  const { data: tenants } = await supabase.from("tenants").select("id, business_name");
   if (!tenants || tenants.length === 0) return NextResponse.json({ sent: 0 });
 
   let totalSent = 0;
@@ -40,7 +40,7 @@ export async function GET(req: NextRequest) {
   for (const tenant of tenants) {
     const tenantAny = tenant as unknown as Record<string, unknown>;
     const tenantId = tenantAny.id as string;
-    const companyName = (tenantAny.name as string | null) ?? "인테리어";
+    const companyName = (tenantAny.business_name as string | null) ?? "인테리어";
     const body = messageTemplate.replace("{COMPANY}", companyName);
 
     const { data: customers } = await supabase

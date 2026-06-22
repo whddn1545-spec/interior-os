@@ -21,16 +21,18 @@ export async function addFinanceEntry(formData: FormData): Promise<{ ok: boolean
     return { ok: false, error: "필수 항목을 모두 입력해주세요" };
   }
 
-  // eslint-disable-next-line @typescript-eslint/no-explicit-any
-  const { error } = await (supabase.from("finance_entries") as any).insert({
+  const insertData: Record<string, unknown> = {
     tenant_id: tenantId,
-    site_id: siteId || null,
     direction,
     category,
     amount,
     paid_at: paidAt,
     memo: memo || null,
-  });
+  };
+  if (siteId) insertData.site_id = siteId;
+
+  // eslint-disable-next-line @typescript-eslint/no-explicit-any
+  const { error } = await (supabase.from("finance_entries") as any).insert(insertData);
 
   if (error) return { ok: false, error: error.message };
 

@@ -90,7 +90,7 @@ export type AssignmentRow = {
   notified_at: string | null; created_at: string; updated_at: string;
 };
 export type FinanceEntryRow = {
-  id: string; tenant_id: string; site_id: string;
+  id: string; tenant_id: string; site_id: string | null;
   direction: "in" | "out";
   category: "customer_payment" | "material" | "labor" | "outsourcing" | "etc";
   counterparty: string | null; worker_id: string | null;
@@ -116,8 +116,9 @@ export type MessageLogRow = {
 };
 export type InstagramPostRow = {
   id: string; tenant_id: string; site_id: string | null;
+  photo_id: string | null; photo_ids: string[];
   status: "draft" | "confirmed" | "published";
-  caption: string | null; photo_ids: string[];
+  caption: string | null; hashtags: string[] | null;
   published_at: string | null; ig_media_id: string | null;
   confirmed_by: string | null; confirmed_at: string | null;
   created_at: string; updated_at: string;

@@ -56,8 +56,7 @@ export async function createInstagramPost(input: {
 
   const tenantId = await getTenantId(supabase, user);
 
-  // eslint-disable-next-line @typescript-eslint/no-explicit-any
-  const { data, error } = await (supabase.from("instagram_posts") as any).insert({
+  const { data, error } = await supabase.from("instagram_posts").insert({
     tenant_id: tenantId,
     photo_id: input.photoId,
     photo_ids: [input.photoId],
@@ -121,7 +120,11 @@ export async function publishToInstagram(postId: string): Promise<{ ok: boolean;
   const photo = p.photos as { storage_path: string } | null;
   if (!photo) return { ok: false, error: "사진을 찾을 수 없어요" };
 
-  const { data: { publicUrl } } = supabase.storage.from("photos").getPublicUrl(photo.storage_path);
+  const { data: signedData, error: signedError } = await supabase.storage
+    .from("photos")
+    .createSignedUrl(photo.storage_path, 3600);
+  if (signedError || !signedData?.signedUrl) return { ok: false, error: "사진 URL 생성 실패" };
+  const photoPublicUrl = signedData.signedUrl;
 
   const hashtags = (p.hashtags as string[]).join(" ");
   const fullCaption = `${p.caption as string}\n\n${hashtags}`;
@@ -134,7 +137,7 @@ export async function publishToInstagram(postId: string): Promise<{ ok: boolean;
         method: "POST",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({
-          image_url: publicUrl,
+          image_url: photoPublicUrl,
           caption: fullCaption,
           access_token: igToken,
         }),

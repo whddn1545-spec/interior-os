@@ -20,16 +20,33 @@ export default async function InstagramPage() {
       .limit(20),
   ]);
 
+  // 서명URL 일괄 발급 (비공개 버킷)
+  const photosPaths = (photos ?? []).map((p) => (p as unknown as Record<string, unknown>).storage_path as string);
+  const postPhotosPaths = (posts ?? []).map((p) => {
+    const pAny = p as unknown as Record<string, unknown>;
+    const photo = pAny.photos as { storage_path: string } | null;
+    return photo?.storage_path ?? "";
+  }).filter(Boolean);
+
+  const allPaths = [...photosPaths, ...postPhotosPaths];
+  const { data: signedUrls } = allPaths.length > 0
+    ? await supabase.storage.from("photos").createSignedUrls(allPaths, 3600)
+    : { data: [] };
+
+  const signedUrlMap = new Map(
+    (signedUrls ?? []).map((s) => [s.path, s.signedUrl ?? ""])
+  );
+
   const recommendedPhotos = (photos ?? []).map((p) => {
     const pAny = p as unknown as Record<string, unknown>;
     const aiTags = pAny.ai_tags as { captionHint?: string } | null;
     const trade = pAny.trades as { name_ko: string } | null;
     const site = pAny.sites as { name: string } | null;
-    const { data: { publicUrl } } = supabase.storage.from("photos").getPublicUrl(pAny.storage_path as string);
+    const storagePath = pAny.storage_path as string;
 
     return {
       id: pAny.id as string,
-      publicUrl,
+      publicUrl: signedUrlMap.get(storagePath) ?? "",
       tradeNameKo: trade?.name_ko ?? "인테리어",
       phase: pAny.phase as string ?? "after",
       qualityScore: pAny.quality_score as number ?? 0,
@@ -41,16 +58,14 @@ export default async function InstagramPage() {
   const existingPosts = (posts ?? []).map((p) => {
     const pAny = p as unknown as Record<string, unknown>;
     const photo = pAny.photos as { storage_path: string } | null;
-    const { data: { publicUrl } } = photo
-      ? supabase.storage.from("photos").getPublicUrl(photo.storage_path)
-      : { data: { publicUrl: "" } };
+    const photoUrl = photo ? (signedUrlMap.get(photo.storage_path) ?? "") : "";
 
     return {
       id: pAny.id as string,
       status: pAny.status as string,
       caption: pAny.caption as string,
       hashtags: (pAny.hashtags as string[]) ?? [],
-      photoUrl: publicUrl,
+      photoUrl,
     };
   });
 

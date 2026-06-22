@@ -53,14 +53,17 @@ export async function uploadAndTagPhoto(
 
   // AI 태깅 (실패해도 업로드 성공 처리)
   try {
-    const { data: { publicUrl } } = supabase.storage.from("photos").getPublicUrl(storagePath);
+    const { data: signedData, error: signedError } = await supabase.storage
+      .from("photos")
+      .createSignedUrl(storagePath, 300); // AI 비전용 5분 URL
+    if (signedError || !signedData?.signedUrl) throw new Error("서명URL 생성 실패");
 
     const { data: trades } = await supabase.from("trades").select("id, code, name_ko");
     const tradeList = (trades as { id: string; code: string; name_ko: string }[] | null) ?? [];
     const availableTradeCodes = tradeList.map((t) => ({ code: t.code, nameKo: t.name_ko }));
     const tradeByCode = new Map(tradeList.map((t) => [t.code, t.id]));
 
-    const tagResult = await tagPhoto({ imageUrl: publicUrl, availableTradeCodes, tenantId });
+    const tagResult = await tagPhoto({ imageUrl: signedData.signedUrl, availableTradeCodes, tenantId });
 
     const tradeId = tradeByCode.get(tagResult.tradeCode) ?? null;
 
