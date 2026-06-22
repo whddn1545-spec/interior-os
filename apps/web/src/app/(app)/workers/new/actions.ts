@@ -1,6 +1,7 @@
 "use server";
 
 import { createClient } from "@/lib/supabase/server";
+import { getTenantId } from "@/lib/supabase/get-tenant";
 
 interface CreateWorkerInput {
   name: string;
@@ -16,7 +17,7 @@ export async function createWorker(
   const { data: { user } } = await supabase.auth.getUser();
   if (!user) return { ok: false, error: "로그인이 필요합니다" };
 
-  const tenantId = user.user_metadata?.tenant_id ?? user.id;
+  const tenantId = await getTenantId(supabase, user);
 
   const { data: worker, error: workerError } = await supabase
     .from("workers")

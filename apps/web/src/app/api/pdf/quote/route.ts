@@ -21,6 +21,10 @@ export async function POST(request: Request) {
     const { data: { user } } = await supabase.auth.getUser();
     if (!user) return NextResponse.json({ error: "인증이 필요합니다" }, { status: 401 });
 
+    const tenantId = (user.user_metadata?.tenant_id as string | undefined)
+      ?? (await supabase.from("users").select("tenant_id").eq("id", user.id).single()).data?.tenant_id
+      ?? user.id;
+
     const { data: quote } = await supabase
       .from("quotes")
       .select("*, sites(name, address, area_pyeong, customers(name, phone)), quote_items(*, trades(name_ko))")
@@ -35,10 +39,10 @@ export async function POST(request: Request) {
       React.createElement(QuotePdfDocument, { quote: q, audience }) as unknown as ReactElement<DocumentProps>
     );
 
-    // Supabase Storage 업로드
-    const fileName = `quotes/${quoteId}/${audience}_${Date.now()}.pdf`;
+    // Supabase Storage 업로드 (tenantId prefix로 RLS 통과)
+    const fileName = `${tenantId}/quotes/${quoteId}/${audience}_${Date.now()}.pdf`;
     const { error: uploadError } = await supabase.storage
-      .from("documents")
+      .from("pdfs")
       .upload(fileName, pdfBuffer, {
         contentType: "application/pdf",
         upsert: true,
@@ -48,9 +52,16 @@ export async function POST(request: Request) {
       return NextResponse.json({ error: uploadError.message }, { status: 500 });
     }
 
-    const { data: { publicUrl } } = supabase.storage.from("documents").getPublicUrl(fileName);
+    // PDF는 서명 URL (1시간 유효)
+    const { data: signedData, error: signErr } = await supabase.storage
+      .from("pdfs")
+      .createSignedUrl(fileName, 60 * 60);
 
-    return NextResponse.json({ url: publicUrl });
+    if (signErr || !signedData?.signedUrl) {
+      return NextResponse.json({ error: "서명 URL 생성 실패" }, { status: 500 });
+    }
+
+    return NextResponse.json({ url: signedData.signedUrl });
   } catch (err) {
     console.error("PDF generation error:", err);
     return NextResponse.json({ error: "PDF 생성 오류" }, { status: 500 });

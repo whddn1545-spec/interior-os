@@ -1,4 +1,5 @@
 import Link from "next/link";
+import { redirect } from "next/navigation";
 import {
   HomeIcon,
   FileTextIcon,
@@ -7,6 +8,7 @@ import {
   UsersIcon,
 } from "lucide-react";
 import { MoreMenu } from "@/components/more-menu";
+import { createClient } from "@/lib/supabase/server";
 
 const tabs = [
   { href: "/", label: "홈", icon: HomeIcon },
@@ -16,7 +18,10 @@ const tabs = [
   { href: "/customers", label: "고객", icon: UsersIcon },
 ];
 
-export default function AppLayout({ children }: { children: React.ReactNode }) {
+export default async function AppLayout({ children }: { children: React.ReactNode }) {
+  const supabase = await createClient();
+  const { data: { user } } = await supabase.auth.getUser();
+  if (!user) redirect("/login");
   return (
     <div className="flex flex-col min-h-screen bg-gray-50">
       <main className="flex-1 pb-20">{children}</main>

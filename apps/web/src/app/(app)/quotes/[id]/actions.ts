@@ -2,6 +2,7 @@
 
 import { createClient } from "@/lib/supabase/server";
 import { revalidatePath } from "next/cache";
+import { cookies } from "next/headers";
 import type { ActionResult } from "../new/actions";
 
 /** 견적 → 계약서 생성 */
@@ -13,7 +14,9 @@ export async function createContractFromQuote(
   const { data: { user } } = await supabase.auth.getUser();
   if (!user) return { ok: false, error: "로그인이 필요합니다" };
 
-  const tenantId = user.user_metadata.tenant_id ?? user.id;
+  const tenantId = (user.user_metadata?.tenant_id as string | undefined)
+    ?? (await supabase.from("users").select("tenant_id").eq("id", user.id).single()).data?.tenant_id
+    ?? user.id;
 
   const { data: quote } = await supabase
     .from("quotes")
@@ -73,18 +76,25 @@ export async function generateQuotePdf(
   const existingUrl = quoteAny[pdfColumn] as string | null;
   if (existingUrl) return { ok: true, data: { url: existingUrl } };
 
-  // PDF 생성 Route Handler 호출
-  const response = await fetch(
-    `${process.env.NEXT_PUBLIC_SUPABASE_URL ? process.env.NEXT_PUBLIC_APP_URL ?? "" : ""}/api/pdf/quote`,
-    {
-      method: "POST",
-      headers: { "Content-Type": "application/json" },
-      body: JSON.stringify({ quoteId, audience }),
-    }
-  );
+  // PDF 생성 Route Handler 내부 호출 (쿠키 포워딩으로 인증 유지)
+  const cookieStore = await cookies();
+  const cookieHeader = cookieStore.getAll().map(c => `${c.name}=${c.value}`).join("; ");
+  const appUrl = process.env.NEXT_PUBLIC_APP_URL ?? `http://localhost:${process.env.PORT ?? 3000}`;
+  const response = await fetch(`${appUrl}/api/pdf/quote`, {
+    method: "POST",
+    headers: {
+      "Content-Type": "application/json",
+      "Cookie": cookieHeader,
+    },
+    body: JSON.stringify({ quoteId, audience }),
+  });
 
   if (!response.ok) {
-    return { ok: false, error: "PDF 생성에 실패했습니다" };
+    const errText = await response.text().catch(() => "");
+    const errMsg = errText.startsWith("{")
+      ? (JSON.parse(errText) as { error?: string }).error ?? "PDF 생성 실패"
+      : "PDF 생성에 실패했습니다";
+    return { ok: false, error: errMsg };
   }
 
   const { url } = (await response.json()) as { url: string };

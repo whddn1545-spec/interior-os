@@ -1,47 +1,41 @@
 import "server-only";
-import Anthropic from "@anthropic-ai/sdk";
+import OpenAI from "openai";
 import { createClient } from "@/lib/supabase/server";
 
-// Anthropic 클라이언트 싱글톤
-let _client: Anthropic | null = null;
+let _client: OpenAI | null = null;
 
-function getClient(): Anthropic {
-  if (!process.env.ANTHROPIC_API_KEY) {
-    throw new Error("ANTHROPIC_API_KEY가 설정되지 않았습니다");
+function getClient(): OpenAI {
+  if (!process.env.OPENAI_API_KEY) {
+    throw new Error("OPENAI_API_KEY가 설정되지 않았습니다");
   }
   if (!_client) {
-    _client = new Anthropic({
-      apiKey: process.env.ANTHROPIC_API_KEY,
-    });
+    _client = new OpenAI({ apiKey: process.env.OPENAI_API_KEY });
   }
   return _client;
 }
 
-// 모델별 비용 (per 1M tokens, USD)
-const MODEL_PRICING: Record<
-  string,
-  { inputPerM: number; outputPerM: number }
-> = {
-  "claude-opus-4-8": { inputPerM: 15, outputPerM: 75 },
-  "claude-sonnet-4-6": { inputPerM: 3, outputPerM: 15 },
+const MODEL_PRICING: Record<string, { inputPerM: number; outputPerM: number }> = {
+  "gpt-4o": { inputPerM: 2.5, outputPerM: 10 },
+  "gpt-4o-mini": { inputPerM: 0.15, outputPerM: 0.6 },
 };
 
 export interface GatewayInput {
-  task: string; // 'generate_quote_text' | 'generate_contract' | 'tag_photo'
-  promptVersion: string; // 'v1', 'v2' 등
-  model: "claude-opus-4-8" | "claude-sonnet-4-6";
+  task: string;
+  promptVersion: string;
+  model: string;
   systemPrompt: string;
-  userMessage: string | Anthropic.Messages.MessageParam[];
-  tools?: Anthropic.Messages.Tool[];
+  userMessage: string | OpenAI.Chat.ChatCompletionMessageParam[];
+  tools?: OpenAI.Chat.ChatCompletionTool[];
   maxTokens?: number;
-  tenantId?: string; // ai_invocations 로깅용
+  tenantId?: string;
 }
 
 export interface GatewayOutput {
-  content: Anthropic.Messages.ContentBlock[];
+  toolInputs: Record<string, unknown> | null;
+  textContent: string;
   inputTokens: number;
   outputTokens: number;
-  costUsd: number; // 토큰 기준 추산
+  costUsd: number;
   latencyMs: number;
 }
 
@@ -75,16 +69,9 @@ async function logInvocation(params: {
   }
 }
 
-function calcCost(
-  model: string,
-  inputTokens: number,
-  outputTokens: number
-): number {
+function calcCost(model: string, inputTokens: number, outputTokens: number): number {
   const pricing = MODEL_PRICING[model] ?? { inputPerM: 0, outputPerM: 0 };
-  return (
-    (inputTokens / 1_000_000) * pricing.inputPerM +
-    (outputTokens / 1_000_000) * pricing.outputPerM
-  );
+  return (inputTokens / 1_000_000) * pricing.inputPerM + (outputTokens / 1_000_000) * pricing.outputPerM;
 }
 
 function sleep(ms: number): Promise<void> {
@@ -94,9 +81,8 @@ function sleep(ms: number): Promise<void> {
 export async function invokeAI(input: GatewayInput): Promise<GatewayOutput> {
   const client = getClient();
   const maxRetries = 2;
-  const timeoutMs = 30_000;
 
-  const messages: Anthropic.Messages.MessageParam[] =
+  const messages: OpenAI.Chat.ChatCompletionMessageParam[] =
     typeof input.userMessage === "string"
       ? [{ role: "user", content: input.userMessage }]
       : input.userMessage;
@@ -107,38 +93,35 @@ export async function invokeAI(input: GatewayInput): Promise<GatewayOutput> {
     const startedAt = Date.now();
 
     try {
-      const controller = new AbortController();
-      const timeoutId = setTimeout(() => controller.abort(), timeoutMs);
-
-      let response: Anthropic.Messages.Message;
-      try {
-        const createParams: Anthropic.Messages.MessageCreateParamsNonStreaming =
-          {
-            model: input.model,
-            max_tokens: input.maxTokens ?? 4096,
-            system: input.systemPrompt,
-            messages,
-            ...(input.tools && input.tools.length > 0
-              ? {
-                  tools: input.tools,
-                  tool_choice: { type: "any" } as Anthropic.Messages.ToolChoiceAny,
-                }
-              : {}),
-          };
-
-        response = await client.messages.create(createParams, {
-          signal: controller.signal,
-        });
-      } finally {
-        clearTimeout(timeoutId);
-      }
+      const response = await client.chat.completions.create({
+        model: input.model,
+        max_tokens: input.maxTokens ?? 4096,
+        messages: [{ role: "system", content: input.systemPrompt }, ...messages],
+        ...(input.tools && input.tools.length > 0
+          ? { tools: input.tools, tool_choice: "required" as const }
+          : {}),
+      });
 
       const latencyMs = Date.now() - startedAt;
-      const inputTokens = response.usage.input_tokens;
-      const outputTokens = response.usage.output_tokens;
+      const inputTokens = response.usage?.prompt_tokens ?? 0;
+      const outputTokens = response.usage?.completion_tokens ?? 0;
       const costUsd = calcCost(input.model, inputTokens, outputTokens);
 
-      // 비동기 로깅 (await 하지 않아 본 동작 차단 없음)
+      const message = response.choices[0]?.message;
+      const textContent = message?.content ?? "";
+
+      let toolInputs: Record<string, unknown> | null = null;
+      if (message?.tool_calls && message.tool_calls.length > 0) {
+        try {
+          const tc = message.tool_calls[0] as { function?: { arguments: string } };
+          if (tc.function?.arguments) {
+            toolInputs = JSON.parse(tc.function.arguments) as Record<string, unknown>;
+          }
+        } catch {
+          toolInputs = null;
+        }
+      }
+
       logInvocation({
         tenantId: input.tenantId,
         task: input.task,
@@ -150,26 +133,17 @@ export async function invokeAI(input: GatewayInput): Promise<GatewayOutput> {
         latencyMs,
       }).catch(() => undefined);
 
-      return {
-        content: response.content,
-        inputTokens,
-        outputTokens,
-        costUsd,
-        latencyMs,
-      };
+      return { toolInputs, textContent, inputTokens, outputTokens, costUsd, latencyMs };
     } catch (err) {
       lastError = err;
       const latencyMs = Date.now() - startedAt;
 
       if (attempt < maxRetries) {
-        const waitMs = 500 * Math.pow(2, attempt);
-        await sleep(waitMs);
+        await sleep(500 * Math.pow(2, attempt));
         continue;
       }
 
-      // 마지막 시도 실패 — 로깅 후 throw
-      const errorMessage =
-        err instanceof Error ? err.message : String(err);
+      const errorMessage = err instanceof Error ? err.message : String(err);
       logInvocation({
         tenantId: input.tenantId,
         task: input.task,

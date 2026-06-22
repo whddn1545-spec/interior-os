@@ -1,6 +1,7 @@
 "use server";
 
 import { createClient } from "@/lib/supabase/server";
+import { getTenantId } from "@/lib/supabase/get-tenant";
 import { generateInstagramCaption } from "@/lib/ai/prompts/instagram";
 import { revalidatePath } from "next/cache";
 
@@ -14,7 +15,7 @@ export async function generateCaption(photoId: string): Promise<{
   const { data: { user } } = await supabase.auth.getUser();
   if (!user) return { ok: false, error: "로그인이 필요합니다" };
 
-  const tenantId = user.user_metadata?.tenant_id ?? user.id;
+  const tenantId = await getTenantId(supabase, user);
 
   const { data: photo } = await supabase
     .from("photos")
@@ -53,7 +54,7 @@ export async function createInstagramPost(input: {
   const { data: { user } } = await supabase.auth.getUser();
   if (!user) return { ok: false, error: "로그인이 필요합니다" };
 
-  const tenantId = user.user_metadata?.tenant_id ?? user.id;
+  const tenantId = await getTenantId(supabase, user);
 
   // eslint-disable-next-line @typescript-eslint/no-explicit-any
   const { data, error } = await (supabase.from("instagram_posts") as any).insert({
@@ -76,10 +77,12 @@ export async function confirmInstagramPost(postId: string): Promise<{ ok: boolea
   const { data: { user } } = await supabase.auth.getUser();
   if (!user) return { ok: false, error: "로그인이 필요합니다" };
 
+  // draft 상태인 것만 확정 (이미 confirmed/published면 no-op)
   const { error } = await supabase
     .from("instagram_posts")
-    .update({ status: "confirmed" })
-    .eq("id", postId);
+    .update({ status: "confirmed", confirmed_by: user.id, confirmed_at: new Date().toISOString() })
+    .eq("id", postId)
+    .eq("status", "draft" as const);
 
   if (error) return { ok: false, error: error.message };
 
@@ -108,6 +111,9 @@ export async function publishToInstagram(postId: string): Promise<{ ok: boolean;
   if (!post) return { ok: false, error: "게시물을 찾을 수 없어요" };
 
   const p = post as unknown as Record<string, unknown>;
+  if (p.status === "published") {
+    return { ok: false, error: "이미 발행된 게시물입니다" };
+  }
   if (p.status !== "confirmed") {
     return { ok: false, error: "먼저 게시물을 확정해야 해요" };
   }

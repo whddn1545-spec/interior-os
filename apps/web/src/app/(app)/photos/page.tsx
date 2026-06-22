@@ -5,13 +5,12 @@ import { ChevronRightIcon, CameraIcon } from "lucide-react";
 export default async function PhotosPage() {
   const supabase = await createClient();
 
-  // 현장 목록 (사진 있는 현장 우선)
+  // 현장 목록 전체 (모든 상태)
   const { data: sites } = await supabase
     .from("sites")
     .select("id, name, status, photos(id)")
-    .in("status", ["contracted", "in_progress", "done"])
     .order("created_at", { ascending: false })
-    .limit(30);
+    .limit(50);
 
   return (
     <div className="px-4 pt-6 pb-24">

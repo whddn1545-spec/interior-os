@@ -1,6 +1,8 @@
 "use server";
 
 import { createClient } from "@/lib/supabase/server";
+import { getTenantId } from "@/lib/supabase/get-tenant";
+import { invokeAI } from "@/lib/ai/gateway";
 import { calcQuote } from "@interior-os/core/pricing";
 import { revalidatePath } from "next/cache";
 import type { QuoteItemInput } from "@interior-os/core/pricing";
@@ -12,10 +14,12 @@ export type ActionResult<T = void> =
 /** 고객 검색 */
 export async function searchCustomers(query: string): Promise<ActionResult<{ id: string; name: string; phone: string }[]>> {
   const supabase = await createClient();
+  // ILIKE 와일드카드 문자 이스케이프
+  const escaped = query.replace(/[%_\\]/g, "\\$&");
   const { data, error } = await supabase
     .from("customers")
     .select("id, name, phone")
-    .ilike("name", `%${query}%`)
+    .ilike("name", `%${escaped}%`)
     .limit(10);
 
   if (error) return { ok: false, error: error.message };
@@ -33,13 +37,13 @@ export async function createCustomer(input: {
   } = await supabase.auth.getUser();
   if (!user) return { ok: false, error: "로그인이 필요합니다" };
 
-  // tenant_id는 JWT claim에서 가져옴 (RLS가 처리)
+  const tenantId0 = await getTenantId(supabase, user);
   const { data, error } = await supabase
     .from("customers")
     .insert({
       name: input.name.trim(),
       phone: input.phone.trim(),
-      tenant_id: user.user_metadata.tenant_id ?? user.id,
+      tenant_id: tenantId0,
       grade: "normal" as const,
       source: "etc" as const,
     })
@@ -65,10 +69,11 @@ export async function createSite(input: {
   } = await supabase.auth.getUser();
   if (!user) return { ok: false, error: "로그인이 필요합니다" };
 
+  const tenantId1 = await getTenantId(supabase, user);
   const { data, error } = await supabase
     .from("sites")
     .insert({
-      tenant_id: user.user_metadata.tenant_id ?? user.id,
+      tenant_id: tenantId1,
       customer_id: input.customerId,
       name: input.name.trim(),
       address: input.address.trim(),
@@ -170,7 +175,7 @@ export async function saveQuoteDraft(input: {
   } = await supabase.auth.getUser();
   if (!user) return { ok: false, error: "로그인이 필요합니다" };
 
-  const tenantId = user.user_metadata.tenant_id ?? user.id;
+  const tenantId = await getTenantId(supabase, user);
 
   // 계산은 @core/pricing 순수 함수가 담당
   const calcItems: QuoteItemInput[] = input.items.map((item) => ({
@@ -265,4 +270,50 @@ export async function confirmQuote(quoteId: string): Promise<ActionResult<void>>
   revalidatePath("/quotes");
   revalidatePath("/");
   return { ok: true, data: undefined };
+}
+
+/** AI 견적 검토 (Step 4에서 확정 전 자동 실행) */
+export async function reviewQuoteDraft(input: {
+  items: { description: string; quantity: number; unit: string; lineTotal: number }[];
+  totalAmount: number;
+  areaPyeong: number;
+}): Promise<ActionResult<{ bullets: string[] }>> {
+  const supabase = await createClient();
+  const { data: { user } } = await supabase.auth.getUser();
+  if (!user) return { ok: false, error: "로그인이 필요합니다" };
+
+  const tenantId = await getTenantId(supabase, user);
+  const pricePerPyeong = Math.round(input.totalAmount / input.areaPyeong);
+
+  const itemsText = input.items
+    .map((i) => `- ${i.description}: ${i.quantity}${i.unit} → ${i.lineTotal.toLocaleString("ko-KR")}원`)
+    .join("\n");
+
+  try {
+    const result = await invokeAI({
+      task: "review_quote_draft",
+      promptVersion: "v1",
+      model: "gpt-4o-mini",
+      systemPrompt: `당신은 20년 경력의 한국 인테리어 견적 전문가입니다.
+견적서를 검토하고 2~3개의 짧은 피드백을 한국어로 주세요.
+- 평당 단가가 적정한지 (일반 서울 기준 150~400만원/평)
+- 누락된 중요 공종이 있는지
+- 특이사항이 있으면 지적
+각 피드백은 20자 이내로 간결하게.`,
+      userMessage: `총액: ${input.totalAmount.toLocaleString("ko-KR")}원 (평당 ${pricePerPyeong.toLocaleString("ko-KR")}원, ${input.areaPyeong}평)\n\n항목:\n${itemsText}`,
+      maxTokens: 256,
+      tenantId,
+    });
+
+    const raw = result.textContent.trim();
+    const bullets = raw
+      .split(/\n/)
+      .map((line) => line.replace(/^[-•*\d.]+\s*/, "").trim())
+      .filter((line) => line.length > 0)
+      .slice(0, 3);
+
+    return { ok: true, data: { bullets } };
+  } catch {
+    return { ok: true, data: { bullets: [] } };
+  }
 }

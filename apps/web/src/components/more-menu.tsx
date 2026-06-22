@@ -9,6 +9,7 @@ import {
   ImageIcon,
   CalculatorIcon,
   SparklesIcon,
+  SettingsIcon,
   MoreHorizontalIcon,
   XIcon,
 } from "lucide-react";
@@ -20,6 +21,7 @@ const items = [
   { href: "/instagram", label: "인스타", icon: ImageIcon },
   { href: "/materials", label: "자재산출", icon: CalculatorIcon },
   { href: "/moodboard", label: "무드보드", icon: SparklesIcon },
+  { href: "/settings", label: "설정", icon: SettingsIcon },
 ];
 
 export function MoreMenu() {

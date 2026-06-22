@@ -151,8 +151,8 @@ export function QuoteWizard() {
       {step === 2 && state.customer && (
         <Step2Site
           customerId={state.customer.id}
-          onNext={(siteId, distanceFactor, difficultyFactor) =>
-            goToStep(3, { siteId, distanceFactor, difficultyFactor })
+          onNext={(siteId, distanceFactor, difficultyFactor, areaPyeong) =>
+            goToStep(3, { siteId, distanceFactor, difficultyFactor, areaPyeong })
           }
           onBack={() => goToStep(1)}
         />
@@ -174,6 +174,7 @@ export function QuoteWizard() {
           items={state.items}
           distanceFactor={state.distanceFactor ?? 1.0}
           difficultyFactor={state.difficultyFactor ?? 1.1}
+          areaPyeong={state.areaPyeong ?? 33}
           onConfirmed={(quoteId, total) => goToStep(5, { quoteId, total })}
           onBack={() => goToStep(3)}
         />

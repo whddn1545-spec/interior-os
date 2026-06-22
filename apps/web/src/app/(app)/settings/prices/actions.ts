@@ -1,6 +1,7 @@
 "use server";
 
 import { createClient } from "@/lib/supabase/server";
+import { getTenantId } from "@/lib/supabase/get-tenant";
 import { revalidatePath } from "next/cache";
 import type { ActionResult } from "../../quotes/new/actions";
 
@@ -17,7 +18,7 @@ export async function upsertTradePrice(input: {
   const { data: { user } } = await supabase.auth.getUser();
   if (!user) return { ok: false, error: "로그인이 필요합니다" };
 
-  const tenantId = user.user_metadata.tenant_id ?? user.id;
+  const tenantId = await getTenantId(supabase, user);
 
   const { data, error } = await supabase
     .from("trade_prices")
@@ -59,7 +60,7 @@ export async function seedDefaultPrices(): Promise<ActionResult<{ count: number 
   const { data: { user } } = await supabase.auth.getUser();
   if (!user) return { ok: false, error: "로그인이 필요합니다" };
 
-  const tenantId = user.user_metadata.tenant_id ?? user.id;
+  const tenantId = await getTenantId(supabase, user);
 
   // 공종 목록 가져오기
   const { data: trades } = await supabase.from("trades").select("id, code");

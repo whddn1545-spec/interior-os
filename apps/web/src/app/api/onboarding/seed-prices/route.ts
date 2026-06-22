@@ -1,5 +1,6 @@
 import { NextResponse } from "next/server";
 import { createClient } from "@/lib/supabase/server";
+import { getTenantId } from "@/lib/supabase/get-tenant";
 import { SEED_PRICES } from "@interior-os/core/pricing";
 
 export async function POST() {
@@ -8,7 +9,7 @@ export async function POST() {
     const { data: { user } } = await supabase.auth.getUser();
     if (!user) return NextResponse.json({ error: "인증이 필요합니다" }, { status: 401 });
 
-    const tenantId = user.user_metadata?.tenant_id ?? user.id;
+    const tenantId = await getTenantId(supabase, user);
 
     const { data: trades } = await supabase.from("trades").select("id, code");
     if (!trades) return NextResponse.json({ error: "공종 목록 조회 실패" }, { status: 500 });

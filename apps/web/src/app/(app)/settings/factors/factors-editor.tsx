@@ -25,6 +25,9 @@ export function FactorsEditor({ zones }: { zones: Zone[] }) {
   const [editing, setEditing] = useState<string | null>(null);
   const [editFactor, setEditFactor] = useState("");
   const [success, setSuccess] = useState<string | null>(null);
+  const [adding, setAdding] = useState(false);
+  const [newName, setNewName] = useState("");
+  const [newFactor, setNewFactor] = useState("1.00");
 
   function startEdit(zone: Zone) {
     setEditing(zone.id);
@@ -43,18 +46,75 @@ export function FactorsEditor({ zones }: { zones: Zone[] }) {
     });
   }
 
+  function addZone() {
+    const factor = parseFloat(newFactor);
+    if (!newName.trim() || isNaN(factor) || factor < 1 || factor > 3) return;
+    startTransition(async () => {
+      await upsertDistanceZone({ name: newName.trim(), distanceFactor: factor });
+      setAdding(false);
+      setNewName("");
+      setNewFactor("1.00");
+      setSuccess("구역을 추가했어요");
+      setTimeout(() => setSuccess(null), 2000);
+    });
+  }
+
   return (
     <div className="space-y-6">
       {/* 거리 계수 */}
       <div className="bg-white rounded-2xl border border-gray-200 overflow-hidden">
-        <div className="px-4 py-4 border-b border-gray-100">
-          <h2 className="text-lg font-bold text-gray-900">거리 계수</h2>
-          <p className="text-sm text-gray-500">현장까지 거리에 따라 견적 금액에 곱해지는 계수</p>
+        <div className="px-4 py-4 border-b border-gray-100 flex items-center justify-between">
+          <div>
+            <h2 className="text-lg font-bold text-gray-900">거리 계수</h2>
+            <p className="text-sm text-gray-500">현장까지 거리에 따라 견적 금액에 곱해지는 계수</p>
+          </div>
+          <button
+            onClick={() => setAdding(true)}
+            className="text-sm font-medium text-blue-600 px-3 py-2 rounded-xl hover:bg-blue-50"
+          >
+            + 구역 추가
+          </button>
         </div>
 
-        {zones.length === 0 ? (
+        {adding && (
+          <div className="px-4 py-4 border-b border-gray-100 bg-blue-50">
+            <p className="text-sm font-semibold text-gray-700 mb-3">새 거리 구역</p>
+            <div className="flex gap-2 mb-2">
+              <input
+                type="text"
+                value={newName}
+                onChange={(e) => setNewName(e.target.value)}
+                placeholder="예: 가까운 곳 (30분 이내)"
+                className="flex-1 border border-gray-300 rounded-xl px-3 py-2 text-sm focus:outline-none focus:border-blue-400"
+              />
+            </div>
+            <div className="flex gap-2 items-center">
+              <span className="text-sm text-gray-600">계수:</span>
+              <input
+                type="number"
+                value={newFactor}
+                onChange={(e) => setNewFactor(e.target.value)}
+                step="0.05"
+                min="1"
+                max="3"
+                className="w-24 border border-gray-300 rounded-xl px-3 py-2 text-sm focus:outline-none focus:border-blue-400"
+              />
+              <button
+                onClick={addZone}
+                disabled={isPending}
+                className="bg-blue-600 text-white px-4 py-2 rounded-xl text-sm font-medium disabled:opacity-50"
+              >
+                추가
+              </button>
+              <button onClick={() => setAdding(false)} className="text-gray-500 text-sm px-2">취소</button>
+            </div>
+          </div>
+        )}
+
+        {zones.length === 0 && !adding ? (
           <div className="px-4 py-6 text-center text-gray-400">
-            <p>거리 구역을 먼저 설정해주세요</p>
+            <p className="mb-2">거리 구역이 없어요</p>
+            <button onClick={() => setAdding(true)} className="text-blue-600 text-sm font-medium">+ 구역 추가하기</button>
           </div>
         ) : (
           <ul className="divide-y divide-gray-100">

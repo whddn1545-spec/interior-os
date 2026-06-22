@@ -1,7 +1,7 @@
 "use client";
 
 import { useState, useRef, useTransition } from "react";
-import { CameraIcon, UploadIcon } from "lucide-react";
+import { CameraIcon, ImageIcon, UploadIcon } from "lucide-react";
 import { uploadAndTagPhoto } from "./actions";
 
 interface PhotoUploaderProps {
@@ -9,7 +9,8 @@ interface PhotoUploaderProps {
 }
 
 export function PhotoUploader({ siteId }: PhotoUploaderProps) {
-  const fileInputRef = useRef<HTMLInputElement>(null);
+  const cameraInputRef = useRef<HTMLInputElement>(null);
+  const galleryInputRef = useRef<HTMLInputElement>(null);
   const [isPending, startTransition] = useTransition();
   const [status, setStatus] = useState<string | null>(null);
   const [error, setError] = useState<string | null>(null);
@@ -39,39 +40,55 @@ export function PhotoUploader({ siteId }: PhotoUploaderProps) {
 
       setStatus(`${successCount}장 업로드 완료 (AI 분석 중...)`);
       setTimeout(() => setStatus(null), 3000);
-      if (fileInputRef.current) fileInputRef.current.value = "";
+      if (cameraInputRef.current) cameraInputRef.current.value = "";
+      if (galleryInputRef.current) galleryInputRef.current.value = "";
     });
   }
 
   return (
     <div>
+      {/* 카메라 전용 input */}
       <input
-        ref={fileInputRef}
+        ref={cameraInputRef}
+        type="file"
+        accept="image/*"
+        capture="environment"
+        className="hidden"
+        onChange={handleFileChange}
+      />
+      {/* 갤러리 전용 input (multiple) */}
+      <input
+        ref={galleryInputRef}
         type="file"
         accept="image/*"
         multiple
         className="hidden"
         onChange={handleFileChange}
-        capture="environment"
       />
 
-      <button
-        onClick={() => fileInputRef.current?.click()}
-        disabled={isPending}
-        className="w-full flex items-center justify-center gap-3 bg-blue-50 border-2 border-dashed border-blue-300 rounded-2xl py-8 text-blue-600 font-semibold text-lg disabled:opacity-50"
-      >
-        {isPending ? (
-          <>
-            <UploadIcon size={28} className="animate-bounce" />
-            {status ?? "업로드 중..."}
-          </>
-        ) : (
-          <>
+      {isPending ? (
+        <div className="w-full flex items-center justify-center gap-3 bg-blue-50 border-2 border-dashed border-blue-300 rounded-2xl py-8 text-blue-600 font-semibold text-lg">
+          <UploadIcon size={28} className="animate-bounce" />
+          {status ?? "업로드 중..."}
+        </div>
+      ) : (
+        <div className="grid grid-cols-2 gap-3">
+          <button
+            onClick={() => cameraInputRef.current?.click()}
+            className="flex flex-col items-center gap-2 bg-blue-50 border-2 border-dashed border-blue-300 rounded-2xl py-6 text-blue-600 font-semibold"
+          >
             <CameraIcon size={28} />
-            사진 올리기 (AI 자동 분류)
-          </>
-        )}
-      </button>
+            <span className="text-base">카메라 촬영</span>
+          </button>
+          <button
+            onClick={() => galleryInputRef.current?.click()}
+            className="flex flex-col items-center gap-2 bg-gray-50 border-2 border-dashed border-gray-300 rounded-2xl py-6 text-gray-600 font-semibold"
+          >
+            <ImageIcon size={28} />
+            <span className="text-base">사진첩 선택</span>
+          </button>
+        </div>
+      )}
 
       {error && (
         <div className="mt-2 bg-red-50 border border-red-200 rounded-xl px-4 py-2 text-red-700 text-sm">

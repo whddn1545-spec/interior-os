@@ -1,6 +1,7 @@
 "use server";
 
 import { createClient } from "@/lib/supabase/server";
+import { getTenantId } from "@/lib/supabase/get-tenant";
 import { revalidatePath } from "next/cache";
 import { calcSchedule, offsetToDate } from "@interior-os/core/pricing";
 import type { ScheduleItemInput } from "@interior-os/core/pricing";
@@ -16,7 +17,7 @@ export async function generateScheduleFromQuote(
   const { data: { user } } = await supabase.auth.getUser();
   if (!user) return { ok: false, error: "로그인이 필요합니다" };
 
-  const tenantId = user.user_metadata.tenant_id ?? user.id;
+  const tenantId = await getTenantId(supabase, user);
 
   // 견적 항목 + 공종 정보 가져오기
   const { data: items } = await supabase
@@ -101,8 +102,12 @@ export async function generateScheduleFromQuote(
   const scheduledResults = calcSchedule(scheduleInputs);
   const start = new Date(startDate);
 
-  // 기존 일정 삭제 후 재생성
-  await supabase.from("schedule_tasks").delete().eq("site_id", siteId);
+  // 진행 중/완료 작업은 보존하고 planned만 삭제 (데이터 손실 방지)
+  await supabase
+    .from("schedule_tasks")
+    .delete()
+    .eq("site_id", siteId)
+    .eq("status", "planned" as const);
 
   const tasksToInsert = scheduledResults.map((r) => ({
     tenant_id: tenantId,
@@ -165,7 +170,7 @@ export async function assignWorker(
   const { data: { user } } = await supabase.auth.getUser();
   if (!user) return { ok: false, error: "로그인이 필요합니다" };
 
-  const tenantId = (user.user_metadata?.tenant_id ?? user.id) as string;
+  const tenantId = await getTenantId(supabase, user);
 
   // trade_id가 없으면 배정 불가 (assignments.trade_id NOT NULL)
   if (!tradeId) return { ok: false, error: "공종 정보가 없어 배정할 수 없어요" };

@@ -1,24 +1,27 @@
 "use client";
 
-import { useState, useTransition } from "react";
+import { useState, useTransition, useEffect } from "react";
 import { calcQuote, formatKRW } from "@interior-os/core/pricing";
-import { saveQuoteDraft, confirmQuote } from "../actions";
+import { saveQuoteDraft, confirmQuote, reviewQuoteDraft } from "../actions";
 import type { QuoteItemDraft } from "../actions";
-import { AlertTriangleIcon } from "lucide-react";
+import { AlertTriangleIcon, SparklesIcon } from "lucide-react";
 
 interface Props {
   siteId: string;
   items: QuoteItemDraft[];
   distanceFactor: number;
   difficultyFactor: number;
+  areaPyeong: number;
   onConfirmed: (quoteId: string, total: number) => void;
   onBack: () => void;
 }
 
-export function Step4Review({ siteId, items, distanceFactor, difficultyFactor, onConfirmed, onBack }: Props) {
+export function Step4Review({ siteId, items, distanceFactor, difficultyFactor, areaPyeong, onConfirmed, onBack }: Props) {
   const [showConfirmDialog, setShowConfirmDialog] = useState(false);
   const [isPending, startTransition] = useTransition();
   const [error, setError] = useState<string | null>(null);
+  const [aiBullets, setAiBullets] = useState<string[] | null>(null);
+  const [aiLoading, setAiLoading] = useState(true);
 
   const result = calcQuote({ items: items.map(item => ({
     tradeId: item.tradeId,
@@ -33,9 +36,28 @@ export function Step4Review({ siteId, items, distanceFactor, difficultyFactor, o
     overrideLaborDays: item.overrideLaborDays,
   })), distanceFactor, difficultyFactor });
 
+  useEffect(() => {
+    reviewQuoteDraft({
+      items: result.items.map((i) => ({
+        description: i.description,
+        quantity: i.quantity,
+        unit: i.unit,
+        lineTotal: i.lineTotal,
+      })),
+      totalAmount: result.total,
+      areaPyeong,
+    }).then((res) => {
+      setAiBullets(res.ok ? res.data.bullets : []);
+      setAiLoading(false);
+    }).catch(() => {
+      setAiBullets([]);
+      setAiLoading(false);
+    });
+  // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, []);
+
   function handleConfirm() {
     startTransition(async () => {
-      // 1. draft 저장
       const saveRes = await saveQuoteDraft({
         siteId,
         items,
@@ -48,7 +70,6 @@ export function Step4Review({ siteId, items, distanceFactor, difficultyFactor, o
         return;
       }
 
-      // 2. 확정 (Human-in-the-loop gate)
       const confirmRes = await confirmQuote(saveRes.data.quoteId);
       if (!confirmRes.ok) {
         setError(confirmRes.error);
@@ -64,6 +85,27 @@ export function Step4Review({ siteId, items, distanceFactor, difficultyFactor, o
     <div className="px-4 pt-6">
       <h2 className="text-2xl font-bold text-gray-900 mb-2">견적 확인</h2>
       <p className="text-lg text-gray-500 mb-6">금액을 확인하고 확정하세요</p>
+
+      {/* AI 검토 패널 */}
+      <div className="bg-blue-50 border border-blue-200 rounded-xl p-4 mb-4">
+        <div className="flex items-center gap-2 mb-2">
+          <SparklesIcon size={16} className="text-blue-600" />
+          <span className="text-sm font-semibold text-blue-700">AI 견적 검토</span>
+        </div>
+        {aiLoading ? (
+          <p className="text-sm text-blue-500 animate-pulse">분석 중...</p>
+        ) : aiBullets && aiBullets.length > 0 ? (
+          <ul className="space-y-1">
+            {aiBullets.map((b, i) => (
+              <li key={i} className="text-sm text-blue-800 flex gap-1.5">
+                <span className="text-blue-400 shrink-0">·</span>{b}
+              </li>
+            ))}
+          </ul>
+        ) : (
+          <p className="text-sm text-blue-600">특이사항 없음</p>
+        )}
+      </div>
 
       {/* 항목별 내역 */}
       <div className="bg-white border border-gray-200 rounded-xl overflow-hidden mb-4">
@@ -129,7 +171,6 @@ export function Step4Review({ siteId, items, distanceFactor, difficultyFactor, o
         </button>
       </div>
 
-      {/* 확정 확인 다이얼로그 */}
       {showConfirmDialog && (
         <div className="fixed inset-0 bg-black/50 z-50 flex items-end sm:items-center justify-center p-4">
           <div className="bg-white rounded-2xl p-6 w-full max-w-sm">

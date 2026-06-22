@@ -12,7 +12,7 @@ interface DistanceZone {
 
 interface Props {
   customerId: string;
-  onNext: (siteId: string, distanceFactor: number, difficultyFactor: number) => void;
+  onNext: (siteId: string, distanceFactor: number, difficultyFactor: number, areaPyeong: number) => void;
   onBack: () => void;
 }
 
@@ -67,7 +67,7 @@ export function Step2Site({ customerId, onNext, onBack }: Props) {
         setError(res.error);
         return;
       }
-      onNext(res.data.id, distanceFactor, difficultyFactor);
+      onNext(res.data.id, distanceFactor, difficultyFactor, area);
     });
   }
 

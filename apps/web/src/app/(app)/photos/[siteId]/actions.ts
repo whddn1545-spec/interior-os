@@ -16,10 +16,12 @@ export async function uploadAndTagPhoto(
 
   if (!file || !siteId) return { ok: false, error: "파일과 현장 ID가 필요합니다" };
 
-  const tenantId = user.user_metadata?.tenant_id ?? user.id as string;
+  const tenantId = (user.user_metadata?.tenant_id as string | undefined)
+    ?? (await supabase.from("users").select("tenant_id").eq("id", user.id).single()).data?.tenant_id
+    ?? user.id;
 
   const ext = file.name.split(".").pop() ?? "jpg";
-  const storagePath = `sites/${siteId}/${Date.now()}.${ext}`;
+  const storagePath = `${tenantId}/sites/${siteId}/${Date.now()}.${ext}`;
   const bytes = await file.arrayBuffer();
 
   const { error: uploadError } = await supabase.storage

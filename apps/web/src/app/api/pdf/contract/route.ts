@@ -18,6 +18,10 @@ export async function POST(request: Request) {
     const { data: { user } } = await supabase.auth.getUser();
     if (!user) return NextResponse.json({ error: "인증이 필요합니다" }, { status: 401 });
 
+    const tenantId = (user.user_metadata?.tenant_id as string | undefined)
+      ?? (await supabase.from("users").select("tenant_id").eq("id", user.id).single()).data?.tenant_id
+      ?? user.id;
+
     const { data: contract } = await supabase
       .from("contracts")
       .select("*, quotes(*, sites(name, address, area_pyeong, customers(name, phone)), quote_items(*, trades(name_ko)))")
@@ -32,9 +36,9 @@ export async function POST(request: Request) {
       React.createElement(ContractPdfDocument, { contract: c }) as unknown as ReactElement<DocumentProps>
     );
 
-    const fileName = `contracts/${contractId}/contract_${Date.now()}.pdf`;
+    const fileName = `${tenantId}/contracts/${contractId}/contract_${Date.now()}.pdf`;
     const { error: uploadError } = await supabase.storage
-      .from("documents")
+      .from("pdfs")
       .upload(fileName, pdfBuffer, {
         contentType: "application/pdf",
         upsert: true,
@@ -44,12 +48,17 @@ export async function POST(request: Request) {
       return NextResponse.json({ error: uploadError.message }, { status: 500 });
     }
 
-    const { data: { publicUrl } } = supabase.storage.from("documents").getPublicUrl(fileName);
+    const { data: signedData, error: signErr } = await supabase.storage
+      .from("pdfs")
+      .createSignedUrl(fileName, 60 * 60);
 
-    // 계약서 URL 업데이트
-    await supabase.from("contracts").update({ pdf_url: publicUrl }).eq("id", contractId);
+    if (signErr || !signedData?.signedUrl) {
+      return NextResponse.json({ error: "서명 URL 생성 실패" }, { status: 500 });
+    }
 
-    return NextResponse.json({ url: publicUrl });
+    await supabase.from("contracts").update({ pdf_url: signedData.signedUrl }).eq("id", contractId);
+
+    return NextResponse.json({ url: signedData.signedUrl });
   } catch (err) {
     console.error("Contract PDF generation error:", err);
     return NextResponse.json({ error: "PDF 생성 오류" }, { status: 500 });

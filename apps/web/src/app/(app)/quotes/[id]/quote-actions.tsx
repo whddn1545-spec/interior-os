@@ -2,7 +2,7 @@
 
 import { useState, useTransition } from "react";
 import { useRouter } from "next/navigation";
-import { CheckCircleIcon, RotateCcwIcon, FileTextIcon, MessageSquareIcon, FileSignatureIcon } from "lucide-react";
+import { CheckCircleIcon, RotateCcwIcon, FileTextIcon, MessageSquareIcon, FileSignatureIcon, Share2Icon } from "lucide-react";
 import { confirmQuote } from "../new/actions";
 import { revertQuoteToDraft, generateQuotePdf, createContractFromQuote } from "./actions";
 import { formatKRW } from "@interior-os/core/pricing";
@@ -24,6 +24,7 @@ export function QuoteActions({ quoteId, status, siteId, totalAmount }: Props) {
   const [interimRate, setInterimRate] = useState(40);
   const [specialTerms, setSpecialTerms] = useState("");
   const [generatingPdf, setGeneratingPdf] = useState<"customer" | "internal" | null>(null);
+  const [pdfUrl, setPdfUrl] = useState<string | null>(null);
 
   function handleConfirm() {
     startTransition(async () => {
@@ -53,8 +54,23 @@ export function QuoteActions({ quoteId, status, siteId, totalAmount }: Props) {
     if (!result.ok) {
       setError(result.error);
     } else {
+      setPdfUrl(result.data.url);
       window.open(result.data.url, "_blank");
       router.refresh();
+    }
+  }
+
+  async function handleShare() {
+    if (!pdfUrl) return;
+    try {
+      if (navigator.share) {
+        await navigator.share({ title: "견적서", text: "인테리어 견적서를 확인해주세요", url: pdfUrl });
+      } else {
+        await navigator.clipboard.writeText(pdfUrl);
+        alert("링크가 복사되었어요");
+      }
+    } catch {
+      // 사용자가 공유 취소한 경우 무시
     }
   }
 
@@ -120,6 +136,15 @@ export function QuoteActions({ quoteId, status, siteId, totalAmount }: Props) {
             <FileTextIcon size={22} />
             {generatingPdf === "customer" ? "PDF 생성 중..." : "고객용 견적서 PDF"}
           </button>
+          {pdfUrl && (
+            <button
+              onClick={handleShare}
+              className="flex items-center justify-center gap-2 w-full bg-blue-50 text-blue-700 border border-blue-200 rounded-2xl py-4 text-lg font-semibold"
+            >
+              <Share2Icon size={20} />
+              PDF 링크 공유하기
+            </button>
+          )}
           <button
             onClick={() => handleGeneratePdf("internal")}
             disabled={generatingPdf !== null}

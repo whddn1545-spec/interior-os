@@ -7,31 +7,33 @@ export default async function HomePage() {
 
   const { data: { user } } = await supabase.auth.getUser();
 
-  // 진행 중인 현장
-  const { data: activeSites } = await supabase
-    .from("sites")
-    .select("id, name, address, status, start_date, end_date")
-    .in("status", ["contracted", "in_progress"])
-    .order("start_date", { ascending: true })
-    .limit(5);
-
-  // 확인 대기 견적 (draft 상태)
-  const { data: draftQuotes } = await supabase
-    .from("quotes")
-    .select("id, version, total_amount, created_at, sites(name)")
-    .eq("status", "draft")
-    .order("created_at", { ascending: false })
-    .limit(5);
-
-  // 오늘 일정 있는 현장
   const today = new Date().toISOString().split("T")[0];
-  const { data: todayTasks } = await supabase
-    .from("schedule_tasks")
-    .select("id, title, site_id, sites(name), trades(name_ko)")
-    .eq("status", "active")
-    .lte("start_date", today)
-    .gte("end_date", today)
-    .limit(10);
+
+  const [
+    { data: activeSites },
+    { data: draftQuotes },
+    { data: todayTasks },
+  ] = await Promise.all([
+    supabase
+      .from("sites")
+      .select("id, name, address, status, start_date, end_date")
+      .in("status", ["contracted", "in_progress"])
+      .order("start_date", { ascending: true })
+      .limit(5),
+    supabase
+      .from("quotes")
+      .select("id, version, total_amount, created_at, sites(name)")
+      .eq("status", "draft")
+      .order("created_at", { ascending: false })
+      .limit(5),
+    supabase
+      .from("schedule_tasks")
+      .select("id, title, site_id, sites(name), trades(name_ko)")
+      .eq("status", "active")
+      .lte("start_date", today)
+      .gte("end_date", today)
+      .limit(10),
+  ]);
 
   const displayName = user?.user_metadata?.display_name ?? user?.email?.split("@")[0] ?? "사장님";
 

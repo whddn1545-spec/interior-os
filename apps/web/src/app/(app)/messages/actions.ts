@@ -1,6 +1,7 @@
 "use server";
 
 import { createClient } from "@/lib/supabase/server";
+import { getTenantId } from "@/lib/supabase/get-tenant";
 import { revalidatePath } from "next/cache";
 import type { ActionResult } from "../quotes/new/actions";
 
@@ -118,7 +119,7 @@ export async function sendMessage(input: {
   const { data: { user } } = await supabase.auth.getUser();
   if (!user) return { ok: false, error: "로그인이 필요합니다" };
 
-  const tenantId = user.user_metadata.tenant_id ?? user.id;
+  const tenantId = await getTenantId(supabase, user);
 
   // 중복 발송 확인
   const { data: existing } = await supabase

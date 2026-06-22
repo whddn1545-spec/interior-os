@@ -1,6 +1,7 @@
 import { NextRequest, NextResponse } from "next/server";
 import { createClient } from "@/lib/supabase/server";
 import { createAdminClient } from "@/lib/supabase/admin";
+import { getTenantId } from "@/lib/supabase/get-tenant";
 
 const TOSS_CLIENT_KEY = process.env.NEXT_PUBLIC_TOSS_CLIENT_KEY ?? "";
 
@@ -35,7 +36,7 @@ export async function POST(req: NextRequest) {
   }
 
   const orderId = `order_${user.id}_${planId}_${Date.now()}`;
-  const tenantId = (user.user_metadata?.tenant_id as string) ?? user.id;
+  const tenantId = await getTenantId(supabase, user);
 
   // 결제 시도 기록 (멱등성 + success 라우트에서 planId/amount 검증용)
   const admin = createAdminClient();
