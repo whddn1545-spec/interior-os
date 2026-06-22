@@ -2,10 +2,14 @@
   "name": "interior-os",
   "private": true,
   "scripts": {
+    "setup": "bash scripts/setup.sh",
     "build": "turbo build",
     "dev": "turbo dev",
     "lint": "turbo lint",
     "typecheck": "turbo typecheck"
+  },
+  "dependencies": {
+    "next": "16.2.9"
   },
   "devDependencies": {
     "turbo": "^2.5.4"
