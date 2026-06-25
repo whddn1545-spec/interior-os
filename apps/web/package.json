@@ -9,7 +9,6 @@
     "lint": "eslint"
   },
   "dependencies": {
-    "@anthropic-ai/sdk": "^0.105.0",
     "@base-ui/react": "^1.5.0",
     "@interior-os/core": "workspace:*",
     "@interior-os/db": "workspace:*",
@@ -22,6 +21,7 @@
     "next": "16.2.9",
     "next-pwa": "^5.6.0",
     "next-themes": "^0.4.6",
+    "openai": "^6.44.0",
     "react": "19.2.4",
     "react-dom": "19.2.4",
     "shadcn": "^4.11.0",

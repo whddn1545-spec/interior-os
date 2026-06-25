@@ -100,7 +100,7 @@ export function Step2Site({ customerId, onNext, onBack }: Props) {
         </div>
 
         <div>
-          <label className="block text-lg font-medium text-gray-700 mb-1">면적 (평)</label>
+          <label className="block text-lg font-medium text-gray-700 mb-1">면적</label>
           <div className="relative">
             <input
               type="number"
@@ -113,6 +113,11 @@ export function Step2Site({ customerId, onNext, onBack }: Props) {
             />
             <span className="absolute right-4 top-1/2 -translate-y-1/2 text-lg text-gray-500">평</span>
           </div>
+          {areaPyeong && !isNaN(parseFloat(areaPyeong)) && parseFloat(areaPyeong) > 0 && (
+            <p className="text-sm text-gray-400 mt-1 ml-1">
+              ≈ {(parseFloat(areaPyeong) * 3.305785).toFixed(1)} ㎡
+            </p>
+          )}
         </div>
 
         {/* 거리 구역 */}

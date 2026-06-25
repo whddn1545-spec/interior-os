@@ -52,10 +52,10 @@ export async function POST(request: Request) {
       return NextResponse.json({ error: uploadError.message }, { status: 500 });
     }
 
-    // PDF는 서명 URL (1시간 유효)
+    // PDF 서명 URL (7일 유효 — 고객 공유용)
     const { data: signedData, error: signErr } = await supabase.storage
       .from("pdfs")
-      .createSignedUrl(fileName, 60 * 60);
+      .createSignedUrl(fileName, 60 * 60 * 24 * 7);
 
     if (signErr || !signedData?.signedUrl) {
       return NextResponse.json({ error: "서명 URL 생성 실패" }, { status: 500 });

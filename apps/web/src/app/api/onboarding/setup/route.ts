@@ -63,7 +63,20 @@ export async function POST(request: Request) {
       return NextResponse.json({ error: userError.message }, { status: 500 });
     }
 
-    // 3) onboarding 완료 표시 (proxy에서 게이트 체크용)
+    // 3) 기본 거리구역 시드 (이미 있으면 skip)
+    const { count } = await admin
+      .from("distance_zones")
+      .select("id", { count: "exact", head: true })
+      .eq("tenant_id", tenantId);
+    if (!count || count === 0) {
+      await admin.from("distance_zones").insert([
+        { tenant_id: tenantId, name: "근거리 (30분 이내)", distance_factor: 1.0 },
+        { tenant_id: tenantId, name: "중거리 (1시간 이내)", distance_factor: 1.1 },
+        { tenant_id: tenantId, name: "원거리 (1시간 초과)", distance_factor: 1.2 },
+      ]);
+    }
+
+    // 4) onboarding 완료 표시 (proxy에서 게이트 체크용)
     await admin.auth.admin.updateUserById(user.id, {
       user_metadata: { ...user.user_metadata, onboarded: true, tenant_id: tenantId },
     });

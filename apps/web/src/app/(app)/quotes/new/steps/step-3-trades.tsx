@@ -54,7 +54,10 @@ export function Step3Trades({ distanceFactor, difficultyFactor, defaultAreaPyeon
     if (next.has(price.tradeId + price.itemName)) {
       next.delete(price.tradeId + price.itemName);
     } else {
-      const defaultQty = price.unit === "day" ? "1" : String(defaultAreaPyeong);
+      let defaultQty: string;
+      if (price.unit === "day") defaultQty = "1";
+      else if (price.unit === "m2") defaultQty = (defaultAreaPyeong * 3.305785).toFixed(1);
+      else defaultQty = String(defaultAreaPyeong);
       next.set(price.tradeId + price.itemName, { price, quantity: defaultQty });
     }
     setSelected(next);
