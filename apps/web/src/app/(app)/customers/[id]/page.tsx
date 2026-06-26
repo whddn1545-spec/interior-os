@@ -112,7 +112,7 @@ export default async function CustomerDetailPage({ params }: { params: Promise<{
           {!sites || sites.length === 0 ? (
             <div className="bg-white rounded-2xl p-6 text-center text-gray-400 border border-gray-100">
               <p className="text-lg">아직 현장이 없어요</p>
-              <Link href={`/quotes/new`} className="mt-2 inline-block text-blue-600">새 견적 만들기 →</Link>
+              <Link href={`/quotes/new?customerId=${id}`} className="mt-2 inline-block text-base text-blue-600">새 견적 만들기 →</Link>
             </div>
           ) : (
             <div className="space-y-2">
@@ -128,10 +128,11 @@ export default async function CustomerDetailPage({ params }: { params: Promise<{
                   >
                     <div className="flex-1 min-w-0">
                       <p className="text-base font-semibold text-gray-900 truncate">{sAny.name as string}</p>
-                      <p className="text-sm text-gray-500">
+                      <p className="text-base text-gray-500">
                         {STATUS_LABEL[sAny.status as string] ?? sAny.status as string}
                         {totalRevenue > 0 ? ` · ${totalRevenue.toLocaleString("ko-KR")}원` : ""}
                       </p>
+                      <p className="text-sm text-blue-600 mt-0.5">현장 정보 · 견적 · 사진 보기</p>
                     </div>
                     <ChevronRightIcon size={18} className="text-gray-300 shrink-0" />
                   </Link>

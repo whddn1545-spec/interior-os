@@ -4,6 +4,7 @@ import {
   getCurrentMonth,
   getCurrentMonthLabel,
 } from "./actions";
+import Link from "next/link";
 import { WorkerCard } from "./worker-card";
 import { HelpButton } from "@/components/tutorial/HelpButton";
 
@@ -43,9 +44,15 @@ export default async function WorkerAttendancePage() {
       )}
 
       {workers.length === 0 ? (
-        <div className="py-16 text-center text-gray-400">
+        <div className="px-4 py-16 text-center text-gray-400">
           <p className="mb-2 text-xl">등록된 작업자가 없어요</p>
           <p className="text-base">작업자를 추가하면 출역을 기록할 수 있어요</p>
+          <Link
+            href="/workers/new"
+            className="mt-4 inline-flex min-h-[56px] items-center justify-center rounded-xl bg-orange-600 px-6 py-4 text-base font-bold text-white hover:bg-orange-700"
+          >
+            작업자 추가하기 →
+          </Link>
         </div>
       ) : (
         <ul className="space-y-3">

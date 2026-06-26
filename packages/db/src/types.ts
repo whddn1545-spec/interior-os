@@ -142,6 +142,19 @@ export type PaymentRecordRow = {
   status: "pending" | "confirmed" | "failed";
   created_at: string; updated_at: string;
 };
+export type PaymentScheduleRow = {
+  id: string; tenant_id: string; site_id: string; quote_id: string | null;
+  stage: "deposit" | "midterm" | "balance"; stage_label: string;
+  amount: number; due_date: string | null;
+  paid_at: string | null; paid_amount: number | null; memo: string | null;
+  created_at: string; updated_at: string;
+};
+// NOTE: worker_attendance에는 updated_at 컬럼이 없음 (마이그레이션 005 기준)
+export type WorkerAttendanceRow = {
+  id: string; tenant_id: string; worker_id: string; site_id: string;
+  work_date: string; day_rate: number; note: string | null;
+  paid_at: string | null; created_at: string;
+};
 
 // Nullable 필드를 optional로 변환 (Supabase CLI 생성 타입과 동일한 패턴)
 type NullableToOptional<T> =
@@ -180,6 +193,8 @@ export type Database = {
       ai_invocations:   T<AiInvocationRow, InsertBase<AiInvocationRow>, never>;
       audit_logs:       T<AuditLogRow,     InsertBase<AuditLogRow>,     never>;
       payment_records:  T<PaymentRecordRow>;
+      payment_schedules: T<PaymentScheduleRow>;
+      worker_attendance: T<WorkerAttendanceRow>;
     };
     Views: { [_ in never]: never };
     Functions: { [_ in never]: never };
@@ -211,3 +226,5 @@ export type DistanceZone = DistanceZoneRow;
 export type InstagramPost = InstagramPostRow;
 export type AiInvocation = AiInvocationRow;
 export type AuditLog = AuditLogRow;
+export type PaymentSchedule = PaymentScheduleRow;
+export type WorkerAttendance = WorkerAttendanceRow;

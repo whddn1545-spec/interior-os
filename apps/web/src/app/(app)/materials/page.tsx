@@ -1,8 +1,8 @@
 "use client";
 
 import { useState } from "react";
-import Link from "next/link";
-import { ArrowLeftIcon, CalculatorIcon } from "lucide-react";
+import { CalculatorIcon } from "lucide-react";
+import { BackLink } from "@/components/back-link";
 
 const MATERIAL_FORMULAS: {
   trade: string;
@@ -80,9 +80,7 @@ export default function MaterialsPage() {
   return (
     <div className="min-h-screen bg-gray-50 pb-24">
       <header className="sticky top-0 bg-white border-b border-gray-100 z-10 px-4 py-3 flex items-center gap-3">
-        <Link href="/" className="p-2 -ml-2 text-gray-600">
-          <ArrowLeftIcon size={24} />
-        </Link>
+        <BackLink fallbackHref="/" />
         <h1 className="text-xl font-bold text-gray-900">자재 수량 산출</h1>
       </header>
 

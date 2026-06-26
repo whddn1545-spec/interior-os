@@ -73,6 +73,9 @@ export default async function MessagesPage() {
         <div className="mt-8 text-center py-12 text-gray-400">
           <MessageSquareIcon size={48} className="mx-auto mb-3 opacity-30" />
           <p className="text-lg">아직 발송한 문자가 없어요</p>
+          <p className="mt-2 text-base text-gray-500">
+            ↑ 위에서 대상을 골라 첫 문자를 보내보세요
+          </p>
         </div>
       )}
     </div>

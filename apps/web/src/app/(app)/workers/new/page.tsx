@@ -4,6 +4,7 @@ import { useState, useTransition } from "react";
 import { useRouter } from "next/navigation";
 import { ArrowLeftIcon } from "lucide-react";
 import Link from "next/link";
+import { toast } from "sonner";
 import { createWorker } from "./actions";
 
 const TRADE_OPTIONS = [
@@ -25,13 +26,24 @@ export default function WorkerNewPage() {
   const router = useRouter();
   const [isPending, startTransition] = useTransition();
   const [error, setError] = useState<string | null>(null);
+  const [allowNoTrade, setAllowNoTrade] = useState(false);
 
   const [name, setName] = useState("");
   const [phone, setPhone] = useState("");
   const [company, setCompany] = useState("");
   const [selectedTrades, setSelectedTrades] = useState<string[]>([]);
 
+  // 입력하는 동안 010-0000-0000 형태로 자동 정리
+  function formatPhone(value: string) {
+    const digits = value.replace(/\D/g, "").slice(0, 11);
+    if (digits.length < 4) return digits;
+    if (digits.length < 8) return `${digits.slice(0, 3)}-${digits.slice(3)}`;
+    return `${digits.slice(0, 3)}-${digits.slice(3, 7)}-${digits.slice(7)}`;
+  }
+
   function toggleTrade(code: string) {
+    setAllowNoTrade(false);
+    setError(null);
     setSelectedTrades((prev) =>
       prev.includes(code) ? prev.filter((c) => c !== code) : [...prev, code]
     );
@@ -39,13 +51,28 @@ export default function WorkerNewPage() {
 
   function handleSubmit() {
     if (!name.trim()) { setError("이름을 입력해주세요"); return; }
-    if (!phone.trim()) { setError("연락처를 입력해주세요"); return; }
 
+    const phoneDigits = phone.replace(/\D/g, "");
+    if (!phoneDigits) { setError("연락처를 입력해주세요"); return; }
+    if (phoneDigits.length < 10 || phoneDigits.length > 11) {
+      setError("전화번호를 정확히 입력해주세요 (예: 010-1234-5678)");
+      return;
+    }
+
+    // 담당 공종 0개는 차단하지 않고 안내만 — 확인 후 한 번 더 누르면 진행
+    if (selectedTrades.length === 0 && !allowNoTrade) {
+      setError("담당 공종을 1개 이상 선택하세요. 그래도 추가하려면 한 번 더 눌러주세요.");
+      setAllowNoTrade(true);
+      return;
+    }
+
+    setError(null);
     startTransition(async () => {
       const result = await createWorker({ name, phone, company, tradeCodes: selectedTrades });
       if (!result.ok) {
         setError(result.error ?? "오류가 발생했습니다");
       } else {
+        toast.success("작업자를 추가했어요");
         router.push("/workers");
       }
     });
@@ -76,11 +103,13 @@ export default function WorkerNewPage() {
           <label className="block text-base font-semibold text-gray-700 mb-2">연락처 *</label>
           <input
             type="tel"
+            inputMode="numeric"
             value={phone}
-            onChange={(e) => setPhone(e.target.value)}
+            onChange={(e) => { setError(null); setPhone(formatPhone(e.target.value)); }}
             placeholder="010-0000-0000"
             className="w-full border border-gray-200 rounded-2xl px-4 py-4 text-lg focus:outline-none focus:border-blue-400"
           />
+          <p className="mt-1.5 text-base text-gray-500">숫자만 입력하면 자동으로 010-0000-0000 형태로 정리돼요</p>
         </div>
 
         <div>
@@ -95,13 +124,18 @@ export default function WorkerNewPage() {
         </div>
 
         <div>
-          <label className="block text-base font-semibold text-gray-700 mb-3">담당 공종</label>
+          <label className="block text-base font-semibold text-gray-700 mb-1">담당 공종</label>
+          <p className="text-base text-gray-500 mb-3">
+            {selectedTrades.length > 0
+              ? `${selectedTrades.length}개 선택됨`
+              : "1개 이상 선택해주세요"}
+          </p>
           <div className="flex flex-wrap gap-2">
             {TRADE_OPTIONS.map((t) => (
               <button
                 key={t.code}
                 onClick={() => toggleTrade(t.code)}
-                className={`px-4 py-2 rounded-full border-2 text-base font-medium transition-colors ${
+                className={`px-5 py-4 rounded-full border-2 text-base font-medium transition-colors ${
                   selectedTrades.includes(t.code)
                     ? "border-blue-600 bg-blue-600 text-white"
                     : "border-gray-200 bg-white text-gray-700"

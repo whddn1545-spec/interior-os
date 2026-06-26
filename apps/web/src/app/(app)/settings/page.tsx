@@ -6,8 +6,8 @@ import { BusinessInfoCard } from "./business-info-form";
 const MENU = [
   { href: "/settings/prices", icon: TagIcon, label: "단가표", desc: "공종별 자재비·인건비 단가" },
   { href: "/settings/factors", icon: MapPinIcon, label: "거리·난이도 계수", desc: "견적 계수 설정" },
-  { href: "/materials", icon: CalculatorIcon, label: "자재 산출", desc: "면적으로 자재 물량 계산하기" },
-  { href: "/moodboard", icon: SparklesIcon, label: "AI 시각화", desc: "사진으로 완성 모습 미리보기" },
+  { href: "/materials?from=settings", icon: CalculatorIcon, label: "자재 산출", desc: "면적으로 자재 물량 계산하기" },
+  { href: "/moodboard?from=settings", icon: SparklesIcon, label: "AI 시각화", desc: "사진으로 완성 모습 미리보기" },
   { href: "/workers", icon: HardHatIcon, label: "작업자 관리", desc: "작업자 명단·연락처·평점" },
   { href: "/pricing", icon: CreditCardIcon, label: "요금제 업그레이드", desc: "Pro/Team 플랜으로 더 많은 기능" },
   { href: "/settings/pwa", icon: SmartphoneIcon, label: "홈 화면에 추가", desc: "태블릿·폰 홈에 설치하기" },

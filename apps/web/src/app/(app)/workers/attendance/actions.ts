@@ -72,10 +72,8 @@ export async function getWorkerAttendanceBoard(): Promise<ActionResult<Attendanc
     .order("name");
   if (wErr) return { ok: false, error: wErr.message };
 
-  // 이번달 출역 기록 — worker_attendance는 신규 테이블이라 생성 타입에 없음 → any 캐스트
-  // eslint-disable-next-line @typescript-eslint/no-explicit-any
-  const db = supabase as any;
-  const { data: rows, error: aErr } = await db
+  // 이번달 출역 기록 — worker_attendance는 Database 타입에 보강됨 → select 컬럼명 검증됨
+  const { data: rows, error: aErr } = await supabase
     .from("worker_attendance")
     .select("worker_id, day_rate, paid_at, work_date")
     .gte("work_date", start)
@@ -142,9 +140,7 @@ export async function recordAttendance(
 
   const tenantId = await getTenantId(supabase, user);
 
-  // eslint-disable-next-line @typescript-eslint/no-explicit-any
-  const db = supabase as any;
-  const { error } = await db
+  const { error } = await supabase
     .from("worker_attendance")
     .upsert(
       {
@@ -176,9 +172,7 @@ export async function markWorkerPaid(
 
   const { start, end } = monthRange(month);
 
-  // eslint-disable-next-line @typescript-eslint/no-explicit-any
-  const db = supabase as any;
-  const { error } = await db
+  const { error } = await supabase
     .from("worker_attendance")
     .update({ paid_at: new Date().toISOString() })
     .eq("worker_id", workerId)

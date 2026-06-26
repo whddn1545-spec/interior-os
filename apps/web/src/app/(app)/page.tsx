@@ -76,24 +76,10 @@ export default async function HomePage() {
     todayTasks = [];
   }
 
-  // 2. 긴급 미수금 — payment_schedules 테이블이 없을 수 있음
-  // (생성 타입에 아직 없을 수 있어 느슨한 클라이언트로 조회)
+  // 2. 긴급 미수금 — payment_schedules는 Database 타입에 보강되어 typed 클라이언트로 조회
   let payments: PaymentRow[] = [];
   try {
-    const looseClient = supabase as unknown as {
-      from: (t: string) => {
-        select: (q: string) => {
-          is: (c: string, v: null) => {
-            lte: (c: string, v: string) => {
-              order: (c: string, o: { ascending: boolean }) => {
-                limit: (n: number) => Promise<{ data: PaymentRow[] | null; error: unknown }>;
-              };
-            };
-          };
-        };
-      };
-    };
-    const { data, error } = await looseClient
+    const { data, error } = await supabase
       .from("payment_schedules")
       .select(
         "id, stage_label, amount, due_date, sites(name, customers(name, phone))"
@@ -102,7 +88,7 @@ export default async function HomePage() {
       .lte("due_date", soon)
       .order("due_date", { ascending: true })
       .limit(10);
-    if (!error) payments = data ?? [];
+    if (!error) payments = (data as unknown as PaymentRow[]) ?? [];
   } catch {
     payments = [];
   }

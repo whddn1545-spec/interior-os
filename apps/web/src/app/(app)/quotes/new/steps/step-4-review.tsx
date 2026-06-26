@@ -22,6 +22,7 @@ export function Step4Review({ siteId, siteName, items, distanceFactor, difficult
   const [showConfirmDialog, setShowConfirmDialog] = useState(false);
   const [isPending, startTransition] = useTransition();
   const [error, setError] = useState<string | null>(null);
+  const [scheduleWarning, setScheduleWarning] = useState<string | null>(null);
   const [aiBullets, setAiBullets] = useState<string[] | null>(null);
   const [aiLoading, setAiLoading] = useState(true);
   const [aiError, setAiError] = useState(false);
@@ -84,13 +85,26 @@ export function Step4Review({ siteId, siteName, items, distanceFactor, difficult
         return;
       }
 
-      // 잔금 스케줄 자동 생성 (실패해도 견적 확정은 완료)
-      createPaymentSchedule({
-        siteId,
-        quoteId: saveRes.data.quoteId,
-        totalAmount: saveRes.data.total,
-        siteName: siteName ?? "현장",
-      }).catch(() => {});
+      // 잔금 스케줄 자동 생성 — 반드시 await (트랜지션 종료/네비게이션에 잘려나가지 않도록).
+      // 실패해도 견적 확정은 유지하고, 사용자에게 수동 복구 경로를 안내한다.
+      let scheduleFailed = false;
+      try {
+        const scheduleRes = await createPaymentSchedule({
+          siteId,
+          quoteId: saveRes.data.quoteId,
+          totalAmount: saveRes.data.total,
+          siteName: siteName ?? "현장",
+        });
+        if (!scheduleRes.ok) scheduleFailed = true;
+      } catch {
+        scheduleFailed = true;
+      }
+
+      if (scheduleFailed) {
+        setScheduleWarning(
+          "잔금 일정 자동 생성에 실패했어요. 견적은 확정되었으니 '받을 돈' 화면에서 수동으로 추가해 주세요."
+        );
+      }
 
       onConfirmed(saveRes.data.quoteId, saveRes.data.total);
     });
@@ -168,8 +182,15 @@ export function Step4Review({ siteId, siteName, items, distanceFactor, difficult
       </div>
 
       {error && (
-        <div className="bg-red-50 border border-red-200 rounded-xl p-3 mb-4 text-red-600">
+        <div className="bg-red-50 border border-red-200 rounded-xl p-3 mb-4 text-base text-red-600">
           {error}
+        </div>
+      )}
+
+      {scheduleWarning && (
+        <div className="bg-amber-50 border border-amber-300 rounded-xl p-4 mb-4 flex gap-3">
+          <AlertTriangleIcon size={24} className="text-amber-500 shrink-0 mt-0.5" />
+          <p className="text-base text-amber-800">{scheduleWarning}</p>
         </div>
       )}
 

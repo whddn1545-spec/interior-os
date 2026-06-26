@@ -1,5 +1,6 @@
-import { getPaymentBoard } from "./actions";
+import { getPaymentBoard, getQuotesMissingSchedule } from "./actions";
 import { PaymentCard } from "./payment-card";
+import { MissingScheduleBanner } from "./missing-schedule-banner";
 import { HelpButton } from "@/components/tutorial/HelpButton";
 
 export const dynamic = "force-dynamic";
@@ -21,9 +22,13 @@ export default async function PaymentsPage({
   const { filter } = await searchParams;
   const activeFilter = (FILTERS.some((f) => f.key === filter) ? filter : "all") as FilterKey;
 
-  const result = await getPaymentBoard();
+  const [result, missingResult] = await Promise.all([
+    getPaymentBoard(),
+    getQuotesMissingSchedule(),
+  ]);
   const items = result.ok ? result.data : [];
   const error = result.ok ? null : result.error;
+  const missingQuotes = missingResult.ok ? missingResult.data : [];
 
   const filtered =
     activeFilter === "all" ? items : items.filter((i) => i.urgency === activeFilter);
@@ -73,10 +78,22 @@ export default async function PaymentsPage({
         </div>
       )}
 
+      {/* 잔금 일정 누락 복구 — 확정 견적은 있는데 스케줄이 없을 때 */}
+      <MissingScheduleBanner quotes={missingQuotes} />
+
       {/* 카드 리스트 */}
       {filtered.length === 0 ? (
-        <div className="rounded-2xl border border-gray-200 bg-white py-16 text-center">
+        <div className="rounded-2xl border border-gray-200 bg-white px-4 py-16 text-center">
           <p className="text-lg font-bold text-gray-400">받을 돈이 없습니다 🎉</p>
+          <p className="mt-3 text-base text-gray-500">
+            확정된 견적이 있는데 안 보이나요?
+          </p>
+          <a
+            href="/quotes"
+            className="mt-4 inline-flex min-h-[56px] items-center justify-center rounded-xl bg-blue-700 px-6 py-4 text-base font-bold text-white hover:bg-blue-800"
+          >
+            견적 보기 →
+          </a>
         </div>
       ) : (
         <div className="flex flex-col gap-4">

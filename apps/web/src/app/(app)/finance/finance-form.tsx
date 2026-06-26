@@ -1,7 +1,8 @@
 "use client";
 
 import { useState, useTransition } from "react";
-import { PlusIcon, XIcon, CheckCircleIcon } from "lucide-react";
+import { PlusIcon, XIcon } from "lucide-react";
+import { toast } from "sonner";
 import { addFinanceEntry } from "./actions";
 
 interface Site { id: string; name: string }
@@ -10,30 +11,48 @@ export function FinanceForm({ sites }: { sites: Site[] }) {
   const [open, setOpen] = useState(false);
   const [isPending, startTransition] = useTransition();
   const [error, setError] = useState<string | null>(null);
-  const [saved, setSaved] = useState(false);
+  const [addedCount, setAddedCount] = useState(0);
+
+  const today = new Date().toISOString().split("T")[0];
 
   function handleSubmit(e: React.FormEvent<HTMLFormElement>) {
     e.preventDefault();
     const form = e.currentTarget;
     const formData = new FormData(form);
 
+    // 클라이언트 사전 검증 — 금액/날짜
+    const amount = Number(formData.get("amount"));
+    const paidAt = String(formData.get("paid_at") ?? "");
+    if (!Number.isFinite(amount) || amount < 1) {
+      setError("금액을 1원 이상으로 입력해주세요");
+      return;
+    }
+    if (paidAt && paidAt > today) {
+      setError("미래 날짜는 입력할 수 없어요. 날짜를 확인해주세요.");
+      return;
+    }
+
     startTransition(async () => {
       setError(null);
       const result = await addFinanceEntry(formData);
       if (result.ok) {
-        setSaved(true);
+        // 자동으로 닫지 않고 토스트로 알린 뒤 연속 입력 유도
+        setAddedCount((c) => c + 1);
+        toast.success("저장됐어요! 이어서 입력할 수 있어요.");
         form.reset();
-        setTimeout(() => {
-          setSaved(false);
-          setOpen(false);
-        }, 1200);
+        const dateInput = form.elements.namedItem("paid_at") as HTMLInputElement | null;
+        if (dateInput) dateInput.value = today;
       } else {
         setError(result.error ?? "저장 실패");
       }
     });
   }
 
-  const today = new Date().toISOString().split("T")[0];
+  function closeSheet() {
+    setOpen(false);
+    setError(null);
+    setAddedCount(0);
+  }
 
   return (
     <>
@@ -48,19 +67,18 @@ export function FinanceForm({ sites }: { sites: Site[] }) {
       {open && (
         <div className="fixed inset-0 bg-black/50 z-50 flex items-end">
           <div className="bg-white w-full rounded-t-3xl p-6 pb-10 max-h-[90vh] overflow-y-auto">
-            {saved ? (
-              <div className="flex flex-col items-center justify-center py-12">
-                <CheckCircleIcon size={72} className="text-green-500 mb-4" />
-                <p className="text-2xl font-bold text-gray-900">저장됐어요!</p>
-              </div>
-            ) : (
-            <>
             <div className="flex items-center justify-between mb-6">
               <h2 className="text-xl font-bold text-gray-900">입출금 추가</h2>
-              <button onClick={() => setOpen(false)} className="p-2 text-gray-400">
-                <XIcon size={24} />
+              <button onClick={closeSheet} aria-label="닫기" className="flex items-center justify-center w-14 h-14 -mr-2 text-gray-400">
+                <XIcon size={28} />
               </button>
             </div>
+
+            {addedCount > 0 && (
+              <div className="bg-green-50 border border-green-200 rounded-xl px-4 py-4 mb-4 text-green-800 text-base font-semibold">
+                지금까지 {addedCount}건 추가됐어요. 계속 입력하거나 닫기를 눌러주세요.
+              </div>
+            )}
 
             <form onSubmit={handleSubmit} className="space-y-4">
               {/* 수입/지출 */}
@@ -112,9 +130,12 @@ export function FinanceForm({ sites }: { sites: Site[] }) {
                   name="amount"
                   required
                   min={1}
+                  step={1}
+                  inputMode="numeric"
                   placeholder="예) 1500000"
                   className="w-full border border-gray-300 rounded-xl px-4 py-3 text-base"
                 />
+                <p className="mt-1.5 text-base text-gray-500">1원 이상, 음수는 입력할 수 없어요</p>
               </div>
 
               {/* 날짜 */}
@@ -124,9 +145,11 @@ export function FinanceForm({ sites }: { sites: Site[] }) {
                   type="date"
                   name="paid_at"
                   required
+                  max={today}
                   defaultValue={today}
                   className="w-full border border-gray-300 rounded-xl px-4 py-3 text-base"
                 />
+                <p className="mt-1.5 text-base text-gray-500">오늘까지만 선택할 수 있어요 (미래 날짜 불가)</p>
               </div>
 
               {/* 현장 */}
@@ -168,8 +191,6 @@ export function FinanceForm({ sites }: { sites: Site[] }) {
                 {isPending ? "저장 중..." : "저장하기"}
               </button>
             </form>
-            </>
-            )}
           </div>
         </div>
       )}

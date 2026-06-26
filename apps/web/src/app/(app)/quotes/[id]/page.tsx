@@ -1,6 +1,6 @@
 import { notFound } from "next/navigation";
 import Link from "next/link";
-import { ArrowLeftIcon, CheckCircleIcon, AlertTriangleIcon, FileTextIcon, SendIcon } from "lucide-react";
+import { ArrowLeftIcon, CheckCircleIcon, AlertTriangleIcon, FileTextIcon, SendIcon, ChevronRightIcon } from "lucide-react";
 import { createClient } from "@/lib/supabase/server";
 import { QuoteActions } from "./quote-actions";
 import { formatKRW } from "@interior-os/core/pricing";
@@ -27,14 +27,33 @@ export default async function QuoteDetailPage({ params }: { params: Promise<{ id
 
   const { data: site } = await supabase
     .from("sites")
-    .select("id, name, address, customers(name, phone)")
+    .select("id, name, address, customer_id, customers(name, phone)")
     .eq("id", quoteAny.site_id as string)
     .single();
 
   const siteAny = site as unknown as {
-    id: string; name: string; address: string;
+    id: string; name: string; address: string; customer_id: string | null;
     customers: { name: string; phone: string } | null;
   } | null;
+
+  // 이 견적으로 만든 계약서 조회 (역방향 링크용, DB 변경 없이 quote_id 조인)
+  const { data: contract } = await supabase
+    .from("contracts")
+    .select("id, status, created_at")
+    .eq("quote_id", id)
+    .order("created_at", { ascending: false })
+    .limit(1)
+    .maybeSingle();
+
+  const contractAny = contract as unknown as {
+    id: string; status: string;
+  } | null;
+
+  const contractStatusLabel: Record<string, string> = {
+    draft: "임시저장",
+    confirmed: "확정됨",
+    signed: "서명완료",
+  };
 
   const statusConfig: Record<string, { label: string; color: string; icon: React.ReactNode }> = {
     draft: { label: "임시저장", color: "bg-gray-100 text-gray-600", icon: null },
@@ -176,6 +195,23 @@ export default async function QuoteDetailPage({ params }: { params: Promise<{ id
               </div>
             </div>
 
+            {/* 이 견적으로 만든 계약서 보기 (역방향 링크) */}
+            {contractAny && (
+              <Link
+                href={`/contracts/${contractAny.id}`}
+                className="bg-white rounded-2xl p-4 border border-gray-100 flex items-center gap-3 min-h-[56px] active:bg-gray-50"
+              >
+                <FileTextIcon size={24} className="text-purple-600 shrink-0" />
+                <div className="flex-1">
+                  <p className="text-base font-semibold text-gray-900">이 견적으로 만든 계약서 보기</p>
+                  <p className="text-sm text-gray-500">
+                    계약서 상태: {contractStatusLabel[contractAny.status] ?? contractAny.status}
+                  </p>
+                </div>
+                <ChevronRightIcon size={22} className="text-gray-400 shrink-0" />
+              </Link>
+            )}
+
             {/* 공사 일정 만들기 CTA */}
             {siteAny && (
               <Link
@@ -222,6 +258,7 @@ export default async function QuoteDetailPage({ params }: { params: Promise<{ id
           quoteId={id}
           status={status}
           siteId={siteAny?.id ?? ""}
+          customerId={siteAny?.customer_id ?? ""}
           totalAmount={quoteAny.total_amount as number}
         />
       </div>

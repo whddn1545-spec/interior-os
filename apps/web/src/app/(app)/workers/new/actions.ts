@@ -17,13 +17,21 @@ export async function createWorker(
   const { data: { user } } = await supabase.auth.getUser();
   if (!user) return { ok: false, error: "로그인이 필요합니다" };
 
+  const name = input.name.trim();
+  if (!name) return { ok: false, error: "이름을 입력해주세요" };
+
+  const phoneDigits = input.phone.replace(/\D/g, "");
+  if (phoneDigits.length < 10 || phoneDigits.length > 11) {
+    return { ok: false, error: "전화번호를 정확히 입력해주세요 (예: 010-1234-5678)" };
+  }
+
   const tenantId = await getTenantId(supabase, user);
 
   const { data: worker, error: workerError } = await supabase
     .from("workers")
     .insert({
       tenant_id: tenantId,
-      name: input.name.trim(),
+      name,
       phone: input.phone.trim(),
       company: input.company?.trim() || null,
       is_active: true,

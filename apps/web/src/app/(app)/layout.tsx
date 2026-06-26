@@ -8,6 +8,7 @@ import {
   SettingsIcon,
 } from "lucide-react";
 import { MoreMenu } from "@/components/more-menu";
+import { Toaster } from "@/components/ui/sonner";
 import { createClient } from "@/lib/supabase/server";
 
 const tabs = [
@@ -56,6 +57,8 @@ export default async function AppLayout({ children }: { children: React.ReactNod
           <MoreMenu />
         </ul>
       </nav>
+
+      <Toaster position="top-center" richColors toastOptions={{ style: { fontSize: "18px" } }} />
     </div>
   );
 }

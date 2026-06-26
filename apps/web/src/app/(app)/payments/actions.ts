@@ -3,6 +3,9 @@
 import { createClient } from "@/lib/supabase/server";
 import { getTenantId } from "@/lib/supabase/get-tenant";
 import { revalidatePath } from "next/cache";
+import type { Database } from "@interior-os/db/types";
+
+type PaymentScheduleInsert = Database["public"]["Tables"]["payment_schedules"]["Insert"];
 
 export type ActionResult<T> = { ok: true; data: T } | { ok: false; error: string };
 
@@ -46,10 +49,8 @@ export async function getPaymentBoard(): Promise<ActionResult<PaymentBoardItem[]
   } = await supabase.auth.getUser();
   if (!user) return { ok: false, error: "로그인이 필요합니다" };
 
-  // payment_schedules는 신규 테이블이라 생성 타입에 없음 → any 캐스트 (finance_entries 패턴 동일)
-  // eslint-disable-next-line @typescript-eslint/no-explicit-any
-  const db = supabase as any;
-  const { data, error } = await db
+  // payment_schedules는 Database 타입에 보강됨 → select 컬럼명이 컴파일 타임 검증됨
+  const { data, error } = await supabase
     .from("payment_schedules")
     .select(
       "id, site_id, quote_id, stage, stage_label, amount, due_date, memo, sites(name, customer_id, customers(name, phone))"
@@ -115,7 +116,7 @@ export async function createPaymentSchedule(input: {
   const midterm = Math.round(input.totalAmount * 0.4);
   const balance = input.totalAmount - deposit - midterm; // 합계 보정
 
-  const rows = [
+  const rows: PaymentScheduleInsert[] = [
     {
       tenant_id: tenantId,
       site_id: input.siteId,
@@ -145,12 +146,71 @@ export async function createPaymentSchedule(input: {
     },
   ];
 
-  // eslint-disable-next-line @typescript-eslint/no-explicit-any
-  const { error } = await (supabase as any).from("payment_schedules").insert(rows);
+  const { error } = await supabase.from("payment_schedules").insert(rows);
   if (error) return { ok: false, error: error.message };
 
   revalidatePath("/payments");
+  revalidatePath("/");
   return { ok: true, data: { count: rows.length } };
+}
+
+export interface MissingScheduleQuote {
+  quoteId: string;
+  siteId: string;
+  siteName: string;
+  customerName: string;
+  totalAmount: number;
+}
+
+/**
+ * 잔금 일정이 누락된 '확정 견적' 조회 — 자동 생성이 실패했을 때 복구 경로.
+ * 확정(confirmed) 상태 견적 중 payment_schedules가 하나도 없는 건만 반환.
+ */
+export async function getQuotesMissingSchedule(): Promise<ActionResult<MissingScheduleQuote[]>> {
+  const supabase = await createClient();
+  const {
+    data: { user },
+  } = await supabase.auth.getUser();
+  if (!user) return { ok: false, error: "로그인이 필요합니다" };
+
+  // 확정된 견적 목록
+  const { data: quotes, error: quotesError } = await supabase
+    .from("quotes")
+    .select("id, site_id, total_amount, sites(name, customers(name))")
+    .eq("status", "confirmed");
+
+  if (quotesError) return { ok: false, error: quotesError.message };
+
+  // 이미 스케줄이 있는 quote_id 집합
+  const { data: schedules, error: schedError } = await supabase
+    .from("payment_schedules")
+    .select("quote_id");
+
+  if (schedError) return { ok: false, error: schedError.message };
+
+  const scheduledQuoteIds = new Set(
+    ((schedules ?? []) as { quote_id: string | null }[])
+      .map((s) => s.quote_id)
+      .filter((id): id is string => Boolean(id))
+  );
+
+  const missing: MissingScheduleQuote[] = ((quotes ?? []) as unknown[])
+    .map((row) => {
+      const r = row as unknown as Record<string, unknown>;
+      const site = r.sites as
+        | { name?: string; customers?: { name?: string } | null }
+        | null;
+      return {
+        quoteId: r.id as string,
+        siteId: r.site_id as string,
+        siteName: site?.name ?? "현장",
+        customerName: site?.customers?.name ?? "고객",
+        totalAmount: Number(r.total_amount ?? 0),
+      };
+    })
+    .filter((q) => q.totalAmount > 0 && !scheduledQuoteIds.has(q.quoteId));
+
+  return { ok: true, data: missing };
 }
 
 /** 입금 확인 처리 */
@@ -164,8 +224,7 @@ export async function markPaid(
   } = await supabase.auth.getUser();
   if (!user) return { ok: false, error: "로그인이 필요합니다" };
 
-  // eslint-disable-next-line @typescript-eslint/no-explicit-any
-  const { error } = await (supabase as any)
+  const { error } = await supabase
     .from("payment_schedules")
     .update({ paid_at: new Date().toISOString(), paid_amount: paidAmount })
     .eq("id", scheduleId);
@@ -176,21 +235,39 @@ export async function markPaid(
   return { ok: true, data: undefined };
 }
 
-/** 독촉 문자 발송 — message_logs 직접 기록 (고객 템플릿 코드 없으므로 SMS API 미호출) */
+export interface ReminderDraft {
+  /** 문자 본문 (사용자가 문자 앱에서 직접 보냄) */
+  body: string;
+  /** 고객 휴대폰 번호 — sms 링크용. 없으면 빈 문자열 */
+  phone: string;
+  customerName: string;
+}
+
+/**
+ * 독촉 문자 '초안' 생성 — 실제 SMS API를 호출하지 않고 message_logs에 queued로 기록만 한다.
+ * 실발송이 아니므로 본문/연락처를 반환해 사용자가 문자 앱에서 직접 보내도록 한다.
+ */
 export async function sendPaymentReminder(
   scheduleId: string,
   tone: "polite" | "firm" | "final"
-): Promise<ActionResult<void>> {
+): Promise<ActionResult<ReminderDraft>> {
   const supabase = await createClient();
   const {
     data: { user },
   } = await supabase.auth.getUser();
   if (!user) return { ok: false, error: "로그인이 필요합니다" };
 
+  // 서버측 입력 검증
+  if (!scheduleId || typeof scheduleId !== "string") {
+    return { ok: false, error: "결제 스케줄 정보가 올바르지 않습니다" };
+  }
+  if (tone !== "polite" && tone !== "firm" && tone !== "final") {
+    return { ok: false, error: "문자 종류가 올바르지 않습니다" };
+  }
+
   const tenantId = await getTenantId(supabase, user);
 
-  // eslint-disable-next-line @typescript-eslint/no-explicit-any
-  const { data: schedule } = await (supabase as any)
+  const { data: schedule } = await supabase
     .from("payment_schedules")
     .select(
       "id, site_id, stage_label, amount, sites(name, customer_id, customers(id, name, phone))"
@@ -228,7 +305,7 @@ export async function sendPaymentReminder(
     body = `${customerName}님, ${siteName} 미수금 ${amountStr}원 관련 연락 주시기 바랍니다. 미입금 지속 시 법적 조치가 필요할 수 있습니다.`;
   }
 
-  const insertData = {
+  const insertData: Database["public"]["Tables"]["message_logs"]["Insert"] = {
     tenant_id: tenantId,
     target_type: "customer",
     target_id: customerId,
@@ -239,10 +316,12 @@ export async function sendPaymentReminder(
     idempotency_key: `payment-reminder-${scheduleId}-${tone}-${Date.now()}`,
   };
 
-  // eslint-disable-next-line @typescript-eslint/no-explicit-any
-  const { error } = await (supabase.from("message_logs") as any).insert(insertData);
+  const { error } = await supabase.from("message_logs").insert(insertData);
   if (error) return { ok: false, error: error.message };
 
   revalidatePath("/payments");
-  return { ok: true, data: undefined };
+  return {
+    ok: true,
+    data: { body, phone: customer?.phone ?? "", customerName },
+  };
 }

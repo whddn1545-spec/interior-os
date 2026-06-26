@@ -11,10 +11,11 @@ interface Props {
   quoteId: string;
   status: string;
   siteId: string;
+  customerId: string;
   totalAmount: number;
 }
 
-export function QuoteActions({ quoteId, status, siteId, totalAmount }: Props) {
+export function QuoteActions({ quoteId, status, siteId, customerId, totalAmount }: Props) {
   const router = useRouter();
   const [isPending, startTransition] = useTransition();
   const [error, setError] = useState<string | null>(null);
@@ -117,11 +118,18 @@ export function QuoteActions({ quoteId, status, siteId, totalAmount }: Props) {
             ✅ 이 금액으로 확정하기
           </button>
           <button
-            onClick={() => router.push(`/quotes/new`)}
+            onClick={() =>
+              router.push(
+                customerId ? `/quotes/new?customerId=${customerId}` : `/quotes/new`
+              )
+            }
             className="w-full bg-gray-100 text-gray-700 rounded-2xl py-4 text-lg font-medium"
           >
-            ✏️ 견적 수정하기
+            📝 새 버전으로 다시 견적
           </button>
+          <p className="text-base text-gray-500 text-center px-2">
+            이 견적은 그대로 두고, 같은 고객으로 새 견적을 처음부터 만들어요
+          </p>
         </>
       )}
 

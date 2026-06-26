@@ -2,7 +2,8 @@
 
 import { useState, useTransition } from "react";
 import { useRouter } from "next/navigation";
-import { markPaid, sendPaymentReminder, type PaymentBoardItem } from "./actions";
+import { toast } from "sonner";
+import { markPaid, sendPaymentReminder, type PaymentBoardItem, type ReminderDraft } from "./actions";
 
 const STAGE_BADGE: Record<string, { label: string; cls: string }> = {
   deposit: { label: "계약금", cls: "bg-emerald-100 text-emerald-800" },
@@ -31,6 +32,7 @@ export function PaymentCard({ schedule }: { schedule: PaymentBoardItem }) {
   const [showReminders, setShowReminders] = useState(false);
   const [paidAmount, setPaidAmount] = useState<string>(String(schedule.amount));
   const [feedback, setFeedback] = useState<string | null>(null);
+  const [draft, setDraft] = useState<ReminderDraft | null>(null);
 
   const stage = STAGE_BADGE[schedule.stage] ?? { label: schedule.stageLabel, cls: "bg-gray-100 text-gray-700" };
   const dDays = daysUntil(schedule.dueDate);
@@ -52,6 +54,10 @@ export function PaymentCard({ schedule }: { schedule: PaymentBoardItem }) {
     startTransition(async () => {
       const res = await markPaid(schedule.id, amount);
       if (res.ok) {
+        toast.success(
+          `${schedule.customerName}님 ${stage.label} 입금 처리됐어요`,
+          { description: `${amount.toLocaleString("ko-KR")}원` }
+        );
         router.refresh();
       } else {
         setFeedback(res.error);
@@ -65,12 +71,31 @@ export function PaymentCard({ schedule }: { schedule: PaymentBoardItem }) {
       const res = await sendPaymentReminder(schedule.id, tone);
       if (res.ok) {
         setShowReminders(false);
-        setFeedback("독촉 문자를 발송했습니다 ✅");
+        setDraft(res.data);
+        toast.success("문자 내용을 만들었어요", {
+          description: "아래에서 복사하거나 문자 앱으로 보내주세요",
+        });
       } else {
         setFeedback(res.error);
       }
     });
   }
+
+  async function handleCopyDraft() {
+    if (!draft) return;
+    try {
+      await navigator.clipboard.writeText(draft.body);
+      toast.success("문자 내용을 복사했어요", {
+        description: "문자 앱에 붙여넣어 보내주세요",
+      });
+    } catch {
+      toast.error("복사하지 못했어요. 아래 내용을 길게 눌러 복사해주세요.");
+    }
+  }
+
+  const smsHref = draft
+    ? `sms:${draft.phone}${draft.phone ? "?" : ""}body=${encodeURIComponent(draft.body)}`
+    : null;
 
   const dueDateStr = schedule.dueDate
     ? new Date(`${schedule.dueDate}T00:00:00Z`).toLocaleDateString("ko-KR", {
@@ -151,18 +176,59 @@ export function PaymentCard({ schedule }: { schedule: PaymentBoardItem }) {
 
       {/* 독촉 문자 토글 */}
       {showReminders && (
-        <div className="mt-4 grid grid-cols-3 gap-2">
-          {TONES.map((t) => (
+        <div className="mt-4">
+          <p className="mb-2 text-base font-bold text-gray-700">
+            어떤 말투로 만들까요?
+          </p>
+          <div className="grid grid-cols-3 gap-2">
+            {TONES.map((t) => (
+              <button
+                key={t.key}
+                type="button"
+                onClick={() => handleReminder(t.key)}
+                disabled={isPending}
+                className="flex h-14 items-center justify-center rounded-xl bg-gray-100 px-2 text-base font-bold text-gray-800 disabled:opacity-50"
+              >
+                {t.label}
+              </button>
+            ))}
+          </div>
+        </div>
+      )}
+
+      {/* 생성된 문자 초안 — 실제 발송이 아니라 사용자가 문자 앱에서 직접 보냄 */}
+      {draft && (
+        <div className="mt-4 rounded-xl border-2 border-blue-200 bg-blue-50 p-4">
+          <p className="text-base font-bold text-blue-900">
+            문자 내용을 만들었어요 — 문자 앱에서 보내주세요
+          </p>
+          <p className="mt-2 whitespace-pre-wrap rounded-lg bg-white p-3 text-base leading-relaxed text-gray-800">
+            {draft.body}
+          </p>
+          <div className="mt-3 flex flex-col gap-2">
+            {smsHref && (
+              <a
+                href={smsHref}
+                className="flex items-center justify-center rounded-xl bg-blue-600 py-4 text-lg font-bold text-white"
+              >
+                📱 문자 앱으로 보내기
+              </a>
+            )}
             <button
-              key={t.key}
               type="button"
-              onClick={() => handleReminder(t.key)}
-              disabled={isPending}
-              className="flex h-14 items-center justify-center rounded-xl bg-gray-100 px-2 text-base font-bold text-gray-800 disabled:opacity-50"
+              onClick={handleCopyDraft}
+              className="flex items-center justify-center rounded-xl bg-gray-200 py-4 text-lg font-bold text-gray-800"
             >
-              {t.label}
+              📋 문자 내용 복사
             </button>
-          ))}
+            <button
+              type="button"
+              onClick={() => setDraft(null)}
+              className="flex items-center justify-center rounded-xl bg-white py-4 text-base font-bold text-gray-500"
+            >
+              닫기
+            </button>
+          </div>
         </div>
       )}
 
@@ -181,10 +247,15 @@ export function PaymentCard({ schedule }: { schedule: PaymentBoardItem }) {
           </button>
           <button
             type="button"
-            onClick={() => setShowReminders((v) => !v)}
+            onClick={() =>
+              setShowReminders((v) => {
+                if (!v) setDraft(null);
+                return !v;
+              })
+            }
             className="flex flex-1 items-center justify-center rounded-xl bg-blue-600 py-4 text-lg font-bold text-white"
           >
-            📱 독촉 문자
+            📱 독촉 문자 만들기
           </button>
         </div>
       )}
