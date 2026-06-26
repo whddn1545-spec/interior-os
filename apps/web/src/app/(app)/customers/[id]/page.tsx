@@ -1,6 +1,6 @@
 import { notFound } from "next/navigation";
 import Link from "next/link";
-import { ArrowLeftIcon, ChevronRightIcon, MessageSquareIcon } from "lucide-react";
+import { ArrowLeftIcon, ChevronRightIcon, MessageSquareIcon, FileTextIcon } from "lucide-react";
 import { createClient } from "@/lib/supabase/server";
 import { CustomerEditForm } from "./customer-edit-form";
 
@@ -47,6 +47,13 @@ export default async function CustomerDetailPage({ params }: { params: Promise<{
               memo: (c.memo as string | null) ?? "",
             }}
           />
+          <Link
+            href={`/quotes/new?customerId=${id}`}
+            className="flex items-center gap-1 bg-blue-100 text-blue-700 px-3 py-2 rounded-xl text-sm font-medium"
+          >
+            <FileTextIcon size={16} />
+            새 견적
+          </Link>
           <Link
             href={`/messages?customerId=${id}`}
             className="flex items-center gap-1 bg-green-100 text-green-700 px-3 py-2 rounded-xl text-sm font-medium"

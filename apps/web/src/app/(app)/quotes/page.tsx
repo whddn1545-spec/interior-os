@@ -4,11 +4,19 @@ import { createClient } from "@/lib/supabase/server";
 
 export default async function QuotesPage() {
   const supabase = await createClient();
+  const now = new Date();
+  const startOfMonth = new Date(now.getFullYear(), now.getMonth(), 1).toISOString().split("T")[0];
+
   const { data: quotes } = await supabase
     .from("quotes")
-    .select("id, version, status, total_amount, created_at, sites(name)")
+    .select("id, version, status, total_amount, created_at, sites(name, customers(name))")
     .order("created_at", { ascending: false })
     .limit(50);
+
+  const allQuotes = quotes ?? [];
+  const monthQuotes = allQuotes.filter((q) => (q.created_at as string) >= startOfMonth);
+  const monthConfirmed = monthQuotes.filter((q) => ["confirmed","sent","accepted"].includes(q.status as string));
+  const monthTotal = monthConfirmed.reduce((s, q) => s + ((q.total_amount as number) ?? 0), 0);
 
   const statusLabel: Record<string, string> = {
     draft: "임시저장",
@@ -39,15 +47,28 @@ export default async function QuotesPage() {
         </Link>
       </div>
 
-      {!quotes || quotes.length === 0 ? (
+      {/* 이번달 요약 */}
+      <div className="grid grid-cols-2 gap-3 mb-6">
+        <div className="bg-blue-50 border border-blue-100 rounded-2xl p-4 text-center">
+          <p className="text-2xl font-black text-blue-700">{monthConfirmed.length}건</p>
+          <p className="text-sm text-gray-500">이번달 확정 견적</p>
+        </div>
+        <div className="bg-green-50 border border-green-100 rounded-2xl p-4 text-center">
+          <p className="text-lg font-black text-green-700">{monthTotal.toLocaleString("ko-KR")}원</p>
+          <p className="text-sm text-gray-500">이번달 견적 총액</p>
+        </div>
+      </div>
+
+      {!allQuotes || allQuotes.length === 0 ? (
         <div className="text-center py-16 text-gray-400">
           <p className="text-xl mb-2">아직 견적이 없어요</p>
           <p className="text-base">위의 "새 견적" 버튼을 눌러 시작하세요</p>
         </div>
       ) : (
         <ul className="space-y-3">
-          {quotes.map((q) => {
-            const site = q.sites as unknown as { name: string } | null;
+          {allQuotes.map((q) => {
+            const site = q.sites as unknown as { name: string; customers: { name: string } | null } | null;
+            const customerName = site?.customers?.name ?? null;
             return (
               <li key={q.id}>
                 <Link
@@ -60,7 +81,7 @@ export default async function QuotesPage() {
                         {site?.name ?? "현장 정보 없음"}
                       </p>
                       <p className="text-base text-gray-500 mt-0.5">
-                        v{q.version} ·{" "}
+                        {customerName ? `${customerName} · ` : ""}v{q.version} ·{" "}
                         {new Date(q.created_at).toLocaleDateString("ko-KR")}
                       </p>
                     </div>
