@@ -62,6 +62,8 @@ export async function createSite(input: {
   areaPyeong: number;
   difficulty: "easy" | "normal" | "hard";
   distanceZoneId?: string;
+  mainDoorCode?: string;
+  unitDoorCode?: string;
 }): Promise<ActionResult<{ id: string }>> {
   const supabase = await createClient();
   const {
@@ -80,6 +82,8 @@ export async function createSite(input: {
       area_pyeong: input.areaPyeong,
       difficulty: input.difficulty,
       distance_zone_id: input.distanceZoneId ?? null,
+      main_door_code: input.mainDoorCode?.trim() || null,
+      unit_door_code: input.unitDoorCode?.trim() || null,
       status: "quoting",
     })
     .select("id")

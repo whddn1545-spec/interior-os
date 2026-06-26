@@ -115,7 +115,7 @@ export async function revertQuoteToDraft(quoteId: string): Promise<ActionResult<
 
   const { error } = await supabase
     .from("quotes")
-    .update({ status: "draft" as const, confirmed_by: null, confirmed_at: null })
+    .update({ status: "draft" as const, confirmed_by: null, confirmed_at: null, customer_pdf_url: null, internal_pdf_url: null })
     .eq("id", quoteId)
     .eq("status", "confirmed" as const);
 

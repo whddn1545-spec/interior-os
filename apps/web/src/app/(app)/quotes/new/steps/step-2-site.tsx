@@ -27,6 +27,8 @@ export function Step2Site({ customerId, onNext, onBack }: Props) {
   const [address, setAddress] = useState("");
   const [areaPyeong, setAreaPyeong] = useState("");
   const [difficulty, setDifficulty] = useState<"easy" | "normal" | "hard">("normal");
+  const [mainDoorCode, setMainDoorCode] = useState("");
+  const [unitDoorCode, setUnitDoorCode] = useState("");
   const [zones, setZones] = useState<DistanceZone[]>([]);
   const [selectedZoneId, setSelectedZoneId] = useState<string>("");
   const [error, setError] = useState<string | null>(null);
@@ -62,6 +64,8 @@ export function Step2Site({ customerId, onNext, onBack }: Props) {
         areaPyeong: area,
         difficulty,
         distanceZoneId: selectedZoneId || undefined,
+        mainDoorCode: mainDoorCode.trim() || undefined,
+        unitDoorCode: unitDoorCode.trim() || undefined,
       });
       if (!res.ok) {
         setError(res.error);
@@ -162,6 +166,42 @@ export function Step2Site({ customerId, onNext, onBack }: Props) {
               </button>
             ))}
           </div>
+        </div>
+
+        {/* 현장 비밀번호 */}
+        <div>
+          <label className="block text-lg font-medium text-gray-700 mb-1">
+            🔒 공동현관 비번
+            <span className="block text-sm font-normal text-amber-600 mt-0.5">
+              보안 — 발송 후 로그에 마스킹 저장
+            </span>
+          </label>
+          <input
+            type="text"
+            value={mainDoorCode}
+            onChange={(e) => setMainDoorCode(e.target.value)}
+            placeholder="예: 1234#"
+            className="w-full px-4 py-4 text-lg border border-gray-300 rounded-xl focus:outline-none focus:ring-2 focus:ring-blue-500"
+          />
+        </div>
+
+        <div>
+          <label className="block text-lg font-medium text-gray-700 mb-1">
+            🔒 세대 비번
+            <span className="block text-sm font-normal text-amber-600 mt-0.5">
+              보안 — 발송 후 로그에 마스킹 저장
+            </span>
+          </label>
+          <input
+            type="text"
+            value={unitDoorCode}
+            onChange={(e) => setUnitDoorCode(e.target.value)}
+            placeholder="예: 5678*"
+            className="w-full px-4 py-4 text-lg border border-gray-300 rounded-xl focus:outline-none focus:ring-2 focus:ring-blue-500"
+          />
+          <p className="text-sm text-gray-400 mt-1 ml-1">
+            문자 발송 시 자동으로 포함됩니다
+          </p>
         </div>
 
         {error && <p className="text-red-500 text-base">{error}</p>}

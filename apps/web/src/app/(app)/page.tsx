@@ -10,7 +10,8 @@ export default async function HomePage() {
   const today = new Date().toISOString().split("T")[0];
 
   const [
-    { data: activeSites },
+    { data: contractedSites },
+    { data: confirmedQuoteSites },
     { data: draftQuotes },
     { data: todayTasks },
   ] = await Promise.all([
@@ -18,6 +19,14 @@ export default async function HomePage() {
       .from("sites")
       .select("id, name, address, status, start_date, end_date")
       .in("status", ["contracted", "in_progress"])
+      .order("start_date", { ascending: true })
+      .limit(5),
+    // 견적은 확정됐지만 아직 계약 전(quoting)인 현장도 진행 중으로 노출
+    supabase
+      .from("sites")
+      .select("id, name, address, status, start_date, end_date, quotes!inner(id, status)")
+      .eq("status", "quoting")
+      .in("quotes.status", ["confirmed", "sent", "accepted"])
       .order("start_date", { ascending: true })
       .limit(5),
     supabase
@@ -34,6 +43,14 @@ export default async function HomePage() {
       .gte("end_date", today)
       .limit(10),
   ]);
+
+  // 계약 단계 현장 + 견적 확정된 현장을 합치고 중복 제거
+  const activeSitesById = new Map<string, { id: string; name: string; address: string; status: string; start_date: string | null; end_date: string | null }>();
+  for (const s of [...(contractedSites ?? []), ...(confirmedQuoteSites ?? [])]) {
+    const site = s as unknown as { id: string; name: string; address: string; status: string; start_date: string | null; end_date: string | null };
+    if (!activeSitesById.has(site.id)) activeSitesById.set(site.id, site);
+  }
+  const activeSites = Array.from(activeSitesById.values()).slice(0, 5);
 
   const displayName = user?.user_metadata?.display_name ?? user?.email?.split("@")[0] ?? "사장님";
 

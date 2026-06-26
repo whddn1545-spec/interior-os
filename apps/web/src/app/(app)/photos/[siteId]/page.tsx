@@ -27,9 +27,22 @@ export default async function SitePhotosPage({ params }: { params: Promise<{ sit
   ]);
 
   const tradeList = (trades as { id: string; code: string; name_ko: string }[] | null) ?? [];
-  const supabaseUrl = process.env.NEXT_PUBLIC_SUPABASE_URL ?? "";
   const photoList = (photos as unknown as Record<string, unknown>[]) ?? [];
   const s = site as unknown as Record<string, unknown>;
+
+  // photos 버킷은 비공개(private)이므로 서명 URL을 서버에서 생성해 전달한다.
+  const storagePaths = photoList.map((photo) => photo.storage_path as string);
+  const signedUrlByPath = new Map<string, string>();
+  if (storagePaths.length > 0) {
+    const { data: signedUrls } = await supabase.storage
+      .from("photos")
+      .createSignedUrls(storagePaths, 3600);
+    for (const entry of signedUrls ?? []) {
+      if (entry.path && entry.signedUrl) {
+        signedUrlByPath.set(entry.path, entry.signedUrl);
+      }
+    }
+  }
 
   return (
     <div className="px-4 pt-6 pb-24">
@@ -59,7 +72,7 @@ export default async function SitePhotosPage({ params }: { params: Promise<{ sit
               <PhotoCard
                 key={photo.id as string}
                 siteId={siteId}
-                supabaseUrl={supabaseUrl}
+                signedUrl={signedUrlByPath.get(photo.storage_path as string) ?? null}
                 trades={tradeList.map((t) => ({ id: t.id, code: t.code, nameKo: t.name_ko }))}
                 photo={{
                   id: photo.id as string,

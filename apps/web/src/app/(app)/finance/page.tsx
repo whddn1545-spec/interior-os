@@ -1,6 +1,7 @@
 import { createClient } from "@/lib/supabase/server";
 import { TrendingUpIcon, TrendingDownIcon } from "lucide-react";
 import { FinanceForm } from "./finance-form";
+import { FinanceEntryItem } from "./finance-entry-item";
 
 const CATEGORY_LABEL: Record<string, string> = {
   customer_payment: "고객 입금",
@@ -68,18 +69,18 @@ export default async function FinancePage() {
       <div className="grid grid-cols-3 gap-3 mb-4">
         <div className="bg-green-50 border border-green-100 rounded-2xl p-4 text-center">
           <TrendingUpIcon size={20} className="mx-auto text-green-600 mb-1" />
-          <p className="text-xl font-black text-green-700">{(totalIn / 10000).toFixed(0)}만</p>
+          <p className="text-lg font-black text-green-700">{totalIn.toLocaleString("ko-KR")}원</p>
           <p className="text-xs text-gray-500">이번 달 수입</p>
         </div>
         <div className="bg-red-50 border border-red-100 rounded-2xl p-4 text-center">
           <TrendingDownIcon size={20} className="mx-auto text-red-500 mb-1" />
-          <p className="text-xl font-black text-red-600">{(totalOut / 10000).toFixed(0)}만</p>
+          <p className="text-lg font-black text-red-600">{totalOut.toLocaleString("ko-KR")}원</p>
           <p className="text-xs text-gray-500">이번 달 지출</p>
         </div>
         <div className="bg-blue-50 border border-blue-100 rounded-2xl p-4 text-center">
           <p className="text-xs text-gray-500 mb-1">순이익</p>
-          <p className={`text-xl font-black ${totalIn - totalOut >= 0 ? "text-blue-700" : "text-red-600"}`}>
-            {((totalIn - totalOut) / 10000).toFixed(0)}만
+          <p className={`text-lg font-black ${totalIn - totalOut >= 0 ? "text-blue-700" : "text-red-600"}`}>
+            {(totalIn - totalOut).toLocaleString("ko-KR")}원
           </p>
         </div>
       </div>
@@ -88,10 +89,10 @@ export default async function FinancePage() {
       <div className="bg-white border border-gray-200 rounded-2xl px-4 py-3 mb-6">
         <p className="text-sm text-gray-500 mb-2">{now.getFullYear()}년 누적</p>
         <div className="flex justify-between text-base">
-          <span className="text-green-600 font-semibold">수입 {(yearIn / 10000).toFixed(0)}만</span>
-          <span className="text-red-500 font-semibold">지출 {(yearOut / 10000).toFixed(0)}만</span>
+          <span className="text-green-600 font-semibold">수입 {yearIn.toLocaleString("ko-KR")}원</span>
+          <span className="text-red-500 font-semibold">지출 {yearOut.toLocaleString("ko-KR")}원</span>
           <span className={`font-bold ${yearIn - yearOut >= 0 ? "text-blue-700" : "text-red-600"}`}>
-            순이익 {((yearIn - yearOut) / 10000).toFixed(0)}만
+            순이익 {(yearIn - yearOut).toLocaleString("ko-KR")}원
           </span>
         </div>
       </div>
@@ -109,36 +110,19 @@ export default async function FinancePage() {
         </div>
       ) : (
         <div className="space-y-2">
-          {(entries as unknown as Record<string, unknown>[]).map((e) => {
-            const isIn = e.direction === "in";
-            const site = e.sites as { name: string } | null;
-            return (
-              <div key={e.id as string} className="bg-white border border-gray-200 rounded-2xl px-4 py-3">
-                <div className="flex items-center justify-between gap-2">
-                  <div className="flex-1 min-w-0">
-                    <div className="flex items-center gap-2">
-                      <span className={`text-xs px-2 py-0.5 rounded-full font-medium ${isIn ? "bg-green-100 text-green-700" : "bg-red-100 text-red-600"}`}>
-                        {isIn ? "수입" : "지출"}
-                      </span>
-                      <p className="text-base font-semibold text-gray-900 truncate">
-                        {CATEGORY_LABEL[e.category as string] ?? e.category as string}
-                      </p>
-                    </div>
-                    <p className="text-sm text-gray-500 mt-0.5">
-                      {e.paid_at as string}
-                      {site?.name ? ` · ${site.name}` : ""}
-                    </p>
-                    {(e.memo as string | null) && (
-                      <p className="text-sm text-gray-400">{e.memo as string}</p>
-                    )}
-                  </div>
-                  <p className={`text-xl font-bold shrink-0 ${isIn ? "text-green-600" : "text-red-500"}`}>
-                    {isIn ? "+" : "-"}{(e.amount as number).toLocaleString("ko-KR")}원
-                  </p>
-                </div>
-              </div>
-            );
-          })}
+          {(entries as unknown as Record<string, unknown>[]).map((e) => (
+            <FinanceEntryItem
+              key={e.id as string}
+              id={e.id as string}
+              direction={e.direction as "in" | "out"}
+              category={e.category as string}
+              amount={e.amount as number}
+              paidAt={e.paid_at as string}
+              siteName={(e.sites as { name: string } | null)?.name ?? null}
+              memo={(e.memo as string | null) ?? null}
+              categoryLabel={CATEGORY_LABEL[e.category as string] ?? e.category as string}
+            />
+          ))}
         </div>
       )}
     </div>

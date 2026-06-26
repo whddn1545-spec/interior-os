@@ -15,13 +15,32 @@ const STATUS_COLOR: Record<string, string> = {
 export default async function SchedulePage() {
   const supabase = await createClient();
 
-  // 일정 있는 현장 목록 (진행 중 또는 계약 완료)
-  const { data: sites } = await supabase
+  // 일정 있는 현장 목록 (진행 중 / 계약 완료 / 견적 확정된 현장)
+  // 1) 계약 이후 단계의 현장은 status 기준으로 노출
+  const { data: contractedSites } = await supabase
     .from("sites")
     .select("id, name, address, status, start_date, end_date, schedule_tasks(id, status)")
     .in("status", ["contracted", "in_progress", "done"])
     .order("start_date", { ascending: false })
     .limit(30);
+
+  // 2) 아직 'quoting' 상태지만 확정된 견적이 있는 현장도 노출
+  //    (견적 확정 → 계약 전이라도 일정을 만들 수 있도록)
+  const { data: quotingSites } = await supabase
+    .from("sites")
+    .select("id, name, address, status, start_date, end_date, schedule_tasks(id, status), quotes!inner(id, status)")
+    .eq("status", "quoting")
+    .in("quotes.status", ["confirmed", "sent", "accepted"])
+    .order("start_date", { ascending: false })
+    .limit(30);
+
+  // 두 결과를 합치고 현장 id 기준으로 중복 제거
+  const sitesById = new Map<string, Record<string, unknown>>();
+  for (const s of [...(contractedSites ?? []), ...(quotingSites ?? [])]) {
+    const sAny = s as unknown as Record<string, unknown>;
+    sitesById.set(sAny.id as string, sAny);
+  }
+  const sites = Array.from(sitesById.values());
 
   const today = new Date().toISOString().split("T")[0];
 
@@ -37,11 +56,11 @@ export default async function SchedulePage() {
         <p className="text-sm text-blue-700">오늘: {new Date().toLocaleDateString("ko-KR", { month: "long", day: "numeric", weekday: "short" })}</p>
       </div>
 
-      {!sites || sites.length === 0 ? (
+      {sites.length === 0 ? (
         <div className="text-center py-16 text-gray-400">
           <CalendarIcon size={48} className="mx-auto mb-3 opacity-30" />
           <p className="text-xl">진행 중인 현장이 없어요</p>
-          <p className="text-sm mt-1">계약 완료 후 일정을 생성할 수 있어요</p>
+          <p className="text-sm mt-1">견적 확정 후 일정을 생성할 수 있어요</p>
         </div>
       ) : (
         <div className="space-y-3">

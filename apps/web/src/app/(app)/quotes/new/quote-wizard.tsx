@@ -181,7 +181,12 @@ export function QuoteWizard() {
       )}
 
       {step === 5 && state.quoteId && state.total !== undefined && (
-        <Step5Done quoteId={state.quoteId} total={state.total} />
+        <Step5Done
+          quoteId={state.quoteId}
+          total={state.total}
+          customerId={state.customer?.id}
+          siteId={state.siteId}
+        />
       )}
     </div>
   );

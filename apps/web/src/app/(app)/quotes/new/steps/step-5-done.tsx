@@ -7,9 +7,15 @@ import { CheckCircleIcon } from "lucide-react";
 interface Props {
   quoteId: string;
   total: number;
+  customerId?: string;
+  siteId?: string;
 }
 
-export function Step5Done({ quoteId, total }: Props) {
+export function Step5Done({ quoteId, total, customerId, siteId }: Props) {
+  const msgParams = new URLSearchParams({ targetType: "customer" });
+  if (customerId) msgParams.set("customerId", customerId);
+  if (siteId) msgParams.set("siteId", siteId);
+  msgParams.set("messageType", "customer_progress");
   return (
     <div className="px-4 pt-12 flex flex-col items-center text-center">
       <CheckCircleIcon size={80} className="text-green-500 mb-6" />
@@ -27,7 +33,7 @@ export function Step5Done({ quoteId, total }: Props) {
         </Link>
 
         <Link
-          href="/messages"
+          href={`/messages?${msgParams.toString()}`}
           className="flex items-center justify-center gap-2 w-full bg-white border-2 border-gray-200 text-gray-800 rounded-2xl py-5 text-xl font-semibold"
         >
           📱 고객에게 문자 보내기

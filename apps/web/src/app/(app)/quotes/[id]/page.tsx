@@ -151,14 +151,26 @@ export default async function QuoteDetailPage({ params }: { params: Promise<{ id
         )}
 
         {/* 확정된 경우 PDF/계약 버튼 */}
-        {status === "confirmed" && (
-          <div className="bg-blue-50 border border-blue-200 rounded-2xl p-4 flex items-start gap-3">
-            <CheckCircleIcon size={22} className="text-blue-600 shrink-0 mt-0.5" />
-            <div>
-              <p className="text-base font-semibold text-blue-800">견적이 확정되었어요</p>
-              <p className="text-sm text-blue-700 mt-0.5">PDF를 생성하거나 고객에게 문자로 보낼 수 있어요</p>
+        {(status === "confirmed" || status === "sent" || status === "accepted") && (
+          <>
+            <div className="bg-blue-50 border border-blue-200 rounded-2xl p-4 flex items-start gap-3">
+              <CheckCircleIcon size={22} className="text-blue-600 shrink-0 mt-0.5" />
+              <div>
+                <p className="text-base font-semibold text-blue-800">견적이 확정되었어요</p>
+                <p className="text-sm text-blue-700 mt-0.5">이제 공사 일정을 만들거나, PDF 생성·문자 발송·계약서 작성을 할 수 있어요</p>
+              </div>
             </div>
-          </div>
+
+            {/* 공사 일정 만들기 CTA */}
+            {siteAny && (
+              <Link
+                href={`/schedule/${siteAny.id}`}
+                className="flex items-center justify-center gap-2 w-full bg-green-600 text-white rounded-2xl py-5 text-xl font-bold active:bg-green-700"
+              >
+                📅 공사 일정 만들기
+              </Link>
+            )}
+          </>
         )}
 
         {/* 견적 PDF 다운로드 링크 */}

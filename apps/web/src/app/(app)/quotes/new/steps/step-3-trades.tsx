@@ -88,15 +88,22 @@ export function Step3Trades({ distanceFactor, difficultyFactor, defaultAreaPyeon
 
   function handleNext() {
     if (selected.size === 0) return;
-    const items: QuoteItemDraft[] = Array.from(selected.values()).map(({ price, quantity }) => ({
-      tradeId: price.tradeId,
-      description: `${price.nameKo} - ${price.itemName}`,
-      quantity: parseFloat(quantity) || 0,
-      unit: price.unit,
-      materialUnitPrice: price.materialUnitPrice,
-      laborDayRate: price.laborDayRate,
-      defaultDaysPerUnit: price.defaultDaysPerUnit,
-    }));
+    const items: QuoteItemDraft[] = Array.from(selected.values())
+      .filter(({ quantity }) => parseFloat(quantity) > 0)
+      .map(({ price, quantity }) => ({
+        tradeId: price.tradeId,
+        description: `${price.nameKo} - ${price.itemName}`,
+        quantity: parseFloat(quantity),
+        unit: price.unit,
+        materialUnitPrice: price.materialUnitPrice,
+        laborDayRate: price.laborDayRate,
+        defaultDaysPerUnit: price.defaultDaysPerUnit,
+      }));
+
+    if (items.length === 0) {
+      alert("수량을 1 이상 입력한 공종이 없어요.\n체크한 항목의 수량을 입력해주세요.");
+      return;
+    }
     onNext(items);
   }
 

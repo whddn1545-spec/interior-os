@@ -1,7 +1,7 @@
 "use client";
 
 import { useState, useTransition } from "react";
-import { PlusIcon, XIcon } from "lucide-react";
+import { PlusIcon, XIcon, CheckCircleIcon } from "lucide-react";
 import { addFinanceEntry } from "./actions";
 
 interface Site { id: string; name: string }
@@ -10,6 +10,7 @@ export function FinanceForm({ sites }: { sites: Site[] }) {
   const [open, setOpen] = useState(false);
   const [isPending, startTransition] = useTransition();
   const [error, setError] = useState<string | null>(null);
+  const [saved, setSaved] = useState(false);
 
   function handleSubmit(e: React.FormEvent<HTMLFormElement>) {
     e.preventDefault();
@@ -20,8 +21,12 @@ export function FinanceForm({ sites }: { sites: Site[] }) {
       setError(null);
       const result = await addFinanceEntry(formData);
       if (result.ok) {
-        setOpen(false);
+        setSaved(true);
         form.reset();
+        setTimeout(() => {
+          setSaved(false);
+          setOpen(false);
+        }, 1200);
       } else {
         setError(result.error ?? "저장 실패");
       }
@@ -43,6 +48,13 @@ export function FinanceForm({ sites }: { sites: Site[] }) {
       {open && (
         <div className="fixed inset-0 bg-black/50 z-50 flex items-end">
           <div className="bg-white w-full rounded-t-3xl p-6 pb-10 max-h-[90vh] overflow-y-auto">
+            {saved ? (
+              <div className="flex flex-col items-center justify-center py-12">
+                <CheckCircleIcon size={72} className="text-green-500 mb-4" />
+                <p className="text-2xl font-bold text-gray-900">저장됐어요!</p>
+              </div>
+            ) : (
+            <>
             <div className="flex items-center justify-between mb-6">
               <h2 className="text-xl font-bold text-gray-900">입출금 추가</h2>
               <button onClick={() => setOpen(false)} className="p-2 text-gray-400">
@@ -156,6 +168,8 @@ export function FinanceForm({ sites }: { sites: Site[] }) {
                 {isPending ? "저장 중..." : "저장하기"}
               </button>
             </form>
+            </>
+            )}
           </div>
         </div>
       )}

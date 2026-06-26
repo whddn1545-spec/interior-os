@@ -1,24 +1,30 @@
 "use client";
 
-import { useState, useTransition } from "react";
+import { useEffect, useState, useTransition } from "react";
+import { useSearchParams } from "next/navigation";
 import { AlertTriangleIcon, SendIcon, CheckCircleIcon } from "lucide-react";
 import { previewMessage, sendMessage } from "./actions";
 
 interface Worker { id: string; name: string; phone: string; tradesKo: string }
-interface Site { id: string; name: string; trades: { id: string; name_ko: string }[] }
+interface Customer { id: string; name: string; phone: string }
+interface Site { id: string; name: string; customerId: string | null; trades: { id: string; name_ko: string }[] }
 
 interface Props {
   workers: Worker[];
   sites: Site[];
+  customers: Customer[];
 }
 
 type Step = "target" | "site" | "preview" | "done";
 type MessageType = "worker_notify" | "customer_progress" | "custom";
 
-export function MessageWizard({ workers, sites }: Props) {
+export function MessageWizard({ workers, sites, customers }: Props) {
+  const searchParams = useSearchParams();
+
   const [step, setStep] = useState<Step>("target");
   const [targetType, setTargetType] = useState<"worker" | "customer">("worker");
   const [selectedWorkerId, setSelectedWorkerId] = useState("");
+  const [selectedCustomerId, setSelectedCustomerId] = useState("");
   const [selectedSiteId, setSelectedSiteId] = useState("");
   const [selectedTradeId, setSelectedTradeId] = useState("");
   const [workDate, setWorkDate] = useState(() => {
@@ -31,16 +37,45 @@ export function MessageWizard({ workers, sites }: Props) {
   const [error, setError] = useState<string | null>(null);
   const [isPending, startTransition] = useTransition();
 
+  // 견적/현장 화면에서 넘어온 컨텍스트(siteId/quoteId/customerId)를 미리 채운다.
+  useEffect(() => {
+    const siteId = searchParams.get("siteId");
+    const customerId = searchParams.get("customerId");
+    const workerId = searchParams.get("workerId");
+
+    if (workerId) {
+      setTargetType("worker");
+      setSelectedWorkerId(workerId);
+      setMessageType("worker_notify");
+    } else if (customerId) {
+      setTargetType("customer");
+      setSelectedCustomerId(customerId);
+      setMessageType("customer_progress");
+    }
+
+    if (siteId) {
+      setSelectedSiteId(siteId);
+      // 대상까지 정해졌다면 바로 현장 단계로 진입
+      if (workerId || customerId) setStep("site");
+    }
+    // 최초 마운트 시 1회만 적용 (이후 사용자의 선택을 덮어쓰지 않도록)
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, []);
+
   const selectedSite = sites.find((s) => s.id === selectedSiteId);
+  // 고객 선택 시 해당 고객의 현장만 보여준다.
+  const customerSites = selectedCustomerId
+    ? sites.filter((s) => s.customerId === selectedCustomerId)
+    : sites;
+  const availableSites = targetType === "customer" ? customerSites : sites;
+  const selectedId = targetType === "worker" ? selectedWorkerId : selectedCustomerId;
 
   async function loadPreview() {
     setError(null);
-    const workerId = targetType === "worker" ? selectedWorkerId : "";
-    const customerId = targetType === "customer" ? selectedWorkerId : ""; // reuse field
 
     const result = await previewMessage({
       targetType,
-      targetId: workerId || customerId,
+      targetId: selectedId,
       siteId: selectedSiteId,
       messageType,
       customBody,
@@ -59,16 +94,18 @@ export function MessageWizard({ workers, sites }: Props) {
   function handleSend() {
     if (!preview) return;
     startTransition(async () => {
-      const key = `${selectedWorkerId}-${selectedSiteId}-${Date.now()}`;
+      const dateKey = messageType === "worker_notify" ? workDate : "";
+      const key = `${targetType}-${selectedId}-${selectedSiteId}-${dateKey}-${messageType}`;
       const result = await sendMessage({
         targetType,
-        targetId: selectedWorkerId,
+        targetId: selectedId,
         siteId: selectedSiteId || undefined,
-        body: preview.body,
-        maskedBody: preview.maskedBody,
+        messageType,
+        customBody: messageType === "custom" ? customBody : undefined,
+        workDate: messageType === "worker_notify" ? workDate : undefined,
+        tradeId: selectedTradeId || undefined,
         channel: "sms",
         idempotencyKey: key,
-        targetPhone: preview.targetPhone,
       });
       if (!result.ok) {
         setError(result.error);
@@ -81,6 +118,7 @@ export function MessageWizard({ workers, sites }: Props) {
   function reset() {
     setStep("target");
     setSelectedWorkerId("");
+    setSelectedCustomerId("");
     setSelectedSiteId("");
     setSelectedTradeId("");
     setPreview(null);
@@ -111,7 +149,7 @@ export function MessageWizard({ workers, sites }: Props) {
 
         <div className="grid grid-cols-2 gap-3 mb-4">
           <button
-            onClick={() => { setTargetType("worker"); setSelectedWorkerId(""); }}
+            onClick={() => { setTargetType("worker"); setSelectedCustomerId(""); setSelectedSiteId(""); setMessageType("worker_notify"); }}
             className={`py-4 rounded-xl text-lg font-semibold border-2 ${
               targetType === "worker" ? "border-blue-600 bg-blue-50 text-blue-700" : "border-gray-200 text-gray-700"
             }`}
@@ -119,7 +157,7 @@ export function MessageWizard({ workers, sites }: Props) {
             👷 작업자
           </button>
           <button
-            onClick={() => { setTargetType("customer"); setSelectedWorkerId(""); }}
+            onClick={() => { setTargetType("customer"); setSelectedWorkerId(""); setSelectedSiteId(""); setMessageType("customer_progress"); }}
             className={`py-4 rounded-xl text-lg font-semibold border-2 ${
               targetType === "customer" ? "border-blue-600 bg-blue-50 text-blue-700" : "border-gray-200 text-gray-700"
             }`}
@@ -141,7 +179,20 @@ export function MessageWizard({ workers, sites }: Props) {
           </select>
         )}
 
-        {step === "target" && selectedWorkerId && (
+        {targetType === "customer" && (
+          <select
+            value={selectedCustomerId}
+            onChange={(e) => { setSelectedCustomerId(e.target.value); setSelectedSiteId(""); }}
+            className="w-full border border-gray-200 rounded-xl px-4 py-4 text-lg text-gray-900 focus:outline-none focus:border-blue-400"
+          >
+            <option value="">고객 선택...</option>
+            {customers.map((c) => (
+              <option key={c.id} value={c.id}>{c.name}</option>
+            ))}
+          </select>
+        )}
+
+        {step === "target" && selectedId && (
           <div className="mt-4">
             <h3 className="text-lg font-semibold text-gray-800 mb-3">메시지 종류</h3>
             <div className="space-y-2">
@@ -185,7 +236,7 @@ export function MessageWizard({ workers, sites }: Props) {
               className="w-full border border-gray-200 rounded-xl px-4 py-4 text-lg text-gray-900 focus:outline-none focus:border-blue-400"
             >
               <option value="">현장 선택...</option>
-              {sites.map((s) => (
+              {availableSites.map((s) => (
                 <option key={s.id} value={s.id}>{s.name}</option>
               ))}
             </select>

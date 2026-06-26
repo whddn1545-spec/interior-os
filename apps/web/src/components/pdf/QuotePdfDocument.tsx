@@ -37,8 +37,9 @@ const styles = StyleSheet.create({
   footerText: { fontSize: 8, color: "#999" },
 });
 
-function won(n: number) {
-  return n.toLocaleString("ko-KR") + "원";
+function won(n: unknown) {
+  const num = typeof n === "number" && !isNaN(n) ? n : 0;
+  return num.toLocaleString("ko-KR") + "원";
 }
 
 interface QuotePdfDocumentProps {
@@ -48,7 +49,7 @@ interface QuotePdfDocumentProps {
 
 export function QuotePdfDocument({ quote, audience }: QuotePdfDocumentProps) {
   const site = quote.sites as { name: string; address: string; area_pyeong: number; customers: { name: string; phone: string } | null } | null;
-  const items = (quote.quote_items as { id: string; trades?: { name_ko: string } | null; quantity: number; material_unit_price: number; labor_unit_price: number }[] | null) ?? [];
+  const items = (quote.quote_items as { id: string; trades?: { name_ko: string } | null; quantity: number; material_cost: number; labor_cost: number; line_total: number }[] | null) ?? [];
   const totalAmount = (quote.total_amount as number) ?? 0;
   const isCustomer = audience === "customer";
   const createdAt = quote.created_at as string;
@@ -97,9 +98,9 @@ export function QuotePdfDocument({ quote, audience }: QuotePdfDocumentProps) {
             <Text style={styles.colTotal}>소계</Text>
           </View>
           {items.map((item) => {
-            const mat = item.material_unit_price * item.quantity;
-            const labor = item.labor_unit_price * item.quantity;
-            const lineTotal = isCustomer ? mat + labor : mat + labor;
+            const mat = item.material_cost;
+            const labor = item.labor_cost;
+            const lineTotal = item.line_total;
             return (
               <View key={item.id} style={styles.tableRow}>
                 <Text style={styles.colTrade}>{item.trades?.name_ko ?? "-"}</Text>

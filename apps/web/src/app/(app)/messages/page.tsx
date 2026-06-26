@@ -1,8 +1,9 @@
+import { Suspense } from "react";
 import { createClient } from "@/lib/supabase/server";
 import Link from "next/link";
 import { MessageSquareIcon, ChevronRightIcon } from "lucide-react";
 import { MessageWizard } from "./message-wizard";
-import { getWorkers, getActiveSites } from "./actions";
+import { getWorkers, getActiveSites, getCustomers } from "./actions";
 
 export default async function MessagesPage() {
   const supabase = await createClient();
@@ -16,6 +17,7 @@ export default async function MessagesPage() {
 
   const workersResult = await getWorkers();
   const sitesResult = await getActiveSites();
+  const customersResult = await getCustomers();
 
   const statusLabel: Record<string, string> = { queued: "대기중", sent: "발송됨", failed: "실패" };
   const statusColor: Record<string, string> = {
@@ -28,10 +30,13 @@ export default async function MessagesPage() {
     <div className="px-4 pt-6 pb-24">
       <h1 className="text-2xl font-bold text-gray-900 mb-6">문자 보내기</h1>
 
-      <MessageWizard
-        workers={workersResult.ok ? workersResult.data : []}
-        sites={sitesResult.ok ? sitesResult.data : []}
-      />
+      <Suspense fallback={<div className="bg-white rounded-2xl border border-gray-200 p-5 text-gray-400">불러오는 중...</div>}>
+        <MessageWizard
+          workers={workersResult.ok ? workersResult.data : []}
+          sites={sitesResult.ok ? sitesResult.data : []}
+          customers={customersResult.ok ? customersResult.data : []}
+        />
+      </Suspense>
 
       {/* 최근 발송 이력 */}
       {recentLogs && recentLogs.length > 0 && (

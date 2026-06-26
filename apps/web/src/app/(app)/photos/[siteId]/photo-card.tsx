@@ -23,17 +23,17 @@ interface PhotoCardProps {
   };
   siteId: string;
   trades: Trade[];
-  supabaseUrl: string;
+  signedUrl: string | null;
 }
 
 const PHASE_LABEL: Record<string, string> = {
-  before: "착공 전", during: "시공 중", after: "완공 후",
+  before: "공사 전", progress: "시공 중", after: "완공",
 };
-const PHASES = ["before", "during", "after"];
+const PHASES = ["before", "progress", "after"];
 
-export function PhotoCard({ photo, siteId, trades, supabaseUrl }: PhotoCardProps) {
+export function PhotoCard({ photo, siteId, trades, signedUrl }: PhotoCardProps) {
   const [open, setOpen] = useState(false);
-  const [phase, setPhase] = useState<string>(photo.phase ?? "during");
+  const [phase, setPhase] = useState<string>(photo.phase ?? "progress");
   const [tradeId, setTradeId] = useState<string>(photo.tradeId ?? "");
   const [isPending, startTransition] = useTransition();
 
@@ -51,12 +51,16 @@ export function PhotoCard({ photo, siteId, trades, supabaseUrl }: PhotoCardProps
     <>
       <div className="bg-white border border-gray-200 rounded-2xl overflow-hidden">
         <div className="aspect-square bg-gray-100 relative">
-          {/* eslint-disable-next-line @next/next/no-img-element */}
-          <img
-            src={`${supabaseUrl}/storage/v1/object/public/photos/${photo.storagePath}`}
-            alt={photo.captionHint ?? "현장 사진"}
-            className="w-full h-full object-cover"
-          />
+          {signedUrl && (
+            <>
+              {/* eslint-disable-next-line @next/next/no-img-element */}
+              <img
+                src={signedUrl}
+                alt={photo.captionHint ?? "현장 사진"}
+                className="w-full h-full object-cover"
+              />
+            </>
+          )}
           {photo.isTagged && (
             <div className="absolute top-2 right-2 bg-green-500 text-white text-xs px-2 py-0.5 rounded-full">
               AI 분석
