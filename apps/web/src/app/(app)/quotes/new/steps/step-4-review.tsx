@@ -3,11 +3,13 @@
 import { useState, useTransition, useEffect } from "react";
 import { calcQuote, formatKRW } from "@interior-os/core/pricing";
 import { saveQuoteDraft, confirmQuote, reviewQuoteDraft } from "../actions";
+import { createPaymentSchedule } from "@/app/(app)/payments/actions";
 import type { QuoteItemDraft } from "../actions";
 import { AlertTriangleIcon, SparklesIcon } from "lucide-react";
 
 interface Props {
   siteId: string;
+  siteName?: string;
   items: QuoteItemDraft[];
   distanceFactor: number;
   difficultyFactor: number;
@@ -16,7 +18,7 @@ interface Props {
   onBack: () => void;
 }
 
-export function Step4Review({ siteId, items, distanceFactor, difficultyFactor, areaPyeong, onConfirmed, onBack }: Props) {
+export function Step4Review({ siteId, siteName, items, distanceFactor, difficultyFactor, areaPyeong, onConfirmed, onBack }: Props) {
   const [showConfirmDialog, setShowConfirmDialog] = useState(false);
   const [isPending, startTransition] = useTransition();
   const [error, setError] = useState<string | null>(null);
@@ -76,6 +78,14 @@ export function Step4Review({ siteId, items, distanceFactor, difficultyFactor, a
         setShowConfirmDialog(false);
         return;
       }
+
+      // 잔금 스케줄 자동 생성 (실패해도 견적 확정은 완료)
+      createPaymentSchedule({
+        siteId,
+        quoteId: saveRes.data.quoteId,
+        totalAmount: saveRes.data.total,
+        siteName: siteName ?? "현장",
+      }).catch(() => {});
 
       onConfirmed(saveRes.data.quoteId, saveRes.data.total);
     });

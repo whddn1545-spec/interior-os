@@ -13,6 +13,7 @@ type Step = 1 | 2 | 3 | 4 | 5;
 interface WizardState {
   customer?: { id: string; name: string; phone: string };
   siteId?: string;
+  siteName?: string;
   distanceFactor?: number;
   difficultyFactor?: number;
   areaPyeong?: number;
@@ -151,8 +152,8 @@ export function QuoteWizard() {
       {step === 2 && state.customer && (
         <Step2Site
           customerId={state.customer.id}
-          onNext={(siteId, distanceFactor, difficultyFactor, areaPyeong) =>
-            goToStep(3, { siteId, distanceFactor, difficultyFactor, areaPyeong })
+          onNext={(siteId, distanceFactor, difficultyFactor, areaPyeong, siteName) =>
+            goToStep(3, { siteId, siteName, distanceFactor, difficultyFactor, areaPyeong })
           }
           onBack={() => goToStep(1)}
         />
@@ -171,6 +172,7 @@ export function QuoteWizard() {
       {step === 4 && state.siteId && state.items && (
         <Step4Review
           siteId={state.siteId}
+          siteName={state.siteName}
           items={state.items}
           distanceFactor={state.distanceFactor ?? 1.0}
           difficultyFactor={state.difficultyFactor ?? 1.1}

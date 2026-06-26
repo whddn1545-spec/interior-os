@@ -1,5 +1,5 @@
 import Link from "next/link";
-import { PlusIcon, PhoneIcon, ChevronRightIcon } from "lucide-react";
+import { PlusIcon, PhoneIcon, ChevronRightIcon, BookOpenIcon } from "lucide-react";
 import { createClient } from "@/lib/supabase/server";
 
 export default async function WorkersPage() {
@@ -13,7 +13,7 @@ export default async function WorkersPage() {
 
   return (
     <div className="px-4 pt-6 pb-24">
-      <div className="flex items-center justify-between mb-6">
+      <div className="flex items-center justify-between mb-4">
         <h1 className="text-2xl font-bold text-gray-900">작업자</h1>
         <Link
           href="/workers/new"
@@ -23,6 +23,19 @@ export default async function WorkersPage() {
           추가
         </Link>
       </div>
+
+      {/* 출역 장부 바로가기 */}
+      <Link
+        href="/workers/attendance"
+        className="flex items-center gap-3 bg-orange-50 border border-orange-200 rounded-2xl px-4 py-4 mb-4"
+      >
+        <BookOpenIcon size={24} className="text-orange-500 shrink-0" />
+        <div className="flex-1">
+          <p className="text-base font-bold text-orange-800">출역 장부 · 일당 정산</p>
+          <p className="text-sm text-orange-600">이번달 출역 기록 및 인건비 정산</p>
+        </div>
+        <ChevronRightIcon size={20} className="text-orange-400" />
+      </Link>
 
       {!workers || workers.length === 0 ? (
         <div className="text-center py-16 text-gray-400">
