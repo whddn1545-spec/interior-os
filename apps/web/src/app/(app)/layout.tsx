@@ -3,9 +3,8 @@ import { redirect } from "next/navigation";
 import {
   HomeIcon,
   FileTextIcon,
-  CalendarIcon,
-  MessageSquareIcon,
-  UsersIcon,
+  WalletIcon,
+  HardHatIcon,
 } from "lucide-react";
 import { MoreMenu } from "@/components/more-menu";
 import { createClient } from "@/lib/supabase/server";
@@ -13,9 +12,8 @@ import { createClient } from "@/lib/supabase/server";
 const tabs = [
   { href: "/", label: "홈", icon: HomeIcon },
   { href: "/quotes", label: "견적", icon: FileTextIcon },
-  { href: "/schedule", label: "일정", icon: CalendarIcon },
-  { href: "/messages", label: "문자", icon: MessageSquareIcon },
-  { href: "/customers", label: "고객", icon: UsersIcon },
+  { href: "/payments", label: "받을돈", icon: WalletIcon },
+  { href: "/workers/attendance", label: "장부", icon: HardHatIcon },
 ];
 
 export default async function AppLayout({ children }: { children: React.ReactNode }) {

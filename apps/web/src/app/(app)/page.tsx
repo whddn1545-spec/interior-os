@@ -1,217 +1,276 @@
 import Link from "next/link";
-import { PlusIcon, FileTextIcon, CalendarIcon, MessageSquareIcon, AlertCircleIcon, ChevronRightIcon } from "lucide-react";
 import { createClient } from "@/lib/supabase/server";
+import { HelpButton } from "@/components/tutorial/HelpButton";
+
+export const dynamic = "force-dynamic";
+
+type WorkerInfo = { name: string; phone: string | null };
+type AssignmentInfo = { workers: WorkerInfo | WorkerInfo[] | null } | null;
+type SiteInfo = { name: string; address: string | null } | null;
+
+type TodayTask = {
+  id: string;
+  title: string;
+  site_id: string;
+  start_date: string | null;
+  end_date: string | null;
+  sites: SiteInfo;
+  assignments: AssignmentInfo;
+};
+
+type PaymentRow = {
+  id: string;
+  stage_label: string;
+  amount: number;
+  due_date: string | null;
+  sites: { name: string; customers: { name: string; phone: string | null } | { name: string; phone: string | null }[] | null } | { name: string; customers: { name: string; phone: string | null } | { name: string; phone: string | null }[] | null }[] | null;
+};
+
+type RecentSite = {
+  id: string;
+  name: string;
+  address: string | null;
+  status: string;
+};
+
+function first<T>(v: T | T[] | null | undefined): T | null {
+  if (!v) return null;
+  return Array.isArray(v) ? v[0] ?? null : v;
+}
+
+function formatKoreanDate(d: Date): string {
+  const days = ["일", "월", "화", "수", "목", "금", "토"];
+  return `${d.getFullYear()}년 ${d.getMonth() + 1}월 ${d.getDate()}일 (${days[d.getDay()]})`;
+}
+
+function mapHref(address: string | null | undefined, name: string): string {
+  const q = encodeURIComponent(address?.trim() || name);
+  return `https://map.kakao.com/?q=${q}`;
+}
 
 export default async function HomePage() {
   const supabase = await createClient();
+  await supabase.auth.getUser();
 
-  const { data: { user } } = await supabase.auth.getUser();
+  const now = new Date();
+  const today = now.toISOString().split("T")[0];
+  const soon = new Date(now.getTime() + 3 * 24 * 60 * 60 * 1000)
+    .toISOString()
+    .split("T")[0];
 
-  const today = new Date().toISOString().split("T")[0];
-
-  const [
-    { data: contractedSites },
-    { data: confirmedQuoteSites },
-    { data: draftQuotes },
-    { data: todayTasks },
-  ] = await Promise.all([
-    supabase
-      .from("sites")
-      .select("id, name, address, status, start_date, end_date")
-      .in("status", ["contracted", "in_progress"])
-      .order("start_date", { ascending: true })
-      .limit(5),
-    // 견적은 확정됐지만 아직 계약 전(quoting)인 현장도 진행 중으로 노출
-    supabase
-      .from("sites")
-      .select("id, name, address, status, start_date, end_date, quotes!inner(id, status)")
-      .eq("status", "quoting")
-      .in("quotes.status", ["confirmed", "sent", "accepted"])
-      .order("start_date", { ascending: true })
-      .limit(5),
-    supabase
-      .from("quotes")
-      .select("id, version, total_amount, created_at, sites(name)")
-      .eq("status", "draft")
-      .order("created_at", { ascending: false })
-      .limit(5),
-    supabase
+  // 1. 오늘 진행 현장
+  let todayTasks: TodayTask[] = [];
+  try {
+    const { data } = await supabase
       .from("schedule_tasks")
-      .select("id, title, site_id, sites(name), trades(name_ko)")
-      .eq("status", "active")
+      .select(
+        "id, title, site_id, start_date, end_date, sites(name, address), assignments(workers(name, phone))"
+      )
       .lte("start_date", today)
       .gte("end_date", today)
-      .limit(10),
-  ]);
-
-  // 계약 단계 현장 + 견적 확정된 현장을 합치고 중복 제거
-  const activeSitesById = new Map<string, { id: string; name: string; address: string; status: string; start_date: string | null; end_date: string | null }>();
-  for (const s of [...(contractedSites ?? []), ...(confirmedQuoteSites ?? [])]) {
-    const site = s as unknown as { id: string; name: string; address: string; status: string; start_date: string | null; end_date: string | null };
-    if (!activeSitesById.has(site.id)) activeSitesById.set(site.id, site);
+      .neq("status", "canceled")
+      .order("start_date", { ascending: true })
+      .limit(20);
+    todayTasks = (data as unknown as TodayTask[]) ?? [];
+  } catch {
+    todayTasks = [];
   }
-  const activeSites = Array.from(activeSitesById.values()).slice(0, 5);
 
-  const displayName = user?.user_metadata?.display_name ?? user?.email?.split("@")[0] ?? "사장님";
+  // 2. 긴급 미수금 — payment_schedules 테이블이 없을 수 있음
+  // (생성 타입에 아직 없을 수 있어 느슨한 클라이언트로 조회)
+  let payments: PaymentRow[] = [];
+  try {
+    const looseClient = supabase as unknown as {
+      from: (t: string) => {
+        select: (q: string) => {
+          is: (c: string, v: null) => {
+            lte: (c: string, v: string) => {
+              order: (c: string, o: { ascending: boolean }) => {
+                limit: (n: number) => Promise<{ data: PaymentRow[] | null; error: unknown }>;
+              };
+            };
+          };
+        };
+      };
+    };
+    const { data, error } = await looseClient
+      .from("payment_schedules")
+      .select(
+        "id, stage_label, amount, due_date, sites(name, customers(name, phone))"
+      )
+      .is("paid_at", null)
+      .lte("due_date", soon)
+      .order("due_date", { ascending: true })
+      .limit(10);
+    if (!error) payments = data ?? [];
+  } catch {
+    payments = [];
+  }
 
-  const statusLabel: Record<string, string> = {
-    contracted: "계약완료",
-    in_progress: "공사중",
-    lead: "상담중",
-    quoting: "견적중",
-    done: "완료",
-  };
+  // 3. 최근 현장 (오늘 현장이 없을 때 fallback)
+  let recentSites: RecentSite[] = [];
+  if (todayTasks.length === 0) {
+    try {
+      const { data } = await supabase
+        .from("sites")
+        .select("id, name, address, status")
+        .in("status", ["in_progress", "contracted"])
+        .order("start_date", { ascending: true })
+        .limit(3);
+      recentSites = (data as unknown as RecentSite[]) ?? [];
+    } catch {
+      recentSites = [];
+    }
+  }
+
+  const quickActions = [
+    { href: "/quotes/new", emoji: "📄", label: "새 견적", bg: "bg-blue-600", active: "active:bg-blue-700" },
+    { href: "/messages", emoji: "✉️", label: "문자 보내기", bg: "bg-green-600", active: "active:bg-green-700" },
+    { href: "/payments", emoji: "💰", label: "잔금 확인", bg: "bg-amber-600", active: "active:bg-amber-700" },
+    { href: "/photos", emoji: "📷", label: "사진 올리기", bg: "bg-purple-600", active: "active:bg-purple-700" },
+  ];
 
   return (
-    <div className="px-4 pt-8 pb-24">
-      <h1 className="text-3xl font-bold text-gray-900 mb-1">{displayName} 안녕하세요 👋</h1>
-      <p className="text-lg text-gray-500 mb-8">오늘도 수고하세요</p>
+    <div className="px-4 pt-6 pb-24 space-y-6">
+      {/* 날짜 헤더 */}
+      <div>
+        <h1 className="text-3xl font-black text-gray-900">오늘의 업무</h1>
+        <p className="text-lg text-gray-500">{formatKoreanDate(now)}</p>
+      </div>
 
-      {/* 빠른 액션 */}
-      <section className="mb-8 grid grid-cols-2 gap-3">
-        <Link
-          href="/quotes/new"
-          className="flex flex-col items-center gap-2 bg-blue-600 text-white rounded-2xl px-4 py-5 shadow-sm active:bg-blue-700"
-        >
-          <PlusIcon size={28} />
-          <span className="text-lg font-semibold">새 견적</span>
-        </Link>
-        <Link
-          href="/messages"
-          className="flex flex-col items-center gap-2 bg-green-600 text-white rounded-2xl px-4 py-5 shadow-sm active:bg-green-700"
-        >
-          <MessageSquareIcon size={28} />
-          <span className="text-lg font-semibold">문자 보내기</span>
-        </Link>
-      </section>
-
-      {/* 확인 대기 견적 */}
-      {draftQuotes && draftQuotes.length > 0 && (
-        <section className="mb-6">
-          <div className="flex items-center gap-2 mb-3">
-            <AlertCircleIcon size={20} className="text-orange-500" />
-            <h2 className="text-xl font-semibold text-gray-800">확인 대기 견적</h2>
-            <span className="bg-orange-500 text-white text-sm font-bold rounded-full w-6 h-6 flex items-center justify-center">
-              {draftQuotes.length}
-            </span>
-          </div>
-          <div className="space-y-2">
-            {draftQuotes.map((q) => {
-              const site = q.sites as unknown as { name: string } | null;
-              return (
-                <Link
-                  key={q.id}
-                  href={`/quotes/${q.id}`}
-                  className="flex items-center justify-between bg-orange-50 border border-orange-200 rounded-2xl px-4 py-4"
+      {/* 섹션 1: 오늘 진행 현장 */}
+      <section>
+        <h2 className="text-xl font-bold text-gray-800 mb-3">📍 오늘 진행 현장</h2>
+        {todayTasks.length === 0 ? (
+          recentSites.length > 0 ? (
+            <div className="space-y-2">
+              <p className="text-base text-gray-400 mb-1">최근 진행 현장</p>
+              {recentSites.map((site) => (
+                <div
+                  key={site.id}
+                  className="bg-white border border-gray-200 rounded-2xl px-5 py-4 flex items-center justify-between"
                 >
-                  <div>
-                    <p className="text-lg font-semibold text-gray-900">{site?.name ?? "현장 미정"}</p>
-                    <p className="text-base text-gray-500">v{q.version} · {q.total_amount.toLocaleString("ko-KR")}원</p>
+                  <div className="min-w-0">
+                    <p className="text-xl font-bold text-gray-900 truncate">{site.name}</p>
+                    <p className="text-base text-gray-500 truncate">{site.address ?? ""}</p>
                   </div>
-                  <div className="flex items-center gap-1 text-orange-600 font-medium">
-                    <span>확인하기</span>
-                    <ChevronRightIcon size={18} />
-                  </div>
-                </Link>
-              );
-            })}
-          </div>
-        </section>
-      )}
-
-      {/* 오늘 일정 */}
-      {todayTasks && todayTasks.length > 0 && (
-        <section className="mb-6">
-          <h2 className="text-xl font-semibold text-gray-800 mb-3">오늘 진행 중인 작업</h2>
-          <div className="space-y-2">
-            {todayTasks.map((task) => {
-              const site = task.sites as unknown as { name: string } | null;
-              const trade = task.trades as unknown as { name_ko: string } | null;
-              return (
-                <Link
-                  key={task.id}
-                  href={`/schedule/${task.site_id}`}
-                  className="flex items-center gap-3 bg-blue-50 border border-blue-200 rounded-2xl px-4 py-4"
-                >
-                  <CalendarIcon size={22} className="text-blue-600 shrink-0" />
-                  <div className="flex-1 min-w-0">
-                    <p className="text-lg font-semibold text-gray-900 truncate">{task.title}</p>
-                    <p className="text-base text-gray-500">{site?.name} · {trade?.name_ko ?? ""}</p>
-                  </div>
-                  <ChevronRightIcon size={18} className="text-gray-400" />
-                </Link>
-              );
-            })}
-          </div>
-        </section>
-      )}
-
-      {/* 진행 중인 현장 */}
-      <section className="mb-6">
-        <div className="flex items-center justify-between mb-3">
-          <h2 className="text-xl font-semibold text-gray-800">진행 중인 현장</h2>
-          <Link href="/customers" className="text-base text-blue-600">전체 보기</Link>
-        </div>
-        {!activeSites || activeSites.length === 0 ? (
-          <div className="bg-white rounded-2xl p-6 text-center text-gray-400 border border-gray-100">
-            <CalendarIcon size={40} className="mx-auto mb-2 opacity-30" />
-            <p className="text-lg">진행 중인 현장이 없어요</p>
-            <Link href="/quotes/new" className="mt-3 inline-block text-blue-600 font-medium">
-              새 견적 만들기 →
-            </Link>
-          </div>
+                  <a
+                    href={mapHref(site.address, site.name)}
+                    target="_blank"
+                    rel="noopener noreferrer"
+                    className="shrink-0 ml-3 bg-gray-100 text-gray-700 text-base font-semibold rounded-xl px-3 py-2"
+                  >
+                    지도 보기
+                  </a>
+                </div>
+              ))}
+            </div>
+          ) : (
+            <div className="bg-gray-100 rounded-2xl px-5 py-8 text-center text-gray-500 text-lg">
+              오늘 예정된 현장이 없어요
+            </div>
+          )
         ) : (
-          <div className="space-y-2">
-            {activeSites.map((site) => (
-              <Link
-                key={site.id}
-                href={`/schedule/${site.id}`}
-                className="flex items-center justify-between bg-white border border-gray-200 rounded-2xl px-4 py-4"
-              >
-                <div className="flex-1 min-w-0">
-                  <p className="text-lg font-semibold text-gray-900 truncate">{site.name}</p>
-                  <p className="text-base text-gray-500 truncate">{site.address}</p>
+          <div className="space-y-3">
+            {todayTasks.map((task) => {
+              const site = first(task.sites);
+              const worker = first(first(task.assignments)?.workers);
+              return (
+                <div
+                  key={task.id}
+                  className="bg-white border border-gray-200 rounded-2xl px-5 py-4"
+                >
+                  <p className="text-2xl font-bold text-gray-900">{site?.name ?? "현장"}</p>
+                  <p className="text-base text-gray-500 mb-3">{task.title}</p>
+                  {worker && (
+                    <a
+                      href={worker.phone ? `tel:${worker.phone}` : undefined}
+                      className="flex items-center gap-2 text-lg text-gray-700 mb-3"
+                    >
+                      <span className="text-2xl">👷</span>
+                      <span className="font-semibold">{worker.name}</span>
+                      {worker.phone && (
+                        <span className="text-blue-600 font-semibold underline">
+                          {worker.phone}
+                        </span>
+                      )}
+                    </a>
+                  )}
+                  <a
+                    href={mapHref(site?.address, site?.name ?? task.title)}
+                    target="_blank"
+                    rel="noopener noreferrer"
+                    className="inline-block bg-blue-50 text-blue-700 text-lg font-bold rounded-xl px-4 py-2.5"
+                  >
+                    🗺️ 지도 보기
+                  </a>
                 </div>
-                <div className="flex items-center gap-2 shrink-0 ml-2">
-                  <span className={`text-sm font-medium px-2 py-1 rounded-full ${
-                    site.status === "in_progress" ? "bg-green-100 text-green-700" : "bg-blue-100 text-blue-700"
-                  }`}>
-                    {statusLabel[site.status] ?? site.status}
-                  </span>
-                  <ChevronRightIcon size={18} className="text-gray-400" />
-                </div>
-              </Link>
-            ))}
+              );
+            })}
           </div>
         )}
       </section>
 
-      {/* 빠른 메뉴 그리드 */}
+      {/* 섹션 2: 받을 돈 */}
       <section>
-        <h2 className="text-xl font-semibold text-gray-800 mb-3">바로가기</h2>
-        <div className="grid grid-cols-3 gap-3">
-          {[
-            { href: "/quotes", label: "견적 목록", emoji: "📄" },
-            { href: "/customers", label: "고객 관리", emoji: "👥" },
-            { href: "/workers", label: "작업자", emoji: "🔧" },
-            { href: "/finance", label: "매출 관리", emoji: "💰" },
-            { href: "/photos", label: "사진 관리", emoji: "📷" },
-            { href: "/instagram", label: "인스타", emoji: "📸" },
-            { href: "/materials", label: "자재산출", emoji: "🧮" },
-            { href: "/moodboard", label: "무드보드", emoji: "🎨" },
-            { href: "/settings/prices", label: "단가표", emoji: "⚙️" },
-          ].map((item) => (
+        <h2 className="text-xl font-bold text-gray-800 mb-3">💰 지금 받아야 할 돈</h2>
+        {payments.length === 0 ? (
+          <div className="bg-green-50 border border-green-200 rounded-2xl px-5 py-6 text-center text-green-700 text-lg font-semibold">
+            미수금이 없어요 👍
+          </div>
+        ) : (
+          <div className="space-y-3">
+            {payments.map((p) => {
+              const site = first(p.sites);
+              const customer = first(site?.customers);
+              return (
+                <div
+                  key={p.id}
+                  className="bg-white border border-red-200 rounded-2xl px-5 py-4 flex items-center justify-between"
+                >
+                  <div className="min-w-0">
+                    <p className="text-xl font-bold text-gray-900 truncate">
+                      {customer?.name ?? site?.name ?? "고객"}
+                    </p>
+                    <p className="text-base text-gray-500">
+                      {p.stage_label}
+                      {p.due_date ? ` · 약정일 ${p.due_date}` : ""}
+                    </p>
+                  </div>
+                  <p className="text-2xl font-black text-red-600 shrink-0 ml-3">
+                    {Number(p.amount).toLocaleString("ko-KR")}원
+                  </p>
+                </div>
+              );
+            })}
+          </div>
+        )}
+        <Link
+          href="/payments"
+          className="mt-3 block text-center bg-amber-100 text-amber-800 text-lg font-bold rounded-2xl py-4"
+        >
+          받을 돈 전체 보기
+        </Link>
+      </section>
+
+      {/* 섹션 3: 빠른 실행 */}
+      <section>
+        <h2 className="text-xl font-bold text-gray-800 mb-3">⚡ 바로 하기</h2>
+        <div className="grid grid-cols-2 gap-3">
+          {quickActions.map((a) => (
             <Link
-              key={item.href}
-              href={item.href}
-              className="flex flex-col items-center gap-2 bg-white border border-gray-200 rounded-2xl py-4 px-2"
+              key={a.href}
+              href={a.href}
+              className={`flex flex-col items-center gap-2 ${a.bg} ${a.active} text-white rounded-2xl py-6 shadow-sm`}
             >
-              <span className="text-2xl">{item.emoji}</span>
-              <span className="text-sm font-medium text-gray-700 text-center">{item.label}</span>
+              <span className="text-3xl">{a.emoji}</span>
+              <span className="text-lg font-bold">{a.label}</span>
             </Link>
           ))}
         </div>
       </section>
+
+      <HelpButton tutorialKey="home" />
     </div>
   );
 }

@@ -3,25 +3,23 @@
 import { useState, useEffect, useRef } from "react";
 import Link from "next/link";
 import {
-  WrenchIcon,
-  DollarSignIcon,
+  CalendarIcon,
+  MessageSquareIcon,
+  UsersIcon,
   CameraIcon,
-  ImageIcon,
-  CalculatorIcon,
-  SparklesIcon,
-  SettingsIcon,
+  DollarSignIcon,
+  HelpCircleIcon,
   MoreHorizontalIcon,
   XIcon,
 } from "lucide-react";
 
 const items = [
-  { href: "/workers", label: "작업자", icon: WrenchIcon },
-  { href: "/finance", label: "매출", icon: DollarSignIcon },
+  { href: "/schedule", label: "일정", icon: CalendarIcon },
+  { href: "/messages", label: "문자", icon: MessageSquareIcon },
+  { href: "/customers", label: "고객", icon: UsersIcon },
   { href: "/photos", label: "사진", icon: CameraIcon },
-  { href: "/instagram", label: "인스타", icon: ImageIcon },
-  { href: "/materials", label: "자재산출", icon: CalculatorIcon },
-  { href: "/moodboard", label: "무드보드", icon: SparklesIcon },
-  { href: "/settings", label: "설정", icon: SettingsIcon },
+  { href: "/finance", label: "매출", icon: DollarSignIcon },
+  { href: "/help", label: "도움말", icon: HelpCircleIcon },
 ];
 
 export function MoreMenu() {
