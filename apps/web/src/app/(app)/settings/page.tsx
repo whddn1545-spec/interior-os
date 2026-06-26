@@ -1,10 +1,12 @@
 import Link from "next/link";
-import { ChevronRightIcon, TagIcon, MapPinIcon, SmartphoneIcon, CreditCardIcon, LogOutIcon } from "lucide-react";
+import { ChevronRightIcon, TagIcon, MapPinIcon, SmartphoneIcon, CreditCardIcon, LogOutIcon, HardHatIcon } from "lucide-react";
 import { createClient } from "@/lib/supabase/server";
+import { BusinessInfoCard } from "./business-info-form";
 
 const MENU = [
   { href: "/settings/prices", icon: TagIcon, label: "단가표", desc: "공종별 자재비·인건비 단가" },
   { href: "/settings/factors", icon: MapPinIcon, label: "거리·난이도 계수", desc: "견적 계수 설정" },
+  { href: "/workers", icon: HardHatIcon, label: "작업자 관리", desc: "작업자 명단·연락처·평점" },
   { href: "/pricing", icon: CreditCardIcon, label: "요금제 업그레이드", desc: "Pro/Team 플랜으로 더 많은 기능" },
   { href: "/settings/pwa", icon: SmartphoneIcon, label: "홈 화면에 추가", desc: "태블릿·폰 홈에 설치하기" },
 ];
@@ -25,12 +27,13 @@ export default async function SettingsPage() {
     <div className="px-4 pt-6 pb-24">
       <h1 className="text-2xl font-bold text-gray-900 mb-6">설정</h1>
 
-      {/* 사업자 정보 */}
+      {/* 사업자 정보 (누르면 수정) */}
       {t && (
-        <div className="bg-blue-600 rounded-2xl px-4 py-5 mb-6 text-white">
-          <p className="text-xl font-bold">{t.business_name}</p>
-          <p className="text-blue-200 mt-0.5">{t.owner_name} 대표 · {t.plan === "basic" ? "기본 요금제" : t.plan}</p>
-        </div>
+        <BusinessInfoCard
+          businessName={t.business_name}
+          ownerName={t.owner_name}
+          plan={t.plan}
+        />
       )}
 
       {/* 메뉴 */}

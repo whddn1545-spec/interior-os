@@ -81,12 +81,15 @@ export default async function SchedulePage({ params }: { params: Promise<{ siteI
   return (
     <div className="min-h-screen bg-gray-50 pb-24">
       <header className="sticky top-0 bg-white border-b border-gray-100 z-10 px-4 py-3 flex items-center gap-3">
-        <Link href="/schedule" className="p-2 -ml-2 text-gray-600">
+        <Link href="/schedule" className="p-3 -ml-3 text-gray-600" aria-label="일정 목록으로">
           <ArrowLeftIcon size={24} />
         </Link>
         <div className="flex-1 min-w-0">
           <h1 className="text-xl font-bold text-gray-900 truncate">{siteAny.name as string}</h1>
-          <p className="text-sm text-gray-500">{customer?.name ?? ""} · 공사 일정</p>
+          <p className="text-base text-gray-500">
+            {customer?.name ? `${customer.name} · ` : ""}
+            {hasTasks ? "공사 일정" : "공사 일정 만들기"}
+          </p>
         </div>
         <div className="flex items-center gap-2 shrink-0">
           <SiteStatusButton siteId={siteId} currentStatus={siteAny.status as string} />

@@ -63,7 +63,7 @@ export function Step1Customer({ onNext, initialCustomer }: Props) {
           type="text"
           value={query}
           onChange={(e) => handleSearch(e.target.value)}
-          placeholder="고객 이름 검색"
+          placeholder="이름 또는 전화번호 검색"
           className="w-full pl-12 pr-4 py-4 text-lg border border-gray-300 rounded-xl focus:outline-none focus:ring-2 focus:ring-blue-500 bg-white"
         />
       </div>

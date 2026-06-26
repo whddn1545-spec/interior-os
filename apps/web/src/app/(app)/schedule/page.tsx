@@ -57,10 +57,17 @@ export default async function SchedulePage() {
       </div>
 
       {sites.length === 0 ? (
-        <div className="text-center py-16 text-gray-400">
-          <CalendarIcon size={48} className="mx-auto mb-3 opacity-30" />
-          <p className="text-xl">진행 중인 현장이 없어요</p>
-          <p className="text-sm mt-1">견적 확정 후 일정을 생성할 수 있어요</p>
+        <div className="text-center py-16">
+          <CalendarIcon size={48} className="mx-auto mb-3 text-gray-300" />
+          <p className="text-xl text-gray-500">진행 중인 현장이 없어요</p>
+          <p className="text-base text-gray-400 mt-1 mb-6">견적을 확정하면 여기에서 일정을 만들 수 있어요</p>
+          <Link
+            href="/quotes"
+            className="inline-flex items-center justify-center gap-2 bg-blue-600 text-white rounded-2xl px-8 py-4 text-lg font-bold"
+          >
+            견적 확정된 현장 보기
+            <ChevronRightIcon size={20} className="shrink-0" />
+          </Link>
         </div>
       ) : (
         <div className="space-y-3">
@@ -127,7 +134,10 @@ export default async function SchedulePage() {
                 )}
 
                 {totalTasks === 0 && (
-                  <p className="text-sm text-amber-600 font-medium">일정 미생성 — 견적 확정 후 일정 생성</p>
+                  <div className="flex items-center justify-center gap-2 bg-blue-600 text-white rounded-xl py-4 px-4 text-base font-bold">
+                    눌러서 공사 일정 만들기
+                    <ChevronRightIcon size={20} className="shrink-0" />
+                  </div>
                 )}
               </Link>
             );

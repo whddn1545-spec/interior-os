@@ -9,6 +9,8 @@ import {
   CameraIcon,
   DollarSignIcon,
   HelpCircleIcon,
+  HardHatIcon,
+  SettingsIcon,
   MoreHorizontalIcon,
   XIcon,
 } from "lucide-react";
@@ -17,8 +19,10 @@ const items = [
   { href: "/schedule", label: "일정", icon: CalendarIcon },
   { href: "/messages", label: "문자", icon: MessageSquareIcon },
   { href: "/customers", label: "고객", icon: UsersIcon },
+  { href: "/workers", label: "작업자", icon: HardHatIcon },
   { href: "/photos", label: "사진", icon: CameraIcon },
   { href: "/finance", label: "매출", icon: DollarSignIcon },
+  { href: "/settings", label: "설정", icon: SettingsIcon },
   { href: "/help", label: "도움말", icon: HelpCircleIcon },
 ];
 

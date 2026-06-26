@@ -2,7 +2,7 @@
 
 import { useState, useTransition } from "react";
 import { useRouter } from "next/navigation";
-import { FileTextIcon, CheckCircleIcon, MessageSquareIcon } from "lucide-react";
+import { FileTextIcon, CheckCircleIcon, MessageSquareIcon, CalendarPlusIcon } from "lucide-react";
 
 interface Props {
   contractId: string;
@@ -53,13 +53,20 @@ export function ContractActions({ contractId, status, siteId }: Props) {
         </button>
       )}
 
-      {status === "confirmed" && (
+      {(status === "confirmed" || status === "signed") && (
         <>
           <button
-            onClick={() => window.open(`/api/pdf/contract/${contractId}`, "_blank")}
+            onClick={() => router.push(`/schedule/${siteId}`)}
             className="flex items-center justify-center gap-2 w-full bg-blue-600 text-white rounded-2xl py-5 text-xl font-bold"
           >
-            <FileTextIcon size={22} />
+            <CalendarPlusIcon size={22} />
+            공사 일정 만들기
+          </button>
+          <button
+            onClick={() => window.open(`/api/pdf/contract/${contractId}`, "_blank")}
+            className="flex items-center justify-center gap-2 w-full bg-white text-blue-700 border-2 border-blue-600 rounded-2xl py-4 text-lg font-semibold"
+          >
+            <FileTextIcon size={20} />
             계약서 PDF 보기
           </button>
           <button

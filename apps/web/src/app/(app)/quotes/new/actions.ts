@@ -19,7 +19,7 @@ export async function searchCustomers(query: string): Promise<ActionResult<{ id:
   const { data, error } = await supabase
     .from("customers")
     .select("id, name, phone")
-    .ilike("name", `%${escaped}%`)
+    .or(`name.ilike.%${escaped}%,phone.ilike.%${escaped}%`)
     .limit(10);
 
   if (error) return { ok: false, error: error.message };

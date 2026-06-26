@@ -128,6 +128,8 @@ export default async function HomePage() {
     { href: "/messages", emoji: "✉️", label: "문자 보내기", bg: "bg-green-600", active: "active:bg-green-700" },
     { href: "/payments", emoji: "💰", label: "잔금 확인", bg: "bg-amber-600", active: "active:bg-amber-700" },
     { href: "/photos", emoji: "📷", label: "사진 올리기", bg: "bg-purple-600", active: "active:bg-purple-700" },
+    { href: "/workers", emoji: "👷", label: "작업자 관리", bg: "bg-slate-600", active: "active:bg-slate-700" },
+    { href: "/settings", emoji: "⚙️", label: "설정·단가표", bg: "bg-gray-600", active: "active:bg-gray-700" },
   ];
 
   return (
