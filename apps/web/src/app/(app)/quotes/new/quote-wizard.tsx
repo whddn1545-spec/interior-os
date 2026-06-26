@@ -50,7 +50,11 @@ function saveDraft(step: Step, state: WizardState) {
   }
 }
 
-export function QuoteWizard() {
+interface QuoteWizardProps {
+  initialCustomer?: { id: string; name: string; phone: string };
+}
+
+export function QuoteWizard({ initialCustomer }: QuoteWizardProps) {
   const [step, setStep] = useState<Step>(1);
   const [state, setState] = useState<WizardState>({});
   const [hydrated, setHydrated] = useState(false);
@@ -58,10 +62,28 @@ export function QuoteWizard() {
   // SSR 후 클라이언트에서 draft 복원
   useEffect(() => {
     const { step: savedStep, state: savedState } = loadDraft();
+
+    // 고객 상세 화면에서 "새 견적"으로 들어온 경우(initialCustomer 존재)
+    if (initialCustomer) {
+      // 저장된 draft가 같은 고객이면 그대로 이어쓰기
+      const sameCustomer = savedState.customer?.id === initialCustomer.id;
+      if (sameCustomer) {
+        setStep(savedStep);
+        setState(savedState);
+      } else {
+        // draft가 없거나 다른 고객이면 파라미터 고객 우선 → 곧장 현장(2단계)으로
+        setStep(2);
+        setState({ customer: initialCustomer });
+        saveDraft(2, { customer: initialCustomer });
+      }
+      setHydrated(true);
+      return;
+    }
+
     setStep(savedStep);
     setState(savedState);
     setHydrated(true);
-  }, []);
+  }, [initialCustomer]);
 
   function updateState(patch: Partial<WizardState>) {
     setState((prev) => {

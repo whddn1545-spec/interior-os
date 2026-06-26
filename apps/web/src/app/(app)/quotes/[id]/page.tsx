@@ -108,20 +108,33 @@ export default async function QuoteDetailPage({ params }: { params: Promise<{ id
         </div>
 
         {/* 금액 합계 */}
+        {(() => {
+          const subtotal = quoteAny.subtotal as number;
+          const distanceFactor = quoteAny.distance_factor as number;
+          const difficultyFactor = quoteAny.difficulty_factor as number;
+          // 소계에 거리 계수를 적용한 중간 금액
+          const afterDistance = subtotal * distanceFactor;
+          // 거리 계수가 더하는 증분
+          const distanceDelta = afterDistance - subtotal;
+          // 거리 계수까지 적용한 금액에 난이도 계수를 적용한 중간 금액
+          const afterDifficulty = afterDistance * difficultyFactor;
+          // 난이도 계수가 더하는 증분(직전 단계 금액 기준)
+          const difficultyDelta = afterDifficulty - afterDistance;
+          return (
         <div className="bg-white rounded-2xl p-4 border border-gray-100">
           <h2 className="text-lg font-semibold text-gray-800 mb-3">금액 내역</h2>
           <div className="space-y-2 text-base">
             <div className="flex justify-between text-gray-600">
               <span>항목 소계</span>
-              <span>{formatKRW(quoteAny.subtotal as number)}</span>
+              <span>{formatKRW(subtotal)}</span>
             </div>
             <div className="flex justify-between text-gray-600">
-              <span>거리 계수 × {quoteAny.distance_factor as number}</span>
-              <span></span>
+              <span>거리 계수 × {distanceFactor}</span>
+              <span>+{formatKRW(distanceDelta)}</span>
             </div>
             <div className="flex justify-between text-gray-600">
-              <span>난이도 계수 × {quoteAny.difficulty_factor as number}</span>
-              <span></span>
+              <span>난이도 계수 × {difficultyFactor}</span>
+              <span>+{formatKRW(difficultyDelta)}</span>
             </div>
             <div className="flex justify-between text-gray-600">
               <span>예비 ({((quoteAny.reserve_rate as number) * 100).toFixed(0)}%)</span>
@@ -138,6 +151,8 @@ export default async function QuoteDetailPage({ params }: { params: Promise<{ id
             </div>
           </div>
         </div>
+          );
+        })()}
 
         {/* draft 경고 */}
         {status === "draft" && (

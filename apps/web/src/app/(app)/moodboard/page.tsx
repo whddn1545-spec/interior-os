@@ -193,14 +193,14 @@ export default function MoodboardPage() {
                     className="flex flex-col items-center gap-2 bg-blue-50 border-2 border-dashed border-blue-300 rounded-2xl py-6 text-blue-600 font-semibold"
                   >
                     <CameraIcon size={28} />
-                    <span className="text-sm">현장 촬영</span>
+                    <span className="text-base">현장 촬영</span>
                   </button>
                   <button
                     onClick={() => galleryRef.current?.click()}
                     className="flex flex-col items-center gap-2 bg-gray-50 border-2 border-dashed border-gray-300 rounded-2xl py-6 text-gray-600 font-semibold"
                   >
                     <ImageIcon size={28} />
-                    <span className="text-sm">앨범 / 도면</span>
+                    <span className="text-base">앨범 / 도면</span>
                   </button>
                 </div>
               )}
@@ -209,10 +209,10 @@ export default function MoodboardPage() {
             {/* 공간 유형 */}
             <div>
               <label className="block text-base font-semibold text-gray-700 mb-2">공간</label>
-              <div className="grid grid-cols-5 gap-2">
+              <div className="grid grid-cols-3 gap-2">
                 {SPACE_TYPES.map(({ value, label }) => (
                   <button key={value} onClick={() => setSpaceType(value)}
-                    className={`py-2.5 rounded-xl text-sm font-semibold transition-colors ${spaceType === value ? "bg-blue-600 text-white" : "bg-white border border-gray-300 text-gray-700"}`}>
+                    className={`py-4 rounded-xl text-base font-semibold transition-colors ${spaceType === value ? "bg-blue-600 text-white" : "bg-white border border-gray-300 text-gray-700"}`}>
                     {label}
                   </button>
                 ))}
@@ -222,7 +222,7 @@ export default function MoodboardPage() {
             {/* 사용 자재 */}
             <div>
               <label className="block text-base font-semibold text-gray-700 mb-2">사용 자재</label>
-              <div className="space-y-2">
+              <div className="space-y-4">
                 {[
                   { key: "floor", label: "바닥재", placeholder: "예: 원목마루, 강마루, 포세린 타일", value: floor, set: setFloor },
                   { key: "wall", label: "벽지/도장", placeholder: "예: 밝은 베이지 실크벽지, 화이트 도장", value: wall, set: setWall },
@@ -230,14 +230,14 @@ export default function MoodboardPage() {
                   { key: "bathroom", label: "욕실 타일", placeholder: "예: 600×600 그레이 포세린", value: bathroom, set: setBathroom },
                   { key: "extra", label: "기타 자재", placeholder: "예: 아트월 대리석 시트지, 몰딩", value: extra, set: setExtra },
                 ].map(({ key, label, placeholder, value, set }) => (
-                  <div key={key} className="flex gap-2 items-center">
-                    <span className="text-sm text-gray-500 w-20 shrink-0">{label}</span>
+                  <div key={key}>
+                    <label className="block text-base font-semibold text-gray-700 mb-1">{label}</label>
                     <input
                       type="text"
                       value={value}
                       onChange={(e) => set(e.target.value)}
                       placeholder={placeholder}
-                      className="flex-1 border border-gray-300 rounded-xl px-3 py-2.5 text-sm focus:outline-none focus:ring-2 focus:ring-blue-300"
+                      className="w-full border border-gray-300 rounded-xl px-4 py-3 text-base focus:outline-none focus:ring-2 focus:ring-blue-300"
                     />
                   </div>
                 ))}
@@ -250,7 +250,7 @@ export default function MoodboardPage() {
               <div className="grid grid-cols-3 gap-2">
                 {STYLES.map(({ value, label }) => (
                   <button key={value} onClick={() => setStyle(value)}
-                    className={`py-2.5 rounded-xl text-sm font-semibold transition-colors ${style === value ? "bg-blue-600 text-white" : "bg-white border border-gray-300 text-gray-700"}`}>
+                    className={`py-4 rounded-xl text-base font-semibold transition-colors ${style === value ? "bg-blue-600 text-white" : "bg-white border border-gray-300 text-gray-700"}`}>
                     {label}
                   </button>
                 ))}
@@ -265,7 +265,7 @@ export default function MoodboardPage() {
               <div className="grid grid-cols-2 gap-2">
                 {COLOR_OPTIONS.map(({ value, label }) => (
                   <button key={value} onClick={() => toggleColor(value)}
-                    className={`py-2.5 rounded-xl text-sm font-semibold transition-colors ${selectedColors.includes(value) ? "bg-blue-600 text-white" : "bg-white border border-gray-300 text-gray-700"}`}>
+                    className={`py-4 rounded-xl text-base font-semibold transition-colors ${selectedColors.includes(value) ? "bg-blue-600 text-white" : "bg-white border border-gray-300 text-gray-700"}`}>
                     {label}
                   </button>
                 ))}
@@ -282,7 +282,7 @@ export default function MoodboardPage() {
                 onChange={(e) => setPreferences(e.target.value)}
                 placeholder="예: 수납공간 많이, 아이 있어서 안전한 소재, 밝고 넓어 보이게, 모던하면서 따뜻한 느낌"
                 rows={3}
-                className="w-full border border-gray-300 rounded-xl px-4 py-3 text-sm focus:outline-none focus:ring-2 focus:ring-blue-300 resize-none"
+                className="w-full border border-gray-300 rounded-xl px-4 py-3 text-base focus:outline-none focus:ring-2 focus:ring-blue-300 resize-none"
               />
             </div>
 
@@ -335,7 +335,7 @@ export default function MoodboardPage() {
               <div className="grid grid-cols-3 gap-2">
                 {STYLES.map(({ value, label }) => (
                   <button key={value} onClick={() => setStyle(value)}
-                    className={`py-2.5 rounded-xl text-sm font-semibold transition-colors ${style === value ? "bg-purple-600 text-white" : "bg-white border border-gray-300 text-gray-700"}`}>
+                    className={`py-4 rounded-xl text-base font-semibold transition-colors ${style === value ? "bg-purple-600 text-white" : "bg-white border border-gray-300 text-gray-700"}`}>
                     {label}
                   </button>
                 ))}
@@ -349,7 +349,7 @@ export default function MoodboardPage() {
               <div className="grid grid-cols-2 gap-2">
                 {COLOR_OPTIONS.map(({ value, label }) => (
                   <button key={value} onClick={() => toggleColor(value)}
-                    className={`py-2.5 rounded-xl text-base font-semibold transition-colors ${selectedColors.includes(value) ? "bg-purple-600 text-white" : "bg-white border border-gray-300 text-gray-700"}`}>
+                    className={`py-4 rounded-xl text-base font-semibold transition-colors ${selectedColors.includes(value) ? "bg-purple-600 text-white" : "bg-white border border-gray-300 text-gray-700"}`}>
                     {label}
                   </button>
                 ))}

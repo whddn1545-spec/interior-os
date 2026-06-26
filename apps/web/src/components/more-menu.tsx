@@ -12,6 +12,8 @@ import {
   HardHatIcon,
   SettingsIcon,
   MoreHorizontalIcon,
+  CalculatorIcon,
+  SparklesIcon,
   XIcon,
 } from "lucide-react";
 
@@ -21,6 +23,8 @@ const items = [
   { href: "/customers", label: "고객", icon: UsersIcon },
   { href: "/workers", label: "작업자", icon: HardHatIcon },
   { href: "/photos", label: "사진", icon: CameraIcon },
+  { href: "/materials", label: "자재산출", icon: CalculatorIcon },
+  { href: "/moodboard", label: "AI시각화", icon: SparklesIcon },
   { href: "/finance", label: "매출", icon: DollarSignIcon },
   { href: "/settings", label: "설정", icon: SettingsIcon },
   { href: "/help", label: "도움말", icon: HelpCircleIcon },

@@ -26,6 +26,21 @@ export async function searchCustomers(query: string): Promise<ActionResult<{ id:
   return { ok: true, data: data ?? [] };
 }
 
+/** 고객 단건 조회 (견적 마법사 진입 시 미리 선택용) */
+export async function getCustomerById(
+  id: string
+): Promise<{ id: string; name: string; phone: string } | null> {
+  const supabase = await createClient();
+  const { data, error } = await supabase
+    .from("customers")
+    .select("id, name, phone")
+    .eq("id", id)
+    .single();
+
+  if (error || !data) return null;
+  return { id: data.id, name: data.name, phone: data.phone };
+}
+
 /** 고객 생성 */
 export async function createCustomer(input: {
   name: string;

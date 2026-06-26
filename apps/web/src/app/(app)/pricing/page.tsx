@@ -1,8 +1,11 @@
 "use client";
 
-import { useState, useTransition } from "react";
+import { Suspense, useEffect, useState, useTransition } from "react";
+import { useSearchParams } from "next/navigation";
 import Link from "next/link";
 import { ArrowLeftIcon, CheckIcon } from "lucide-react";
+
+const SUPPORT_CONTACT = process.env.NEXT_PUBLIC_SUPPORT_EMAIL ?? "고객센터";
 
 const PLANS = [
   {
@@ -60,10 +63,17 @@ const PLANS = [
   },
 ];
 
-export default function PricingPage() {
+function PricingContent() {
+  const searchParams = useSearchParams();
   const [selectedPlan, setSelectedPlan] = useState<string | null>(null);
   const [isPending, startTransition] = useTransition();
   const [error, setError] = useState<string | null>(null);
+
+  useEffect(() => {
+    if (searchParams.get("error") === "canceled") {
+      setError("결제가 취소되었어요. 다시 시도해주세요.");
+    }
+  }, [searchParams]);
 
   function handleSubscribe(planId: string, price: number) {
     if (price === 0) return;
@@ -192,10 +202,18 @@ export default function PricingPage() {
           </div>
         ))}
 
-        <p className="text-center text-sm text-gray-400 mt-4">
-          결제 관련 문의: whddn1545@gmail.com
+        <p className="text-center text-base text-gray-400 mt-4">
+          결제 관련 문의: {SUPPORT_CONTACT}
         </p>
       </div>
     </div>
+  );
+}
+
+export default function PricingPage() {
+  return (
+    <Suspense fallback={null}>
+      <PricingContent />
+    </Suspense>
   );
 }

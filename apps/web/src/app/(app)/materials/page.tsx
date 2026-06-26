@@ -99,7 +99,7 @@ export default function MaterialsPage() {
               <button
                 key={trade}
                 onClick={() => { setSelectedTrade(trade); setCalculated(false); }}
-                className={`py-3 rounded-xl text-base font-semibold transition-colors ${
+                className={`py-4 rounded-xl text-base font-semibold transition-colors ${
                   selectedTrade === trade
                     ? "bg-blue-600 text-white"
                     : "bg-white border border-gray-300 text-gray-700"
@@ -153,7 +153,7 @@ export default function MaterialsPage() {
                 <div key={i} className="flex items-center justify-between py-2 border-b border-gray-100 last:border-0">
                   <div>
                     <p className="text-base font-semibold text-gray-900">{r.name}</p>
-                    <p className="text-xs text-gray-400">{r.formulaText}</p>
+                    <p className="text-sm text-gray-500">{r.formulaText}</p>
                   </div>
                   <div className="text-right">
                     <p className="text-2xl font-black text-blue-700">{r.qty}</p>

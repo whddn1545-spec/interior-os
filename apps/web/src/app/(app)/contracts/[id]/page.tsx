@@ -1,6 +1,6 @@
 import { notFound } from "next/navigation";
 import Link from "next/link";
-import { ArrowLeftIcon, CheckCircleIcon, AlertTriangleIcon } from "lucide-react";
+import { ArrowLeftIcon, CheckCircleIcon, AlertTriangleIcon, FileTextIcon, ChevronRightIcon } from "lucide-react";
 import { createClient } from "@/lib/supabase/server";
 import { formatKRW } from "@interior-os/core/pricing";
 import { ContractActions } from "./contract-actions";
@@ -107,6 +107,21 @@ export default async function ContractDetailPage({ params }: { params: Promise<{
               </div>
             </div>
           </div>
+        )}
+
+        {/* 원본 견적 연결 */}
+        {(c.quote_id as string | null) && (
+          <Link
+            href={`/quotes/${c.quote_id}`}
+            className="bg-white rounded-2xl p-4 border border-gray-100 flex items-center gap-3 min-h-[56px] active:bg-gray-50"
+          >
+            <FileTextIcon size={24} className="text-blue-600 shrink-0" />
+            <div className="flex-1">
+              <p className="text-base font-semibold text-gray-900">이 계약의 원본 견적 보기</p>
+              <p className="text-sm text-gray-500">금액 근거가 된 견적서를 확인할 수 있어요</p>
+            </div>
+            <ChevronRightIcon size={22} className="text-gray-400 shrink-0" />
+          </Link>
         )}
 
         {/* 특약사항 */}

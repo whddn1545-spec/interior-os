@@ -1,6 +1,6 @@
 "use client";
 
-import { useState, useTransition } from "react";
+import { useState, useRef, useEffect, useTransition } from "react";
 import { SearchIcon, PlusIcon, UserIcon } from "lucide-react";
 import { searchCustomers, createCustomer } from "../actions";
 
@@ -23,17 +23,46 @@ export function Step1Customer({ onNext, initialCustomer }: Props) {
   const [newPhone, setNewPhone] = useState("");
   const [error, setError] = useState<string | null>(null);
   const [isPending, startTransition] = useTransition();
+  // 이미 선택된 고객(고객 상세에서 진입 또는 이어쓰기)이 있으면 카드로 보여주고
+  // '변경'을 누르기 전까지는 검색 UI를 숨긴다.
+  const [selected, setSelected] = useState<CustomerOption | undefined>(initialCustomer);
+
+  // 디바운스 타이머와 마지막 요청 순번(레이스 가드)을 ref로 관리한다.
+  // 느린 모바일에서 응답이 순서 뒤바뀌어 도착해도 가장 최근 요청 결과만 반영한다.
+  const debounceRef = useRef<ReturnType<typeof setTimeout> | null>(null);
+  const requestSeqRef = useRef(0);
+
+  // 언마운트 시 대기 중인 타이머 정리
+  useEffect(() => {
+    return () => {
+      if (debounceRef.current) clearTimeout(debounceRef.current);
+    };
+  }, []);
 
   function handleSearch(value: string) {
     setQuery(value);
-    if (value.length < 1) {
+
+    // 이전 디바운스 타이머 취소
+    if (debounceRef.current) clearTimeout(debounceRef.current);
+
+    // 60대 사용자가 천천히 타이핑할 때 결과가 계속 바뀌지 않도록
+    // 최소 2글자부터 검색한다.
+    const trimmed = value.trim();
+    if (trimmed.length < 2) {
       setResults([]);
       return;
     }
-    startTransition(async () => {
-      const res = await searchCustomers(value);
-      if (res.ok) setResults(res.data);
-    });
+
+    // 250ms 디바운스: 연속 타이핑 중에는 마지막 입력만 검색한다.
+    debounceRef.current = setTimeout(() => {
+      const seq = ++requestSeqRef.current;
+      startTransition(async () => {
+        const res = await searchCustomers(trimmed);
+        // 더 최근 요청이 시작됐다면 이 응답은 버린다(순서 가드).
+        if (seq !== requestSeqRef.current) return;
+        if (res.ok) setResults(res.data);
+      });
+    }, 250);
   }
 
   function handleCreateNew() {
@@ -49,6 +78,39 @@ export function Step1Customer({ onNext, initialCustomer }: Props) {
       }
       onNext({ id: res.data.id, name: newName, phone: newPhone });
     });
+  }
+
+  // 선택된 고객 카드 표시 (변경 누르기 전까지 검색 숨김)
+  if (selected) {
+    return (
+      <div className="px-4 pt-6">
+        <h2 className="text-2xl font-bold text-gray-900 mb-2">누구 집인가요?</h2>
+        <p className="text-lg text-gray-500 mb-6">선택된 고객이에요</p>
+
+        <div className="flex items-center gap-4 bg-white border border-blue-200 rounded-xl px-4 py-4 mb-4">
+          <div className="w-12 h-12 bg-blue-100 rounded-full flex items-center justify-center shrink-0">
+            <UserIcon size={22} className="text-blue-600" />
+          </div>
+          <div className="flex-1 min-w-0">
+            <p className="text-lg font-semibold text-gray-900">{selected.name}</p>
+            <p className="text-base text-gray-500">{selected.phone}</p>
+          </div>
+          <button
+            onClick={() => setSelected(undefined)}
+            className="px-4 py-3 text-base font-medium text-blue-600 border border-blue-200 rounded-xl"
+          >
+            변경
+          </button>
+        </div>
+
+        <button
+          onClick={() => onNext(selected)}
+          className="w-full py-4 text-lg bg-blue-600 text-white rounded-xl font-semibold"
+        >
+          다음
+        </button>
+      </div>
+    );
   }
 
   return (
