@@ -24,6 +24,7 @@ export function Step4Review({ siteId, siteName, items, distanceFactor, difficult
   const [error, setError] = useState<string | null>(null);
   const [aiBullets, setAiBullets] = useState<string[] | null>(null);
   const [aiLoading, setAiLoading] = useState(true);
+  const [aiError, setAiError] = useState(false);
 
   const result = calcQuote({ items: items.map(item => ({
     tradeId: item.tradeId,
@@ -49,10 +50,14 @@ export function Step4Review({ siteId, siteName, items, distanceFactor, difficult
       totalAmount: result.total,
       areaPyeong,
     }).then((res) => {
-      setAiBullets(res.ok ? res.data.bullets : []);
+      if (res.ok) {
+        setAiBullets(res.data.bullets);
+      } else {
+        setAiError(true);
+      }
       setAiLoading(false);
     }).catch(() => {
-      setAiBullets([]);
+      setAiError(true);
       setAiLoading(false);
     });
   // eslint-disable-next-line react-hooks/exhaustive-deps
@@ -103,7 +108,9 @@ export function Step4Review({ siteId, siteName, items, distanceFactor, difficult
           <span className="text-sm font-semibold text-blue-700">AI 견적 검토</span>
         </div>
         {aiLoading ? (
-          <p className="text-sm text-blue-500 animate-pulse">분석 중...</p>
+          <p className="text-sm text-blue-500 animate-pulse">AI가 견적을 검토 중이에요...</p>
+        ) : aiError ? (
+          <p className="text-sm text-gray-400">AI 검토를 일시적으로 이용할 수 없어요. 견적 확정은 정상 진행됩니다.</p>
         ) : aiBullets && aiBullets.length > 0 ? (
           <ul className="space-y-1">
             {aiBullets.map((b, i) => (
@@ -113,7 +120,7 @@ export function Step4Review({ siteId, siteName, items, distanceFactor, difficult
             ))}
           </ul>
         ) : (
-          <p className="text-sm text-blue-600">특이사항 없음</p>
+          <p className="text-sm text-blue-600">✅ 특이사항 없음 — 견적이 적정해 보여요</p>
         )}
       </div>
 

@@ -3,7 +3,7 @@ import { Document, Page, View, Text, StyleSheet, Font } from "@react-pdf/rendere
 
 Font.register({
   family: "NotoSansKR",
-  src: "https://fonts.gstatic.com/s/notosanskr/v36/PbyxFmXiEBPT4ITbgNA5Cgm20xz64px_1hVWr0wuPNGmlQNMEfD4.0.woff2",
+  src: "/fonts/NotoSansKR.ttf",
 });
 
 const styles = StyleSheet.create({
