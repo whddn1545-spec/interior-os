@@ -21,6 +21,8 @@ export interface WorkerNotifyInput {
   tradeName: string;
   mainDoorCode?: string | null; // 공동현관 비번 (있으면 포함)
   unitDoorCode?: string | null; // 세대 비번
+  contactName?: string | null; // 담당자(상호/대표) 이름 — 문의 안내에 표시
+  contactPhone?: string | null; // 담당자 연락처 — '문의: 010-...'로 본문에 포함
 }
 
 export function buildWorkerNotifyMessage(input: WorkerNotifyInput): {
@@ -35,9 +37,18 @@ export function buildWorkerNotifyMessage(input: WorkerNotifyInput): {
     tradeName,
     mainDoorCode,
     unitDoorCode,
+    contactName,
+    contactPhone,
   } = input;
 
   const tradePart = tradeName ? `${tradeName} ` : "";
+
+  // 담당자 연락처가 있으면 '문의: 홍길동인테리어 010-...'로 구체적으로 안내한다.
+  // 번호가 없으면 기존 문구(담당자에게 연락 바랍니다)로 자연스럽게 폴백한다.
+  const contactPrefix = contactName ? `${contactName} ` : "";
+  const contactLine = contactPhone
+    ? `문의: ${contactPrefix}${contactPhone}`
+    : "문의사항은 담당자에게 연락 바랍니다.";
 
   const doorLines: string[] = [];
   const maskedDoorLines: string[] = [];
@@ -65,7 +76,7 @@ ${workDate} ${tradePart}작업 안내드립니다.
 현장명: ${siteName}
 주소: ${siteAddress}${doors}
 
-문의사항은 담당자에게 연락 바랍니다.`;
+${contactLine}`;
 
   return {
     body: template(doorSection),
@@ -81,13 +92,16 @@ export interface CustomerProgressInput {
   siteName: string;
   tradeName?: string; // 진행 중/예정 공종 (예: 도배)
   scheduledDate?: string; // "6월 20일 (목)" 형태로 가공된 예정일
+  businessName?: string | null; // 사업자 상호 (설정 > 사업자 정보)
+  ownerName?: string | null; // 대표자명 (설정 > 사업자 정보)
 }
 
 export function buildCustomerProgressMessage(input: CustomerProgressInput): {
   body: string;
   maskedBody: string;
 } {
-  const { customerName, siteName, tradeName, scheduledDate } = input;
+  const { customerName, siteName, tradeName, scheduledDate, businessName, ownerName } =
+    input;
 
   // 본문 가운데 안내 문장은 공종·예정일 유무에 따라 자연스럽게 구성한다.
   let progressLine: string;
@@ -98,7 +112,9 @@ export function buildCustomerProgressMessage(input: CustomerProgressInput): {
   } else if (scheduledDate) {
     progressLine = `다음 작업은 ${scheduledDate}에 예정되어 있습니다.`;
   } else {
-    progressLine = "공사가 순조롭게 진행되고 있습니다.";
+    // 공종·예정일이 모두 비면 단조로운 한 줄로 수렴하지 않도록,
+    // 사업자(상호/대표)·현장명 등 기존 데이터로 좀 더 구체적인 변형을 만든다.
+    progressLine = buildGenericProgressLine({ siteName, businessName, ownerName });
   }
 
   const body = `${HEADER} ${customerName} 고객님,
@@ -110,6 +126,35 @@ ${progressLine}
 
   // 고객 알림에는 민감 정보가 없으므로 maskedBody = body
   return { body, maskedBody: body };
+}
+
+/**
+ * 공종·예정일이 모두 비었을 때 쓰는 일반 진행 안내 문장.
+ * 사업자(상호/대표)·현장명 같은 기존 데이터로 변형을 만들어,
+ * 모든 진행 알림이 "공사가 순조롭게 진행되고 있습니다." 한 줄로 수렴하는 것을 막는다.
+ */
+function buildGenericProgressLine(args: {
+  siteName: string;
+  businessName?: string | null;
+  ownerName?: string | null;
+}): string {
+  const businessName = args.businessName?.trim();
+  const ownerName = args.ownerName?.trim();
+
+  // 1순위: 상호 + 대표가 있으면 책임 시공 느낌의 안내
+  if (businessName && ownerName) {
+    return `${businessName} ${ownerName} 대표가 현장을 직접 챙기며 공사를 진행하고 있습니다.`;
+  }
+  // 2순위: 상호만 있으면 상호 기준 안내
+  if (businessName) {
+    return `${businessName}에서 현장 공사를 순조롭게 진행하고 있습니다.`;
+  }
+  // 3순위: 사업자 정보가 없으면 현장명 기반으로라도 구체화
+  if (args.siteName.trim()) {
+    return `${args.siteName} 현장 공사를 차질 없이 진행하고 있습니다.`;
+  }
+  // 최후 폴백 (기존 문구)
+  return "공사가 순조롭게 진행되고 있습니다.";
 }
 
 // ──────────────────────────────────────────────

@@ -44,13 +44,13 @@ export function WorkerCard({
 
   function handleMarkPaid() {
     if (worker.balance <= 0) {
-      setFeedback("정산할 금액이 없습니다");
+      setFeedback("정산할 금액이 없어요");
       return;
     }
     const ok = window.confirm(
       `${worker.name}님 ${monthLabel} 정산을 완료 처리할까요?\n잔액 ${worker.balance.toLocaleString(
         "ko-KR"
-      )}원이 정산 완료됩니다.`
+      )}원이 정산 완료돼요.`
     );
     if (!ok) return;
     setFeedback(null);
@@ -58,7 +58,7 @@ export function WorkerCard({
       const res = await markWorkerPaid(worker.id, month);
       if (res.ok) {
         router.refresh();
-        setFeedback("정산 완료 ✅");
+        setFeedback("정산이 완료됐어요 ✅");
       } else {
         setFeedback(res.error);
       }
@@ -69,9 +69,9 @@ export function WorkerCard({
     const msg = buildStatementMessage(worker, monthLabel);
     try {
       await navigator.clipboard.writeText(msg);
-      setFeedback("정산 명세를 복사했습니다 📋");
+      setFeedback("정산 명세를 복사했어요 📋");
     } catch {
-      setFeedback("복사에 실패했습니다");
+      setFeedback("복사에 실패했어요");
     }
   }
 

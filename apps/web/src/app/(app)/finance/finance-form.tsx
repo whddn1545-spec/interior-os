@@ -7,13 +7,27 @@ import { addFinanceEntry } from "./actions";
 
 interface Site { id: string; name: string }
 
+// 카테고리별로 수입/지출 기본값을 정한다.
+// 고객 입금만 수입(in)이고, 나머지(자재비/인건비/외주비/기타)는 모두 지출(out)이다.
+function directionForCategory(category: string): "in" | "out" {
+  return category === "customer_payment" ? "in" : "out";
+}
+
 export function FinanceForm({ sites }: { sites: Site[] }) {
   const [open, setOpen] = useState(false);
   const [isPending, startTransition] = useTransition();
   const [error, setError] = useState<string | null>(null);
   const [addedCount, setAddedCount] = useState(0);
+  const [category, setCategory] = useState("customer_payment");
+  const [direction, setDirection] = useState<"in" | "out">("in");
 
   const today = new Date().toISOString().split("T")[0];
+
+  // 항목을 고르면 그에 맞는 수입/지출로 자동 전환한다.
+  function handleCategoryChange(next: string) {
+    setCategory(next);
+    setDirection(directionForCategory(next));
+  }
 
   function handleSubmit(e: React.FormEvent<HTMLFormElement>) {
     e.preventDefault();
@@ -40,6 +54,9 @@ export function FinanceForm({ sites }: { sites: Site[] }) {
         setAddedCount((c) => c + 1);
         toast.success("저장됐어요! 이어서 입력할 수 있어요.");
         form.reset();
+        // 폼 초기화 후 항목/종류 기본값도 함께 되돌린다.
+        setCategory("customer_payment");
+        setDirection("in");
         const dateInput = form.elements.namedItem("paid_at") as HTMLInputElement | null;
         if (dateInput) dateInput.value = today;
       } else {
@@ -52,6 +69,8 @@ export function FinanceForm({ sites }: { sites: Site[] }) {
     setOpen(false);
     setError(null);
     setAddedCount(0);
+    setCategory("customer_payment");
+    setDirection("in");
   }
 
   return (
@@ -81,7 +100,25 @@ export function FinanceForm({ sites }: { sites: Site[] }) {
             )}
 
             <form onSubmit={handleSubmit} className="space-y-4">
-              {/* 수입/지출 */}
+              {/* 카테고리 — 항목을 먼저 고르면 수입/지출이 자동으로 맞춰진다 */}
+              <div>
+                <label className="block text-base font-semibold text-gray-700 mb-2">항목</label>
+                <select
+                  name="category"
+                  required
+                  value={category}
+                  onChange={(e) => handleCategoryChange(e.target.value)}
+                  className="w-full border border-gray-300 rounded-xl px-4 py-3 text-base bg-white"
+                >
+                  <option value="customer_payment">고객 입금</option>
+                  <option value="material">자재비</option>
+                  <option value="labor">인건비</option>
+                  <option value="outsourcing">외주비</option>
+                  <option value="etc">기타</option>
+                </select>
+              </div>
+
+              {/* 수입/지출 — 항목에 맞춰 자동 선택되며, 필요하면 직접 바꿀 수 있다 */}
               <div>
                 <label className="block text-base font-semibold text-gray-700 mb-2">종류</label>
                 <div className="grid grid-cols-2 gap-3">
@@ -94,7 +131,8 @@ export function FinanceForm({ sites }: { sites: Site[] }) {
                         type="radio"
                         name="direction"
                         value={value}
-                        defaultChecked={value === "in"}
+                        checked={direction === value}
+                        onChange={() => setDirection(value as "in" | "out")}
                         className="sr-only peer"
                         required
                       />
@@ -104,22 +142,7 @@ export function FinanceForm({ sites }: { sites: Site[] }) {
                     </label>
                   ))}
                 </div>
-              </div>
-
-              {/* 카테고리 */}
-              <div>
-                <label className="block text-base font-semibold text-gray-700 mb-2">항목</label>
-                <select
-                  name="category"
-                  required
-                  className="w-full border border-gray-300 rounded-xl px-4 py-3 text-base bg-white"
-                >
-                  <option value="customer_payment">고객 입금</option>
-                  <option value="material">자재비</option>
-                  <option value="labor">인건비</option>
-                  <option value="outsourcing">외주비</option>
-                  <option value="etc">기타</option>
-                </select>
+                <p className="mt-1.5 text-base text-gray-500">항목에 맞춰 자동으로 골라드려요. 다르면 직접 바꿀 수 있어요.</p>
               </div>
 
               {/* 금액 */}

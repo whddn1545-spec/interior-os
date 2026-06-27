@@ -123,7 +123,7 @@ export default async function CustomerDetailPage({ params }: { params: Promise<{
                 return (
                   <Link
                     key={sAny.id as string}
-                    href={`/schedule/${sAny.id as string}`}
+                    href={`/sites/${sAny.id as string}`}
                     className="flex items-center gap-3 bg-white border border-gray-200 rounded-2xl px-4 py-4"
                   >
                     <div className="flex-1 min-w-0">

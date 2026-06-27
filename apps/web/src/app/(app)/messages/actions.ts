@@ -63,6 +63,57 @@ function extractBankAccount(settings: unknown): string | null {
   return null;
 }
 
+/** tenants.default_settings(jsonb) 에서 사업자 연락처를 안전하게 꺼낸다(있으면). */
+function extractContactPhone(settings: unknown): string | null {
+  if (!settings || typeof settings !== "object") return null;
+  const s = settings as Record<string, unknown>;
+  const raw =
+    s.business_phone ?? s.businessPhone ?? s.contact_phone ?? s.phone ?? s.tel;
+  if (typeof raw === "string" && raw.trim()) return raw.trim();
+  return null;
+}
+
+/** 현재 로그인 사업자(tenant)의 상호·대표·연락처를 한 번에 조회한다. */
+async function loadTenantInfo(
+  supabase: Awaited<ReturnType<typeof createClient>>
+): Promise<{
+  businessName: string | null;
+  ownerName: string | null;
+  contactPhone: string | null;
+  bankAccount: string | null;
+}> {
+  const empty = {
+    businessName: null,
+    ownerName: null,
+    contactPhone: null,
+    bankAccount: null,
+  };
+  const {
+    data: { user },
+  } = await supabase.auth.getUser();
+  if (!user) return empty;
+
+  const tenantId = await getTenantId(supabase, user);
+  const { data: tenant } = await supabase
+    .from("tenants")
+    .select("business_name, owner_name, default_settings")
+    .eq("id", tenantId)
+    .maybeSingle();
+  if (!tenant) return empty;
+
+  const t = tenant as unknown as {
+    business_name: string | null;
+    owner_name: string | null;
+    default_settings: unknown;
+  };
+  return {
+    businessName: t.business_name?.trim() || null,
+    ownerName: t.owner_name?.trim() || null,
+    contactPhone: extractContactPhone(t.default_settings),
+    bankAccount: extractBankAccount(t.default_settings),
+  };
+}
+
 /** 문자 미리보기 생성 — 본문은 lib/sms/templates.ts 빌더 함수가 단일 출처다. */
 export async function previewMessage(
   input: PreviewMessageInput
@@ -129,6 +180,8 @@ export async function previewMessage(
   let maskedBody = "";
 
   if (input.messageType === "worker_notify") {
+    // 작업자에게 '문의: 상호 010-...'를 안내하기 위해 사업자 연락처를 주입한다.
+    const tenantInfo = await loadTenantInfo(supabase);
     const built = buildWorkerNotifyMessage({
       workerName: targetName,
       siteName: siteAny.name,
@@ -137,15 +190,21 @@ export async function previewMessage(
       tradeName,
       mainDoorCode: siteAny.main_door_code,
       unitDoorCode: siteAny.unit_door_code,
+      contactName: tenantInfo.businessName ?? tenantInfo.ownerName,
+      contactPhone: tenantInfo.contactPhone,
     });
     body = built.body;
     maskedBody = built.maskedBody;
   } else if (input.messageType === "customer_progress") {
+    // 공종·예정일이 비어도 단조롭게 수렴하지 않도록 사업자(상호/대표) 정보를 주입한다.
+    const tenantInfo = await loadTenantInfo(supabase);
     const built = buildCustomerProgressMessage({
       customerName: targetName,
       siteName: siteAny.name,
       tradeName: tradeName || undefined,
       scheduledDate: dateStr || undefined,
+      businessName: tenantInfo.businessName,
+      ownerName: tenantInfo.ownerName,
     });
     body = built.body;
     maskedBody = built.maskedBody;
@@ -175,22 +234,7 @@ export async function previewMessage(
     };
 
     // 사업자 입금 계좌 (tenants.default_settings)
-    const {
-      data: { user },
-    } = await supabase.auth.getUser();
-    let bankAccount: string | null = null;
-    if (user) {
-      const tenantId = await getTenantId(supabase, user);
-      const { data: tenant } = await supabase
-        .from("tenants")
-        .select("default_settings")
-        .eq("id", tenantId)
-        .maybeSingle();
-      bankAccount = extractBankAccount(
-        (tenant as unknown as { default_settings: unknown } | null)
-          ?.default_settings
-      );
-    }
+    const bankAccount = (await loadTenantInfo(supabase)).bankAccount;
 
     const built = buildPaymentRequestMessage({
       customerName: targetName,

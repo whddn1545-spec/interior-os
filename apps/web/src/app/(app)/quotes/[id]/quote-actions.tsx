@@ -2,10 +2,11 @@
 
 import { useState, useTransition } from "react";
 import { useRouter } from "next/navigation";
-import { CheckCircleIcon, RotateCcwIcon, FileTextIcon, MessageSquareIcon, FileSignatureIcon, Share2Icon, CopyIcon, Trash2Icon, AlertTriangleIcon } from "lucide-react";
+import { CheckCircleIcon, RotateCcwIcon, FileTextIcon, MessageSquareIcon, FileSignatureIcon, Share2Icon, CopyIcon, Trash2Icon, AlertTriangleIcon, PencilIcon, MinusCircleIcon } from "lucide-react";
 import { confirmQuote } from "../new/actions";
-import { revertQuoteToDraft, generateQuotePdf, createContractFromQuote, deleteQuote, duplicateQuote } from "./actions";
-import { formatKRW } from "@interior-os/core/pricing";
+import { revertQuoteToDraft, generateQuotePdf, createContractFromQuote, deleteQuote, duplicateQuote, getQuoteForEdit, updateQuoteItems } from "./actions";
+import type { EditableQuoteItem } from "./actions";
+import { calcQuote, formatKRW } from "@interior-os/core/pricing";
 
 interface Props {
   quoteId: string;
@@ -27,6 +28,110 @@ export function QuoteActions({ quoteId, status, siteId, customerId, totalAmount 
   const [specialTerms, setSpecialTerms] = useState("");
   const [generatingPdf, setGeneratingPdf] = useState<"customer" | "internal" | null>(null);
   const [pdfUrl, setPdfUrl] = useState<string | null>(null);
+
+  // 항목 수정 모드
+  const [editItems, setEditItems] = useState<EditableQuoteItem[] | null>(null);
+  const [editFactors, setEditFactors] = useState<{
+    distanceFactor: number;
+    difficultyFactor: number;
+    reserveRate: number;
+    contingencyRate: number;
+  } | null>(null);
+  const [loadingEdit, setLoadingEdit] = useState(false);
+
+  function handleStartEdit() {
+    setError(null);
+    setLoadingEdit(true);
+    startTransition(async () => {
+      const result = await getQuoteForEdit(quoteId);
+      setLoadingEdit(false);
+      if (!result.ok) {
+        setError(result.error);
+        return;
+      }
+      setEditItems(result.data.items);
+      setEditFactors({
+        distanceFactor: result.data.distanceFactor,
+        difficultyFactor: result.data.difficultyFactor,
+        reserveRate: result.data.reserveRate,
+        contingencyRate: result.data.contingencyRate,
+      });
+    });
+  }
+
+  function handleEditQty(id: string, value: string) {
+    const qty = parseFloat(value);
+    setEditItems((prev) =>
+      prev
+        ? prev.map((it) => (it.id === id ? { ...it, quantity: Number.isFinite(qty) ? qty : 0 } : it))
+        : prev
+    );
+  }
+
+  function handleRemoveEditItem(id: string) {
+    setEditItems((prev) => (prev ? prev.filter((it) => it.id !== id) : prev));
+  }
+
+  function handleCancelEdit() {
+    setEditItems(null);
+    setEditFactors(null);
+    setError(null);
+  }
+
+  function handleSaveEdit() {
+    if (!editItems) return;
+    const remaining = editItems.filter((it) => it.quantity > 0);
+    if (remaining.length === 0) {
+      setError("최소 한 개 이상의 항목이 필요해요. 모두 빼려면 견적을 삭제해주세요.");
+      return;
+    }
+    setError(null);
+    startTransition(async () => {
+      const result = await updateQuoteItems(
+        quoteId,
+        remaining.map((it) => ({
+          tradeId: it.tradeId,
+          description: it.description,
+          quantity: it.quantity,
+          unit: it.unit,
+          materialUnitPrice: it.materialUnitPrice,
+          laborDayRate: it.laborDayRate,
+          defaultDaysPerUnit: it.defaultDaysPerUnit,
+        }))
+      );
+      if (!result.ok) {
+        setError(result.error);
+        return;
+      }
+      setEditItems(null);
+      setEditFactors(null);
+      router.refresh();
+    });
+  }
+
+  // 수정 화면 실시간 합계 미리보기 (서버 재계산과 동일 로직)
+  const editPreview =
+    editItems && editFactors
+      ? calcQuote({
+          items: editItems
+            .filter((it) => it.quantity > 0)
+            .map((it) => ({
+              tradeId: it.tradeId,
+              description: it.description,
+              quantity: it.quantity,
+              unit: it.unit,
+              price: {
+                materialUnitPrice: it.materialUnitPrice,
+                laborDayRate: it.laborDayRate,
+                defaultDaysPerUnit: it.defaultDaysPerUnit,
+              },
+            })),
+          distanceFactor: editFactors.distanceFactor,
+          difficultyFactor: editFactors.difficultyFactor,
+          reserveRate: editFactors.reserveRate,
+          contingencyRate: editFactors.contingencyRate,
+        })
+      : null;
 
   function handleConfirm() {
     startTransition(async () => {
@@ -143,6 +248,17 @@ export function QuoteActions({ quoteId, status, siteId, customerId, totalAmount 
           >
             ✅ 이 금액으로 확정하기
           </button>
+          <button
+            onClick={handleStartEdit}
+            disabled={isPending || loadingEdit}
+            className="flex items-center justify-center gap-2 w-full bg-amber-50 text-amber-700 border border-amber-200 rounded-2xl py-4 text-lg font-semibold disabled:opacity-50"
+          >
+            <PencilIcon size={20} />
+            {loadingEdit ? "불러오는 중..." : "항목 수정하기"}
+          </button>
+          <p className="text-base text-gray-500 text-center px-2">
+            항목 한 줄을 빼거나 수량을 고치면 금액이 자동으로 다시 계산돼요
+          </p>
           <button
             onClick={handleDuplicate}
             disabled={isPending}
@@ -366,6 +482,96 @@ export function QuoteActions({ quoteId, status, siteId, customerId, totalAmount 
               <button
                 onClick={() => setShowContractDialog(false)}
                 className="w-full bg-gray-100 text-gray-700 rounded-2xl py-4 text-lg font-medium"
+              >
+                취소
+              </button>
+            </div>
+          </div>
+        </div>
+      )}
+
+      {/* 항목 수정 화면 (draft 전용) */}
+      {editItems && editFactors && (
+        <div className="fixed inset-0 bg-black/50 z-50 flex items-end overflow-y-auto">
+          <div className="bg-white w-full rounded-t-3xl p-6 pb-8 mt-auto max-h-[90vh] overflow-y-auto">
+            <h3 className="text-2xl font-bold text-gray-900 mb-1">항목 수정하기</h3>
+            <p className="text-base text-gray-500 mb-5">
+              빼고 싶은 항목은 빼고, 수량은 직접 고칠 수 있어요
+            </p>
+
+            {error && (
+              <div className="bg-red-50 border border-red-200 rounded-xl px-4 py-3 mb-4 text-red-700 text-base">
+                {error}
+              </div>
+            )}
+
+            <div className="space-y-3 mb-5">
+              {editItems.map((item) => (
+                <div
+                  key={item.id}
+                  className="border border-gray-200 rounded-2xl p-4"
+                >
+                  <div className="flex items-start justify-between gap-3 mb-3">
+                    <div className="flex-1">
+                      <p className="text-base font-semibold text-gray-900">
+                        {item.tradeName ? `${item.tradeName} · ` : ""}{item.description}
+                      </p>
+                    </div>
+                    <button
+                      onClick={() => handleRemoveEditItem(item.id)}
+                      className="flex items-center gap-1 text-red-500 text-base font-medium shrink-0 py-1"
+                    >
+                      <MinusCircleIcon size={20} />
+                      빼기
+                    </button>
+                  </div>
+                  <div className="flex items-center gap-2">
+                    <span className="text-base text-gray-500 shrink-0">수량</span>
+                    <input
+                      type="number"
+                      inputMode="decimal"
+                      min={0}
+                      value={item.quantity}
+                      onChange={(e) => handleEditQty(item.id, e.target.value)}
+                      className="w-28 px-3 py-3 text-lg border border-gray-300 rounded-xl text-right focus:outline-none focus:ring-2 focus:ring-blue-500"
+                    />
+                    <span className="text-base text-gray-500">{item.unit}</span>
+                  </div>
+                </div>
+              ))}
+              {editItems.length === 0 && (
+                <p className="text-base text-gray-500 text-center py-6">
+                  모든 항목을 뺐어요. 견적을 유지하려면 항목이 최소 한 개는 있어야 해요.
+                </p>
+              )}
+            </div>
+
+            {/* 실시간 합계 */}
+            {editPreview && (
+              <div className="bg-gray-50 border border-gray-200 rounded-2xl p-4 mb-5">
+                <div className="flex justify-between text-base text-gray-600 mb-1">
+                  <span>소계</span>
+                  <span>{formatKRW(editPreview.subtotal)}</span>
+                </div>
+                <div className="flex justify-between items-baseline border-t border-gray-300 pt-2 mt-2">
+                  <span className="text-lg font-bold text-gray-900">새 합계</span>
+                  <span className="text-2xl font-black text-blue-700">{formatKRW(editPreview.total)}</span>
+                </div>
+              </div>
+            )}
+
+            <div className="space-y-3">
+              <button
+                onClick={handleSaveEdit}
+                disabled={isPending || editItems.filter((it) => it.quantity > 0).length === 0}
+                className="w-full bg-blue-600 text-white rounded-2xl py-5 text-xl font-bold disabled:opacity-50"
+              >
+                {isPending ? "저장 중..." : "수정 내용 저장하기"}
+              </button>
+              <button
+                onClick={handleCancelEdit}
+                disabled={isPending}
+                className="w-full bg-gray-100 text-gray-700 rounded-2xl py-4 text-lg font-medium disabled:opacity-50"
               >
                 취소
               </button>

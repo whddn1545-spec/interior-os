@@ -27,7 +27,7 @@ type WorkDoneVariant = "completed" | "warranty";
 
 // 고객 대상 문자 종류 (작업자에게는 섭외·안내만 노출)
 const CUSTOMER_MESSAGE_TYPES: ReadonlyArray<readonly [MessageType, string, string]> = [
-  ["customer_progress", "공사 진행 알림", "현장·공종·예정일 안내"],
+  ["customer_progress", "공사 진행 알림", "공종·예정일은 선택 — 비워도 상호로 안내됩니다"],
   ["payment_request", "대금 청구", "계약금·중도금·잔금 입금 안내"],
   ["work_done", "완료·하자보수 안내", "공사 완료/하자보수 안내"],
   ["custom", "직접 입력", "내용을 직접 작성"],
@@ -287,6 +287,14 @@ export function MessageWizard({ workers, sites, customers }: Props) {
                   <option key={t.id} value={t.id}>{t.name_ko}</option>
                 ))}
               </select>
+            )}
+
+            {/* 진행 알림: 공종·예정일을 비워도 상호 기반 안내로 채워진다는 안내 */}
+            {messageType === "customer_progress" && !selectedTradeId && (
+              <p className="text-sm text-gray-500">
+                공종·예정일을 비워두면 상호·대표자 이름으로 진행 안내 문구가
+                자동으로 채워집니다.
+              </p>
             )}
 
             {/* 대금 청구: 청구 단계 선택 */}

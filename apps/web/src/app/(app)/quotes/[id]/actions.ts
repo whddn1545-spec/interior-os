@@ -4,7 +4,223 @@ import { createClient } from "@/lib/supabase/server";
 import { getTenantId } from "@/lib/supabase/get-tenant";
 import { revalidatePath } from "next/cache";
 import { cookies } from "next/headers";
+import { calcQuote } from "@interior-os/core/pricing";
+import type { QuoteItemInput } from "@interior-os/core/pricing";
 import type { ActionResult } from "../new/actions";
+
+/** 편집 화면에 보여줄 draft 견적 항목 한 줄 */
+export interface EditableQuoteItem {
+  /** quote_items.id (저장 시에는 쓰지 않고 화면 식별용) */
+  id: string;
+  tradeId: string;
+  /** 화면 표시용 공종명 (예: "도배") */
+  tradeName: string;
+  description: string;
+  quantity: number;
+  unit: string;
+  lineTotal: number;
+  // 재계산용으로 보관하는 단위 단가 (DB의 파생값에서 역산)
+  materialUnitPrice: number;
+  laborDayRate: number;
+  defaultDaysPerUnit: number;
+}
+
+/**
+ * 임시저장(draft) 견적의 항목을 편집 화면용으로 조회.
+ * DB에는 파생값(material_cost/labor_days/labor_cost)만 있으므로,
+ * 수량 변경 시 재계산이 가능하도록 단위 단가를 역산해 함께 돌려준다.
+ */
+export async function getQuoteForEdit(quoteId: string): Promise<
+  ActionResult<{
+    status: string;
+    distanceFactor: number;
+    difficultyFactor: number;
+    reserveRate: number;
+    contingencyRate: number;
+    items: EditableQuoteItem[];
+  }>
+> {
+  const supabase = await createClient();
+  const { data: { user } } = await supabase.auth.getUser();
+  if (!user) return { ok: false, error: "로그인이 필요합니다" };
+
+  const { data: quote, error: quoteError } = await supabase
+    .from("quotes")
+    .select("id, status, distance_factor, difficulty_factor, reserve_rate, contingency_rate")
+    .eq("id", quoteId)
+    .single();
+
+  if (quoteError || !quote) return { ok: false, error: "견적을 찾을 수 없습니다" };
+  const q = quote as unknown as {
+    status: string;
+    distance_factor: number;
+    difficulty_factor: number;
+    reserve_rate: number;
+    contingency_rate: number;
+  };
+  if (q.status !== "draft")
+    return { ok: false, error: "임시저장 견적만 항목을 수정할 수 있습니다" };
+
+  const { data: itemsRaw, error: itemsError } = await supabase
+    .from("quote_items")
+    .select("id, trade_id, description, quantity, unit, material_cost, labor_days, labor_cost, line_total, trades(name_ko)")
+    .eq("quote_id", quoteId)
+    .order("created_at");
+  if (itemsError) return { ok: false, error: itemsError.message };
+
+  const items: EditableQuoteItem[] = (itemsRaw ?? []).map((row) => {
+    const r = row as unknown as {
+      id: string;
+      trade_id: string;
+      description: string;
+      quantity: number;
+      unit: string;
+      material_cost: number;
+      labor_days: number;
+      labor_cost: number;
+      line_total: number;
+      trades: { name_ko: string } | null;
+    };
+    // 파생값에서 단위 단가 역산 (수량 0 등 0 분모는 0으로 안전 처리)
+    const materialUnitPrice = r.quantity > 0 ? r.material_cost / r.quantity : 0;
+    const laborDayRate = r.labor_days > 0 ? r.labor_cost / r.labor_days : 0;
+    const defaultDaysPerUnit = r.quantity > 0 ? r.labor_days / r.quantity : 0;
+    return {
+      id: r.id,
+      tradeId: r.trade_id,
+      tradeName: r.trades?.name_ko ?? "",
+      description: r.description,
+      quantity: r.quantity,
+      unit: r.unit,
+      lineTotal: r.line_total,
+      materialUnitPrice,
+      laborDayRate,
+      defaultDaysPerUnit,
+    };
+  });
+
+  return {
+    ok: true,
+    data: {
+      status: q.status,
+      distanceFactor: q.distance_factor,
+      difficultyFactor: q.difficulty_factor,
+      reserveRate: q.reserve_rate,
+      contingencyRate: q.contingency_rate,
+      items,
+    },
+  };
+}
+
+/** updateQuoteItems 로 넘기는 항목(수량만 조정/삭제 가능) */
+export interface QuoteItemEditInput {
+  tradeId: string;
+  description: string;
+  quantity: number;
+  unit: string;
+  materialUnitPrice: number;
+  laborDayRate: number;
+  defaultDaysPerUnit: number;
+}
+
+/**
+ * 임시저장(draft) 견적의 항목을 통째로 교체하고 금액을 재계산.
+ * - 확정 견적은 거부 (deleteQuote 와 동일한 draft 이중 검증)
+ * - DB 스키마/테이블 변경 없음: 기존 quote_items 삭제 후 재삽입, quotes 헤더 금액만 갱신
+ */
+export async function updateQuoteItems(
+  quoteId: string,
+  items: QuoteItemEditInput[]
+): Promise<ActionResult<{ total: number }>> {
+  const supabase = await createClient();
+  const { data: { user } } = await supabase.auth.getUser();
+  if (!user) return { ok: false, error: "로그인이 필요합니다" };
+
+  const tenantId = await getTenantId(supabase, user);
+
+  // 항목이 최소 1개는 남아야 한다 (빈 견적 방지)
+  const cleaned = items.filter((it) => it.quantity > 0);
+  if (cleaned.length === 0)
+    return { ok: false, error: "최소 한 개 이상의 항목이 필요합니다. 모두 빼려면 견적을 삭제해주세요." };
+
+  // draft 상태 + 계수 스냅샷 조회 (이중 검증)
+  const { data: quote, error: quoteError } = await supabase
+    .from("quotes")
+    .select("id, status, distance_factor, difficulty_factor, reserve_rate, contingency_rate")
+    .eq("id", quoteId)
+    .single();
+
+  if (quoteError || !quote) return { ok: false, error: "견적을 찾을 수 없습니다" };
+  const q = quote as unknown as {
+    status: string;
+    distance_factor: number;
+    difficulty_factor: number;
+    reserve_rate: number;
+    contingency_rate: number;
+  };
+  if (q.status !== "draft")
+    return { ok: false, error: "임시저장 견적만 항목을 수정할 수 있습니다" };
+
+  // 기존 계수를 그대로 유지하며 재계산
+  const calcItems: QuoteItemInput[] = cleaned.map((it) => ({
+    tradeId: it.tradeId,
+    description: it.description,
+    quantity: it.quantity,
+    unit: it.unit,
+    price: {
+      materialUnitPrice: it.materialUnitPrice,
+      laborDayRate: it.laborDayRate,
+      defaultDaysPerUnit: it.defaultDaysPerUnit,
+    },
+  }));
+
+  const result = calcQuote({
+    items: calcItems,
+    distanceFactor: q.distance_factor,
+    difficultyFactor: q.difficulty_factor,
+    reserveRate: q.reserve_rate,
+    contingencyRate: q.contingency_rate,
+  });
+
+  // 기존 항목 삭제
+  const { error: deleteError } = await supabase
+    .from("quote_items")
+    .delete()
+    .eq("quote_id", quoteId);
+  if (deleteError) return { ok: false, error: deleteError.message };
+
+  // 재계산한 항목 재삽입
+  const { error: insertError } = await supabase.from("quote_items").insert(
+    result.items.map((item) => ({
+      tenant_id: tenantId,
+      quote_id: quoteId,
+      trade_id: item.tradeId,
+      description: item.description,
+      quantity: item.quantity,
+      unit: item.unit,
+      material_cost: item.materialCost,
+      labor_days: item.laborDays,
+      labor_cost: item.laborCost,
+      line_total: item.lineTotal,
+    }))
+  );
+  if (insertError) return { ok: false, error: insertError.message };
+
+  // 견적 헤더 금액 갱신 — draft 조건을 다시 걸어 동시성 보호
+  const { error: updateError } = await supabase
+    .from("quotes")
+    .update({
+      subtotal: result.subtotal,
+      total_amount: result.total,
+    })
+    .eq("id", quoteId)
+    .eq("status", "draft" as const);
+  if (updateError) return { ok: false, error: updateError.message };
+
+  revalidatePath(`/quotes/${quoteId}`);
+  revalidatePath("/quotes");
+  return { ok: true, data: { total: result.total } };
+}
 
 /** 견적 → 계약서 생성 */
 export async function createContractFromQuote(

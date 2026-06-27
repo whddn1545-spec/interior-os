@@ -70,19 +70,29 @@ export async function getWorkerAttendanceBoard(): Promise<ActionResult<Attendanc
     .select("id, name, phone")
     .eq("is_active", true)
     .order("name");
-  if (wErr) return { ok: false, error: wErr.message };
+  if (wErr) {
+    // 작업자 목록 자체를 못 불러오면 친절한 안내 문구로 강등 (Supabase 원문 노출 금지)
+    return { ok: false, error: "작업자 목록을 불러오지 못했어요. 잠시 후 다시 시도해주세요" };
+  }
 
-  // 이번달 출역 기록 — worker_attendance는 Database 타입에 보강됨 → select 컬럼명 검증됨
-  const { data: rows, error: aErr } = await supabase
-    .from("worker_attendance")
-    .select("worker_id, day_rate, paid_at, work_date")
-    .gte("work_date", start)
-    .lt("work_date", end);
-  if (aErr) return { ok: false, error: aErr.message };
+  // 이번달 출역 기록 — worker_attendance 테이블 부재/권한 문제 시
+  // 홈 화면(payment_schedules·schedule_tasks)과 동일하게 빈 기록으로 우아하게 강등한다.
+  // worker_attendance는 Database 타입에 보강됨 → select 컬럼명 검증됨
+  let rows: unknown[] = [];
+  try {
+    const { data, error: aErr } = await supabase
+      .from("worker_attendance")
+      .select("worker_id, day_rate, paid_at, work_date")
+      .gte("work_date", start)
+      .lt("work_date", end);
+    if (!aErr) rows = (data ?? []) as unknown[];
+  } catch {
+    rows = [];
+  }
 
   type Agg = { daysWorked: number; totalEarned: number; totalPaid: number; lastRate: number };
   const byWorker = new Map<string, Agg>();
-  for (const raw of (rows ?? []) as unknown[]) {
+  for (const raw of rows) {
     const r = raw as Record<string, unknown>;
     const wid = r.worker_id as string;
     const rate = Number(r.day_rate ?? 0);

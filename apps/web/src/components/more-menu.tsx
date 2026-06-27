@@ -5,11 +5,11 @@ import Link from "next/link";
 import {
   CalendarIcon,
   MessageSquareIcon,
-  UsersIcon,
   CameraIcon,
   DollarSignIcon,
   HelpCircleIcon,
   HardHatIcon,
+  ClipboardListIcon,
   SettingsIcon,
   MoreHorizontalIcon,
   CalculatorIcon,
@@ -20,9 +20,9 @@ import {
 
 const items = [
   { href: "/schedule", label: "일정", icon: CalendarIcon },
-  { href: "/messages", label: "문자", icon: MessageSquareIcon },
-  { href: "/customers", label: "고객", icon: UsersIcon },
   { href: "/workers", label: "작업자", icon: HardHatIcon },
+  { href: "/workers/attendance", label: "장부", icon: ClipboardListIcon },
+  { href: "/messages", label: "문자", icon: MessageSquareIcon },
   { href: "/photos", label: "사진", icon: CameraIcon },
   { href: "/materials", label: "자재산출", icon: CalculatorIcon },
   { href: "/moodboard", label: "AI시각화", icon: SparklesIcon },

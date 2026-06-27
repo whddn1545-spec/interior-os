@@ -44,7 +44,7 @@ export async function createCustomer(
 ): Promise<{ ok: boolean; error?: string; customerId?: string }> {
   const supabase = await createClient();
   const { data: { user } } = await supabase.auth.getUser();
-  if (!user) return { ok: false, error: "로그인이 필요합니다" };
+  if (!user) return { ok: false, error: "로그인이 필요해요" };
 
   const tenantId = await getTenantId(supabase, user);
 
@@ -60,13 +60,13 @@ export async function createCustomer(
     return { ok: false, error: "연락처를 입력해주세요" };
   }
   if (phoneDigits.length < 9 || phoneDigits.length > 11) {
-    return { ok: false, error: "연락처를 다시 확인해주세요 (숫자 9~11자리)" };
+    return { ok: false, error: "연락처를 다시 확인해주세요 (숫자 9~11자리예요)" };
   }
   const phone = normalizePhone(input.phone);
 
   // 유입 경로 화이트리스트 검증
   if (!SOURCE_VALUES.includes(input.source as Source)) {
-    return { ok: false, error: "유입 경로가 올바르지 않습니다" };
+    return { ok: false, error: "유입 경로가 올바르지 않아요" };
   }
   const source = input.source as Source;
 
@@ -87,7 +87,7 @@ export async function createCustomer(
   if (existing) {
     return {
       ok: false,
-      error: `이미 등록된 연락처입니다 (${existing.name})`,
+      error: `이미 등록된 연락처예요 (${existing.name})`,
     };
   }
 
