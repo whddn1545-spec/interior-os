@@ -1,5 +1,6 @@
+import Link from "next/link";
 import { createClient } from "@/lib/supabase/server";
-import { ImageIcon } from "lucide-react";
+import { ImageIcon, ArrowLeftIcon } from "lucide-react";
 import { InstagramManager } from "./instagram-manager";
 
 export default async function InstagramPage() {
@@ -71,6 +72,15 @@ export default async function InstagramPage() {
 
   return (
     <div className="px-4 pt-6 pb-24">
+      {/* 홈으로 돌아가기 (더보기 메뉴로 진입 시 길 잃지 않도록) */}
+      <Link
+        href="/"
+        className="mb-3 -ml-2 inline-flex h-14 items-center gap-2 rounded-xl px-2 text-base font-semibold text-gray-600 active:bg-gray-100"
+      >
+        <ArrowLeftIcon size={24} />
+        홈으로
+      </Link>
+
       <div className="flex items-center gap-3 mb-2">
         <ImageIcon size={28} className="text-pink-600" />
         <h1 className="text-2xl font-bold text-gray-900">인스타그램 마케팅</h1>

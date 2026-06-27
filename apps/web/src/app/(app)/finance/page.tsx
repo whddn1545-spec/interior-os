@@ -1,5 +1,6 @@
+import Link from "next/link";
 import { createClient } from "@/lib/supabase/server";
-import { TrendingUpIcon, TrendingDownIcon } from "lucide-react";
+import { TrendingUpIcon, TrendingDownIcon, ArrowLeftIcon } from "lucide-react";
 import { FinanceForm } from "./finance-form";
 import { FinanceEntryItem } from "./finance-entry-item";
 
@@ -60,6 +61,15 @@ export default async function FinancePage() {
 
   return (
     <div className="px-4 pt-6 pb-24">
+      {/* 홈으로 돌아가기 (더보기 메뉴로 진입 시 길 잃지 않도록) */}
+      <Link
+        href="/"
+        className="mb-3 -ml-2 inline-flex h-14 items-center gap-2 rounded-xl px-2 text-base font-semibold text-gray-600 active:bg-gray-100"
+      >
+        <ArrowLeftIcon size={24} />
+        홈으로
+      </Link>
+
       <div className="flex items-center justify-between mb-6">
         <h1 className="text-2xl font-bold text-gray-900">매출 관리</h1>
         <FinanceForm sites={siteList} />

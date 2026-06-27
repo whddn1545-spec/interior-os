@@ -72,8 +72,8 @@ export function PriceEditor({ trades, prices, showSeedButton }: Props) {
       } else {
         setEditingId(null);
         setAddingTradeId(null);
-        setSuccess("저장됐어요");
-        setTimeout(() => setSuccess(null), 2000);
+        setSuccess("저장됐어요. 바뀐 단가는 새로 만드는 견적서부터 적용돼요.");
+        setTimeout(() => setSuccess(null), 4000);
         router.refresh();
       }
     });
@@ -223,59 +223,108 @@ function PriceForm({
   onCancel: () => void;
   isPending: boolean;
 }) {
+  const materialNum = Number(form.materialUnitPrice);
+  const laborNum = Number(form.laborDayRate);
+  const daysNum = Number(form.defaultDaysPerUnit);
+
+  // 입력값 범위 힌트 (오타 방지) — 저장은 막지 않고 안내만
+  const hasMaterial = form.materialUnitPrice.trim() !== "" && !Number.isNaN(materialNum);
+  const hasLabor = form.laborDayRate.trim() !== "" && !Number.isNaN(laborNum);
+  const hasDays = form.defaultDaysPerUnit.trim() !== "" && !Number.isNaN(daysNum);
+
+  const materialWarning =
+    hasMaterial && materialNum > 0 && materialNum < 1000
+      ? "단가가 너무 작아요. 0이 빠지지 않았는지 확인해주세요."
+      : hasMaterial && materialNum > 100000000
+        ? "단가가 너무 커요. 0을 더 누르지 않았는지 확인해주세요."
+        : null;
+
+  const laborWarning =
+    hasLabor && laborNum > 0 && laborNum < 50000
+      ? "일당이 너무 적어요. 0이 빠지지 않았는지 확인해주세요. (보통 15만~30만원)"
+      : hasLabor && laborNum > 2000000
+        ? "일당이 너무 많아요. 0을 더 누르지 않았는지 확인해주세요."
+        : null;
+
+  const daysWarning =
+    hasDays && daysNum > 0 && daysNum > 30
+      ? "작업일수가 너무 큰 값이에요. 다시 확인해주세요."
+      : null;
+
   return (
-    <div className="bg-blue-50 rounded-xl p-3 mb-3 space-y-2">
-      <input
-        type="text"
-        placeholder="자재명 (예: 강마루, 실크벽지)"
-        value={form.itemName}
-        onChange={(e) => setForm({ ...form, itemName: e.target.value })}
-        className="w-full border border-gray-200 rounded-lg px-3 py-2.5 text-base bg-white focus:outline-none focus:border-blue-400"
-      />
+    <div className="bg-blue-50 rounded-xl p-3 mb-3 space-y-3">
+      <div>
+        <label className="text-base font-semibold text-gray-700 mb-1 block">자재명</label>
+        <p className="text-sm text-gray-500 mb-1.5">어떤 자재인지 적어주세요. 예) 강마루, 실크벽지</p>
+        <input
+          type="text"
+          placeholder="예: 강마루"
+          value={form.itemName}
+          onChange={(e) => setForm({ ...form, itemName: e.target.value })}
+          className="w-full border border-gray-200 rounded-lg px-3 py-3 text-base bg-white focus:outline-none focus:border-blue-400"
+        />
+      </div>
       <div className="grid grid-cols-2 gap-2">
         <div>
-          <label className="text-xs text-gray-500 mb-1 block">자재 단가 (원/{unit})</label>
+          <label className="text-base font-semibold text-gray-700 mb-1 block">자재 단가 (원/{unit})</label>
+          <p className="text-sm text-gray-500 mb-1.5">{unit} 1개당 자재값이에요. 예) 30,000원</p>
           <input
             type="number"
+            inputMode="numeric"
             placeholder="30000"
             value={form.materialUnitPrice}
             onChange={(e) => setForm({ ...form, materialUnitPrice: e.target.value })}
-            className="w-full border border-gray-200 rounded-lg px-3 py-2.5 text-base bg-white focus:outline-none focus:border-blue-400"
+            className="w-full border border-gray-200 rounded-lg px-3 py-3 text-base bg-white focus:outline-none focus:border-blue-400"
           />
+          {materialWarning && (
+            <p className="text-sm text-amber-700 mt-1.5 leading-snug">⚠️ {materialWarning}</p>
+          )}
         </div>
         <div>
-          <label className="text-xs text-gray-500 mb-1 block">일당 (원/일)</label>
+          <label className="text-base font-semibold text-gray-700 mb-1 block">일당 (원/일)</label>
+          <p className="text-sm text-gray-500 mb-1.5">하루 인건비예요. 예) 250,000원</p>
           <input
             type="number"
+            inputMode="numeric"
             placeholder="250000"
             value={form.laborDayRate}
             onChange={(e) => setForm({ ...form, laborDayRate: e.target.value })}
-            className="w-full border border-gray-200 rounded-lg px-3 py-2.5 text-base bg-white focus:outline-none focus:border-blue-400"
+            className="w-full border border-gray-200 rounded-lg px-3 py-3 text-base bg-white focus:outline-none focus:border-blue-400"
           />
+          {laborWarning && (
+            <p className="text-sm text-amber-700 mt-1.5 leading-snug">⚠️ {laborWarning}</p>
+          )}
         </div>
       </div>
       <div>
-        <label className="text-xs text-gray-500 mb-1 block">{unit}당 작업일수</label>
+        <label className="text-base font-semibold text-gray-700 mb-1 block">{unit}당 작업일수</label>
+        <p className="text-sm text-gray-500 mb-1.5">
+          {unit} 1개를 작업하는 데 걸리는 날수예요. 예) 0.12 (약 10개에 하루)
+        </p>
         <input
           type="number"
           step="0.01"
+          inputMode="decimal"
           placeholder="0.12"
           value={form.defaultDaysPerUnit}
           onChange={(e) => setForm({ ...form, defaultDaysPerUnit: e.target.value })}
-          className="w-full border border-gray-200 rounded-lg px-3 py-2.5 text-base bg-white focus:outline-none focus:border-blue-400"
+          className="w-full border border-gray-200 rounded-lg px-3 py-3 text-base bg-white focus:outline-none focus:border-blue-400"
         />
+        {daysWarning && (
+          <p className="text-sm text-amber-700 mt-1.5 leading-snug">⚠️ {daysWarning}</p>
+        )}
       </div>
       <div className="flex gap-2">
         <button
           onClick={onSave}
           disabled={isPending || !form.itemName}
-          className="flex-1 bg-blue-600 text-white rounded-lg py-2.5 text-base font-semibold disabled:opacity-50"
+          className="flex-1 bg-blue-600 text-white rounded-lg py-4 text-base font-semibold disabled:opacity-50"
         >
           {isPending ? "저장 중..." : "저장"}
         </button>
         <button
           onClick={onCancel}
-          className="flex-1 bg-white text-gray-700 rounded-lg py-2.5 text-base font-medium border border-gray-200"
+          className="flex-1 bg-white text-gray-700 rounded-lg py-4 text-base font-medium border border-gray-200"
         >
           취소
         </button>

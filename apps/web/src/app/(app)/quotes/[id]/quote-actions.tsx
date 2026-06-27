@@ -2,9 +2,9 @@
 
 import { useState, useTransition } from "react";
 import { useRouter } from "next/navigation";
-import { CheckCircleIcon, RotateCcwIcon, FileTextIcon, MessageSquareIcon, FileSignatureIcon, Share2Icon } from "lucide-react";
+import { CheckCircleIcon, RotateCcwIcon, FileTextIcon, MessageSquareIcon, FileSignatureIcon, Share2Icon, CopyIcon, Trash2Icon, AlertTriangleIcon } from "lucide-react";
 import { confirmQuote } from "../new/actions";
-import { revertQuoteToDraft, generateQuotePdf, createContractFromQuote } from "./actions";
+import { revertQuoteToDraft, generateQuotePdf, createContractFromQuote, deleteQuote, duplicateQuote } from "./actions";
 import { formatKRW } from "@interior-os/core/pricing";
 
 interface Props {
@@ -21,6 +21,7 @@ export function QuoteActions({ quoteId, status, siteId, customerId, totalAmount 
   const [error, setError] = useState<string | null>(null);
   const [showConfirmDialog, setShowConfirmDialog] = useState(false);
   const [showContractDialog, setShowContractDialog] = useState(false);
+  const [showDeleteDialog, setShowDeleteDialog] = useState(false);
   const [depositRate, setDepositRate] = useState(30);
   const [interimRate, setInterimRate] = useState(40);
   const [specialTerms, setSpecialTerms] = useState("");
@@ -44,6 +45,31 @@ export function QuoteActions({ quoteId, status, siteId, customerId, totalAmount 
       const result = await revertQuoteToDraft(quoteId);
       if (!result.ok) setError(result.error);
       else router.refresh();
+    });
+  }
+
+  function handleDuplicate() {
+    setError(null);
+    startTransition(async () => {
+      const result = await duplicateQuote(quoteId);
+      if (!result.ok) {
+        setError(result.error);
+      } else {
+        router.push(`/quotes/${result.data.quoteId}`);
+      }
+    });
+  }
+
+  function handleDelete() {
+    setError(null);
+    startTransition(async () => {
+      const result = await deleteQuote(quoteId);
+      if (!result.ok) {
+        setError(result.error);
+        setShowDeleteDialog(false);
+      } else {
+        router.push("/quotes");
+      }
     });
   }
 
@@ -118,18 +144,40 @@ export function QuoteActions({ quoteId, status, siteId, customerId, totalAmount 
             ✅ 이 금액으로 확정하기
           </button>
           <button
+            onClick={handleDuplicate}
+            disabled={isPending}
+            className="flex items-center justify-center gap-2 w-full bg-gray-100 text-gray-700 rounded-2xl py-4 text-lg font-medium disabled:opacity-50"
+          >
+            <CopyIcon size={20} />
+            {isPending ? "복제 중..." : "이 견적 복제하기"}
+          </button>
+          <p className="text-base text-gray-500 text-center px-2">
+            같은 현장의 항목·금액을 그대로 복사해 새 견적으로 만들어요
+          </p>
+
+          <button
             onClick={() =>
               router.push(
                 customerId ? `/quotes/new?customerId=${customerId}` : `/quotes/new`
               )
             }
-            className="w-full bg-gray-100 text-gray-700 rounded-2xl py-4 text-lg font-medium"
+            disabled={isPending}
+            className="w-full bg-gray-100 text-gray-700 rounded-2xl py-4 text-lg font-medium disabled:opacity-50"
           >
-            📝 새 버전으로 다시 견적
+            📝 처음부터 새로 견적 작성
           </button>
           <p className="text-base text-gray-500 text-center px-2">
             이 견적은 그대로 두고, 같은 고객으로 새 견적을 처음부터 만들어요
           </p>
+
+          <button
+            onClick={() => setShowDeleteDialog(true)}
+            disabled={isPending}
+            className="flex items-center justify-center gap-2 w-full bg-red-50 text-red-600 border border-red-200 rounded-2xl py-4 text-lg font-semibold disabled:opacity-50"
+          >
+            <Trash2Icon size={20} />
+            이 견적 삭제
+          </button>
         </>
       )}
 
@@ -222,6 +270,37 @@ export function QuoteActions({ quoteId, status, siteId, customerId, totalAmount 
                 className="w-full bg-gray-100 text-gray-700 rounded-2xl py-4 text-lg font-medium"
               >
                 다시 확인할게요
+              </button>
+            </div>
+          </div>
+        </div>
+      )}
+
+      {/* 삭제 확인 다이얼로그 */}
+      {showDeleteDialog && (
+        <div className="fixed inset-0 bg-black/50 z-50 flex items-end">
+          <div className="bg-white w-full rounded-t-3xl p-6 pb-8">
+            <div className="text-center mb-6">
+              <AlertTriangleIcon size={48} className="mx-auto text-red-500 mb-3" />
+              <h3 className="text-2xl font-bold text-gray-900">이 견적을 삭제할까요?</h3>
+              <p className="text-base text-gray-500 mt-2">
+                삭제하면 이 임시저장 견적과 모든 항목이 완전히 지워져요. 되돌릴 수 없어요.
+              </p>
+            </div>
+            <div className="space-y-3">
+              <button
+                onClick={handleDelete}
+                disabled={isPending}
+                className="w-full bg-red-600 text-white rounded-2xl py-5 text-xl font-bold disabled:opacity-50"
+              >
+                {isPending ? "삭제 중..." : "네, 삭제합니다"}
+              </button>
+              <button
+                onClick={() => setShowDeleteDialog(false)}
+                disabled={isPending}
+                className="w-full bg-gray-100 text-gray-700 rounded-2xl py-4 text-lg font-medium disabled:opacity-50"
+              >
+                아니요, 그대로 둘게요
               </button>
             </div>
           </div>

@@ -16,7 +16,38 @@ interface Props {
 }
 
 type Step = "target" | "site" | "preview" | "done";
-type MessageType = "worker_notify" | "customer_progress" | "custom";
+type MessageType =
+  | "worker_notify"
+  | "customer_progress"
+  | "payment_request"
+  | "work_done"
+  | "custom";
+type PaymentStage = "deposit" | "midterm" | "balance";
+type WorkDoneVariant = "completed" | "warranty";
+
+// 고객 대상 문자 종류 (작업자에게는 섭외·안내만 노출)
+const CUSTOMER_MESSAGE_TYPES: ReadonlyArray<readonly [MessageType, string, string]> = [
+  ["customer_progress", "공사 진행 알림", "현장·공종·예정일 안내"],
+  ["payment_request", "대금 청구", "계약금·중도금·잔금 입금 안내"],
+  ["work_done", "완료·하자보수 안내", "공사 완료/하자보수 안내"],
+  ["custom", "직접 입력", "내용을 직접 작성"],
+];
+
+const WORKER_MESSAGE_TYPES: ReadonlyArray<readonly [MessageType, string, string]> = [
+  ["worker_notify", "섭외·안내 문자", "작업 일정, 주소, 비번 포함"],
+  ["custom", "직접 입력", "내용을 직접 작성"],
+];
+
+const PAYMENT_STAGES: ReadonlyArray<readonly [PaymentStage, string]> = [
+  ["deposit", "계약금"],
+  ["midterm", "중도금"],
+  ["balance", "잔금"],
+];
+
+// 날짜 입력이 필요한 문자 종류 (작업일/예정일)
+function needsDate(t: MessageType): boolean {
+  return t === "worker_notify" || t === "customer_progress" || t === "work_done";
+}
 
 export function MessageWizard({ workers, sites, customers }: Props) {
   const searchParams = useSearchParams();
@@ -32,6 +63,8 @@ export function MessageWizard({ workers, sites, customers }: Props) {
     return d.toISOString().split("T")[0];
   });
   const [messageType, setMessageType] = useState<MessageType>("worker_notify");
+  const [paymentStage, setPaymentStage] = useState<PaymentStage>("deposit");
+  const [workDoneVariant, setWorkDoneVariant] = useState<WorkDoneVariant>("completed");
   const [customBody, setCustomBody] = useState("");
   const [preview, setPreview] = useState<{ body: string; maskedBody: string; targetName: string; targetPhone: string } | null>(null);
   const [error, setError] = useState<string | null>(null);
@@ -79,8 +112,10 @@ export function MessageWizard({ workers, sites, customers }: Props) {
       siteId: selectedSiteId,
       messageType,
       customBody,
-      workDate: messageType === "worker_notify" ? workDate : undefined,
+      workDate: needsDate(messageType) ? workDate : undefined,
       tradeId: selectedTradeId || undefined,
+      paymentStage: messageType === "payment_request" ? paymentStage : undefined,
+      workDoneVariant: messageType === "work_done" ? workDoneVariant : undefined,
     });
 
     if (!result.ok) {
@@ -94,16 +129,20 @@ export function MessageWizard({ workers, sites, customers }: Props) {
   function handleSend() {
     if (!preview) return;
     startTransition(async () => {
-      const dateKey = messageType === "worker_notify" ? workDate : "";
-      const key = `${targetType}-${selectedId}-${selectedSiteId}-${dateKey}-${messageType}`;
+      const dateKey = needsDate(messageType) ? workDate : "";
+      const stageKey = messageType === "payment_request" ? paymentStage : "";
+      const variantKey = messageType === "work_done" ? workDoneVariant : "";
+      const key = `${targetType}-${selectedId}-${selectedSiteId}-${dateKey}-${messageType}-${stageKey}${variantKey}`;
       const result = await sendMessage({
         targetType,
         targetId: selectedId,
         siteId: selectedSiteId || undefined,
         messageType,
         customBody: messageType === "custom" ? customBody : undefined,
-        workDate: messageType === "worker_notify" ? workDate : undefined,
+        workDate: needsDate(messageType) ? workDate : undefined,
         tradeId: selectedTradeId || undefined,
+        paymentStage: messageType === "payment_request" ? paymentStage : undefined,
+        workDoneVariant: messageType === "work_done" ? workDoneVariant : undefined,
         channel: "sms",
         idempotencyKey: key,
       });
@@ -196,11 +235,7 @@ export function MessageWizard({ workers, sites, customers }: Props) {
           <div className="mt-4">
             <h3 className="text-lg font-semibold text-gray-800 mb-3">메시지 종류</h3>
             <div className="space-y-2">
-              {([
-                ["worker_notify", "섭외·안내 문자", "작업 일정, 주소, 비번 포함"],
-                ["customer_progress", "공사 진행 알림", "고객에게 진행 상황 안내"],
-                ["custom", "직접 입력", "내용을 직접 작성"],
-              ] as const).map(([type, label, desc]) => (
+              {(targetType === "worker" ? WORKER_MESSAGE_TYPES : CUSTOMER_MESSAGE_TYPES).map(([type, label, desc]) => (
                 <button
                   key={type}
                   onClick={() => setMessageType(type)}
@@ -254,13 +289,75 @@ export function MessageWizard({ workers, sites, customers }: Props) {
               </select>
             )}
 
-            {messageType === "worker_notify" && (
-              <input
-                type="date"
-                value={workDate}
-                onChange={(e) => setWorkDate(e.target.value)}
-                className="w-full border border-gray-200 rounded-xl px-4 py-4 text-lg text-gray-900 focus:outline-none focus:border-blue-400"
-              />
+            {/* 대금 청구: 청구 단계 선택 */}
+            {messageType === "payment_request" && (
+              <div>
+                <p className="text-base font-semibold text-gray-800 mb-2">청구 단계</p>
+                <div className="grid grid-cols-3 gap-2">
+                  {PAYMENT_STAGES.map(([stage, label]) => (
+                    <button
+                      key={stage}
+                      type="button"
+                      onClick={() => setPaymentStage(stage)}
+                      className={`py-4 rounded-xl text-base font-semibold border-2 ${
+                        paymentStage === stage
+                          ? "border-blue-600 bg-blue-50 text-blue-700"
+                          : "border-gray-200 text-gray-700"
+                      }`}
+                    >
+                      {label}
+                    </button>
+                  ))}
+                </div>
+                <p className="text-sm text-gray-500 mt-2">
+                  미수 금액과 입금 계좌가 자동으로 채워집니다.
+                </p>
+              </div>
+            )}
+
+            {/* 완료·하자보수: 종류 선택 */}
+            {messageType === "work_done" && (
+              <div>
+                <p className="text-base font-semibold text-gray-800 mb-2">안내 종류</p>
+                <div className="grid grid-cols-2 gap-2">
+                  {([
+                    ["completed", "공사 완료"],
+                    ["warranty", "하자보수"],
+                  ] as const).map(([variant, label]) => (
+                    <button
+                      key={variant}
+                      type="button"
+                      onClick={() => setWorkDoneVariant(variant)}
+                      className={`py-4 rounded-xl text-base font-semibold border-2 ${
+                        workDoneVariant === variant
+                          ? "border-blue-600 bg-blue-50 text-blue-700"
+                          : "border-gray-200 text-gray-700"
+                      }`}
+                    >
+                      {label}
+                    </button>
+                  ))}
+                </div>
+              </div>
+            )}
+
+            {/* 작업일/예정일 */}
+            {needsDate(messageType) && (
+              <div>
+                <label className="block text-base font-semibold text-gray-800 mb-2">
+                  {messageType === "worker_notify"
+                    ? "작업 예정일"
+                    : messageType === "work_done" && workDoneVariant === "warranty"
+                      ? "방문 예정일 (선택)"
+                      : "예정일 (선택)"}
+                </label>
+                <input
+                  type="date"
+                  value={workDate}
+                  onChange={(e) => setWorkDate(e.target.value)}
+                  className="w-full border border-gray-200 rounded-xl px-4 py-4 text-lg text-gray-900 focus:outline-none focus:border-blue-400"
+                />
+              </div>
             )}
 
             {messageType === "custom" && (

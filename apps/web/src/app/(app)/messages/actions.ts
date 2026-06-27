@@ -4,6 +4,25 @@ import { createClient } from "@/lib/supabase/server";
 import { getTenantId } from "@/lib/supabase/get-tenant";
 import { revalidatePath } from "next/cache";
 import type { ActionResult } from "../quotes/new/actions";
+import {
+  buildWorkerNotifyMessage,
+  buildCustomerProgressMessage,
+  buildPaymentRequestMessage,
+  buildWorkDoneMessage,
+  formatKoreanDate,
+} from "@/lib/sms/templates";
+
+export type MessageType =
+  | "worker_notify"
+  | "customer_progress"
+  | "payment_request"
+  | "work_done"
+  | "custom";
+
+/** 대금 청구 단계 */
+export type PaymentStage = "deposit" | "midterm" | "balance";
+/** 공사 완료/하자보수 구분 */
+export type WorkDoneVariant = "completed" | "warranty";
 
 export interface MessagePreviewResult {
   body: string;
@@ -12,17 +31,47 @@ export interface MessagePreviewResult {
   targetPhone: string;
 }
 
-/** 문자 미리보기 생성 */
-export async function previewMessage(input: {
+export interface PreviewMessageInput {
   targetType: "customer" | "worker";
   targetId: string;
   siteId: string;
-  messageType: "worker_notify" | "customer_progress" | "custom";
+  messageType: MessageType;
   customBody?: string;
   workDate?: string;
   tradeId?: string;
-}): Promise<ActionResult<MessagePreviewResult>> {
+  paymentStage?: PaymentStage;
+  workDoneVariant?: WorkDoneVariant;
+}
+
+/** 문자 종류 검증 (서버측) */
+function isValidMessageType(t: unknown): t is MessageType {
+  return (
+    t === "worker_notify" ||
+    t === "customer_progress" ||
+    t === "payment_request" ||
+    t === "work_done" ||
+    t === "custom"
+  );
+}
+
+/** tenants.default_settings(jsonb) 에서 입금 계좌 문자열을 안전하게 꺼낸다. */
+function extractBankAccount(settings: unknown): string | null {
+  if (!settings || typeof settings !== "object") return null;
+  const s = settings as Record<string, unknown>;
+  const raw = s.bank_account ?? s.bankAccount;
+  if (typeof raw === "string" && raw.trim()) return raw.trim();
+  return null;
+}
+
+/** 문자 미리보기 생성 — 본문은 lib/sms/templates.ts 빌더 함수가 단일 출처다. */
+export async function previewMessage(
+  input: PreviewMessageInput
+): Promise<ActionResult<MessagePreviewResult>> {
   const supabase = await createClient();
+
+  if (!isValidMessageType(input.messageType)) {
+    return { ok: false, error: "문자 종류가 올바르지 않습니다" };
+  }
 
   // 현장 정보
   const { data: site } = await supabase
@@ -32,7 +81,12 @@ export async function previewMessage(input: {
     .single();
 
   if (!site) return { ok: false, error: "현장을 찾을 수 없습니다" };
-  const siteAny = site as unknown as Record<string, unknown>;
+  const siteAny = site as unknown as {
+    name: string;
+    address: string;
+    main_door_code: string | null;
+    unit_door_code: string | null;
+  };
 
   let targetName = "";
   let targetPhone = "";
@@ -69,33 +123,97 @@ export async function previewMessage(input: {
     if (trade) tradeName = (trade as unknown as { name_ko: string }).name_ko;
   }
 
+  const dateStr = formatKoreanDate(input.workDate);
+
   let body = "";
   let maskedBody = "";
 
   if (input.messageType === "worker_notify") {
-    const mainDoor = siteAny.main_door_code as string | null;
-    const unitDoor = siteAny.unit_door_code as string | null;
-    const dateStr = input.workDate
-      ? new Date(input.workDate).toLocaleDateString("ko-KR", { month: "long", day: "numeric", weekday: "short" })
-      : "미정";
-
-    const codeSection = [
-      mainDoor ? `공동현관: ${mainDoor}` : null,
-      unitDoor ? `세대현관: ${unitDoor}` : null,
-    ].filter(Boolean).join("\n");
-
-    const maskedCodeSection = [
-      mainDoor ? `공동현관: ****` : null,
-      unitDoor ? `세대현관: ****` : null,
-    ].filter(Boolean).join("\n");
-
-    body = `${targetName}님, ${dateStr} ${siteAny.name as string} ${tradeName} 작업 부탁드립니다.\n주소: ${siteAny.address as string}${codeSection ? `\n${codeSection}` : ""}\n감사합니다.`;
-    maskedBody = `${targetName}님, ${dateStr} ${siteAny.name as string} ${tradeName} 작업 부탁드립니다.\n주소: ${siteAny.address as string}${maskedCodeSection ? `\n${maskedCodeSection}` : ""}\n감사합니다.`;
-
+    const built = buildWorkerNotifyMessage({
+      workerName: targetName,
+      siteName: siteAny.name,
+      siteAddress: siteAny.address,
+      workDate: dateStr || "작업일 미정",
+      tradeName,
+      mainDoorCode: siteAny.main_door_code,
+      unitDoorCode: siteAny.unit_door_code,
+    });
+    body = built.body;
+    maskedBody = built.maskedBody;
   } else if (input.messageType === "customer_progress") {
-    body = `${targetName}님, ${siteAny.name as string} 공사가 순조롭게 진행 중입니다. 궁금하신 점은 언제든 연락주세요.`;
-    maskedBody = body;
+    const built = buildCustomerProgressMessage({
+      customerName: targetName,
+      siteName: siteAny.name,
+      tradeName: tradeName || undefined,
+      scheduledDate: dateStr || undefined,
+    });
+    body = built.body;
+    maskedBody = built.maskedBody;
+  } else if (input.messageType === "payment_request") {
+    // 대금 청구: payment_schedules(미수)·tenants 계좌 조회
+    const stage = input.paymentStage ?? "deposit";
+    const { data: schedule } = await supabase
+      .from("payment_schedules")
+      .select("stage_label, amount, due_date")
+      .eq("site_id", input.siteId)
+      .eq("stage", stage)
+      .is("paid_at", null)
+      .order("due_date", { ascending: true })
+      .limit(1)
+      .maybeSingle();
 
+    if (!schedule) {
+      return {
+        ok: false,
+        error: "해당 단계의 미수 대금이 없습니다. 잔금 보드에서 확인해주세요.",
+      };
+    }
+    const sch = schedule as unknown as {
+      stage_label: string;
+      amount: number | string;
+      due_date: string | null;
+    };
+
+    // 사업자 입금 계좌 (tenants.default_settings)
+    const {
+      data: { user },
+    } = await supabase.auth.getUser();
+    let bankAccount: string | null = null;
+    if (user) {
+      const tenantId = await getTenantId(supabase, user);
+      const { data: tenant } = await supabase
+        .from("tenants")
+        .select("default_settings")
+        .eq("id", tenantId)
+        .maybeSingle();
+      bankAccount = extractBankAccount(
+        (tenant as unknown as { default_settings: unknown } | null)
+          ?.default_settings
+      );
+    }
+
+    const built = buildPaymentRequestMessage({
+      customerName: targetName,
+      siteName: siteAny.name,
+      stageLabel: sch.stage_label,
+      amount: Number(sch.amount ?? 0),
+      dueDate: formatKoreanDate(sch.due_date) || undefined,
+      bankAccount,
+    });
+    body = built.body;
+    maskedBody = built.maskedBody;
+  } else if (input.messageType === "work_done") {
+    const variant: WorkDoneVariant =
+      input.workDoneVariant === "warranty" ? "warranty" : "completed";
+    const built = buildWorkDoneMessage({
+      customerName: targetName,
+      siteName: siteAny.name,
+      variant,
+      tradeName: tradeName || undefined,
+      scheduledDate: dateStr || undefined,
+    });
+    body = built.body;
+    maskedBody = built.maskedBody;
   } else {
     body = input.customBody ?? "";
     maskedBody = body;
@@ -109,16 +227,22 @@ export async function sendMessage(input: {
   targetType: "customer" | "worker";
   targetId: string;
   siteId?: string;
-  messageType: "worker_notify" | "customer_progress" | "custom";
+  messageType: MessageType;
   customBody?: string;
   workDate?: string;
   tradeId?: string;
+  paymentStage?: PaymentStage;
+  workDoneVariant?: WorkDoneVariant;
   channel: "sms" | "alimtalk";
   idempotencyKey: string;
 }): Promise<ActionResult<void>> {
   const supabase = await createClient();
   const { data: { user } } = await supabase.auth.getUser();
   if (!user) return { ok: false, error: "로그인이 필요합니다" };
+
+  if (!isValidMessageType(input.messageType)) {
+    return { ok: false, error: "문자 종류가 올바르지 않습니다" };
+  }
 
   const tenantId = await getTenantId(supabase, user);
 
@@ -131,6 +255,8 @@ export async function sendMessage(input: {
     customBody: input.customBody,
     workDate: input.workDate,
     tradeId: input.tradeId,
+    paymentStage: input.paymentStage,
+    workDoneVariant: input.workDoneVariant,
   });
   if (!previewResult.ok || !previewResult.data) {
     return { ok: false, error: (!previewResult.ok ? (previewResult as { ok: false; error?: string }).error : undefined) ?? "메시지 생성 실패" };

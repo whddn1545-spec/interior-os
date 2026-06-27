@@ -68,6 +68,9 @@ export default function CustomerNewPage() {
             placeholder="010-0000-0000"
             className="w-full border border-gray-200 rounded-2xl px-4 py-4 text-lg focus:outline-none focus:border-blue-400"
           />
+          <p className="mt-2 text-base text-gray-500">
+            숫자만 입력해도 자동으로 정리됩니다
+          </p>
         </div>
 
         <div>

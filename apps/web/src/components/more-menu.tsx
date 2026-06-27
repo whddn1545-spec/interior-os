@@ -14,6 +14,7 @@ import {
   MoreHorizontalIcon,
   CalculatorIcon,
   SparklesIcon,
+  ImageIcon,
   XIcon,
 } from "lucide-react";
 
@@ -25,6 +26,7 @@ const items = [
   { href: "/photos", label: "사진", icon: CameraIcon },
   { href: "/materials", label: "자재산출", icon: CalculatorIcon },
   { href: "/moodboard", label: "AI시각화", icon: SparklesIcon },
+  { href: "/instagram", label: "인스타", icon: ImageIcon },
   { href: "/finance", label: "매출", icon: DollarSignIcon },
   { href: "/settings", label: "설정", icon: SettingsIcon },
   { href: "/help", label: "도움말", icon: HelpCircleIcon },

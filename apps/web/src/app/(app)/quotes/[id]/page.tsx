@@ -1,6 +1,6 @@
 import { notFound } from "next/navigation";
 import Link from "next/link";
-import { ArrowLeftIcon, CheckCircleIcon, AlertTriangleIcon, FileTextIcon, SendIcon, ChevronRightIcon } from "lucide-react";
+import { ArrowLeftIcon, CheckCircleIcon, AlertTriangleIcon, FileTextIcon, SendIcon, ChevronRightIcon, LayoutGridIcon } from "lucide-react";
 import { createClient } from "@/lib/supabase/server";
 import { QuoteActions } from "./quote-actions";
 import { formatKRW } from "@interior-os/core/pricing";
@@ -96,6 +96,15 @@ export default async function QuoteDetailPage({ params }: { params: Promise<{ id
                 <span className="font-medium text-right max-w-[220px]">{siteAny.address}</span>
               </div>
             </div>
+            {/* 현장 종합 허브 — 이 현장의 견적·일정·사진·받을돈을 한 화면에서 */}
+            <Link
+              href={`/sites/${siteAny.id}`}
+              className="mt-3 flex items-center gap-2 px-3 py-4 rounded-xl bg-blue-50 text-blue-700 active:bg-blue-100"
+            >
+              <LayoutGridIcon size={20} className="shrink-0" />
+              <span className="flex-1 text-base font-bold">현장 종합 보기</span>
+              <ChevronRightIcon size={18} className="text-blue-400 shrink-0" />
+            </Link>
           </div>
         )}
 

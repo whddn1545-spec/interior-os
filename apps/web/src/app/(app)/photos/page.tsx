@@ -1,6 +1,6 @@
 import { createClient } from "@/lib/supabase/server";
 import Link from "next/link";
-import { ChevronRightIcon, CameraIcon, ArrowLeftIcon } from "lucide-react";
+import { ChevronRightIcon, CameraIcon, ArrowLeftIcon, LayoutGridIcon } from "lucide-react";
 
 export default async function PhotosPage() {
   const supabase = await createClient();
@@ -66,31 +66,44 @@ export default async function PhotosPage() {
             const coverPath = coverPathBySite.get(sAny.id as string);
             const coverUrl = coverPath ? signedUrlByPath.get(coverPath) : undefined;
             return (
-              <Link
+              <div
                 key={sAny.id as string}
-                href={`/photos/${sAny.id as string}`}
-                className="flex items-center justify-between bg-white border border-gray-200 rounded-2xl px-4 py-4"
+                className="bg-white border border-gray-200 rounded-2xl overflow-hidden"
               >
-                <div className="flex items-center gap-3">
-                  {coverUrl ? (
-                    // eslint-disable-next-line @next/next/no-img-element
-                    <img
-                      src={coverUrl}
-                      alt={`${sAny.name as string} 대표 사진`}
-                      className="w-12 h-12 rounded-xl object-cover bg-gray-100"
-                    />
-                  ) : (
-                    <div className="w-12 h-12 bg-gray-100 rounded-xl flex items-center justify-center">
-                      <CameraIcon size={22} className="text-gray-400" />
+                <Link
+                  href={`/photos/${sAny.id as string}`}
+                  className="flex items-center justify-between px-4 py-4 active:bg-gray-50"
+                >
+                  <div className="flex items-center gap-3">
+                    {coverUrl ? (
+                      // eslint-disable-next-line @next/next/no-img-element
+                      <img
+                        src={coverUrl}
+                        alt={`${sAny.name as string} 대표 사진`}
+                        className="w-12 h-12 rounded-xl object-cover bg-gray-100"
+                      />
+                    ) : (
+                      <div className="w-12 h-12 bg-gray-100 rounded-xl flex items-center justify-center">
+                        <CameraIcon size={22} className="text-gray-400" />
+                      </div>
+                    )}
+                    <div>
+                      <p className="text-base font-semibold text-gray-900">{sAny.name as string}</p>
+                      <p className="text-sm text-gray-500">사진 {photos.length}장</p>
                     </div>
-                  )}
-                  <div>
-                    <p className="text-base font-semibold text-gray-900">{sAny.name as string}</p>
-                    <p className="text-sm text-gray-500">사진 {photos.length}장</p>
                   </div>
-                </div>
-                <ChevronRightIcon size={18} className="text-gray-300" />
-              </Link>
+                  <ChevronRightIcon size={18} className="text-gray-300" />
+                </Link>
+                {/* 현장 종합 허브로 이동 — 견적·일정·받을돈까지 한눈에 */}
+                <Link
+                  href={`/sites/${sAny.id as string}`}
+                  className="flex items-center gap-2 border-t border-gray-100 px-4 py-4 text-blue-700 active:bg-blue-50"
+                >
+                  <LayoutGridIcon size={18} className="shrink-0" />
+                  <span className="flex-1 text-base font-semibold">현장 종합 보기</span>
+                  <ChevronRightIcon size={16} className="text-blue-300 shrink-0" />
+                </Link>
+              </div>
             );
           })}
         </div>

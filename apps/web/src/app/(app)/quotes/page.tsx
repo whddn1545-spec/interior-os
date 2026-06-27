@@ -1,6 +1,7 @@
 import Link from "next/link";
 import { PlusIcon } from "lucide-react";
 import { createClient } from "@/lib/supabase/server";
+import { QuoteListActions } from "./quote-list-actions";
 
 const STATUS_FILTERS = [
   { key: "all", label: "전체" },
@@ -121,11 +122,12 @@ export default async function QuotesPage({
           {visibleQuotes.map((q) => {
             const site = q.sites as unknown as { name: string; customers: { name: string } | null } | null;
             const customerName = site?.customers?.name ?? null;
+            const isDraft = (q.status as string) === "draft";
             return (
-              <li key={q.id}>
+              <li key={q.id} className="bg-white border border-gray-200 rounded-2xl px-4 py-4">
                 <Link
                   href={`/quotes/${q.id}`}
-                  className="block bg-white border border-gray-200 rounded-2xl px-4 py-4 hover:border-blue-300"
+                  className="block hover:opacity-80"
                 >
                   <div className="flex items-start justify-between gap-3">
                     <div className="flex-1 min-w-0">
@@ -151,6 +153,7 @@ export default async function QuotesPage({
                     </div>
                   </div>
                 </Link>
+                {isDraft && <QuoteListActions quoteId={q.id} />}
               </li>
             );
           })}

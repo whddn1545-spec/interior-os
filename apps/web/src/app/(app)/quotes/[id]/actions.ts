@@ -1,6 +1,7 @@
 "use server";
 
 import { createClient } from "@/lib/supabase/server";
+import { getTenantId } from "@/lib/supabase/get-tenant";
 import { revalidatePath } from "next/cache";
 import { cookies } from "next/headers";
 import type { ActionResult } from "../new/actions";
@@ -105,6 +106,144 @@ export async function generateQuotePdf(
 
   revalidatePath(`/quotes/${quoteId}`);
   return { ok: true, data: { url } };
+}
+
+/** 견적 삭제 (임시저장 상태만, 항목까지 함께 삭제) */
+export async function deleteQuote(quoteId: string): Promise<ActionResult<void>> {
+  const supabase = await createClient();
+  const { data: { user } } = await supabase.auth.getUser();
+  if (!user) return { ok: false, error: "로그인이 필요합니다" };
+
+  // 서버 측 검증: 임시저장(draft) 상태인지 확인
+  const { data: quote, error: fetchError } = await supabase
+    .from("quotes")
+    .select("id, status")
+    .eq("id", quoteId)
+    .single();
+
+  if (fetchError || !quote) return { ok: false, error: "견적을 찾을 수 없습니다" };
+  if ((quote.status as string) !== "draft")
+    return { ok: false, error: "임시저장 견적만 삭제할 수 있습니다" };
+
+  // 항목 먼저 삭제 (FK 정리)
+  const { error: itemsError } = await supabase
+    .from("quote_items")
+    .delete()
+    .eq("quote_id", quoteId);
+  if (itemsError) return { ok: false, error: itemsError.message };
+
+  // 견적 헤더 삭제 — draft 조건을 다시 걸어 동시성 보호
+  const { error: quoteError } = await supabase
+    .from("quotes")
+    .delete()
+    .eq("id", quoteId)
+    .eq("status", "draft" as const);
+  if (quoteError) return { ok: false, error: quoteError.message };
+
+  revalidatePath("/quotes");
+  revalidatePath("/");
+  return { ok: true, data: undefined };
+}
+
+/** 견적 복제 (기존 항목/금액을 그대로 복사해 새 draft 견적 생성) */
+export async function duplicateQuote(
+  quoteId: string
+): Promise<ActionResult<{ quoteId: string }>> {
+  const supabase = await createClient();
+  const { data: { user } } = await supabase.auth.getUser();
+  if (!user) return { ok: false, error: "로그인이 필요합니다" };
+
+  const tenantId = await getTenantId(supabase, user);
+
+  // 원본 견적 헤더 조회
+  const { data: source, error: sourceError } = await supabase
+    .from("quotes")
+    .select("site_id, subtotal, distance_factor, difficulty_factor, reserve_rate, contingency_rate, total_amount")
+    .eq("id", quoteId)
+    .single();
+
+  if (sourceError || !source) return { ok: false, error: "복제할 견적을 찾을 수 없습니다" };
+
+  const src = source as unknown as {
+    site_id: string;
+    subtotal: number;
+    distance_factor: number;
+    difficulty_factor: number;
+    reserve_rate: number;
+    contingency_rate: number;
+    total_amount: number;
+  };
+
+  // 원본 항목 조회
+  const { data: sourceItemsRaw, error: itemsFetchError } = await supabase
+    .from("quote_items")
+    .select("trade_id, description, quantity, unit, material_cost, labor_days, labor_cost, line_total")
+    .eq("quote_id", quoteId);
+  if (itemsFetchError) return { ok: false, error: itemsFetchError.message };
+
+  const sourceItems = (sourceItemsRaw ?? []) as unknown as {
+    trade_id: string;
+    description: string;
+    quantity: number;
+    unit: string;
+    material_cost: number;
+    labor_days: number;
+    labor_cost: number;
+    line_total: number;
+  }[];
+
+  // 같은 현장의 다음 버전 번호 계산
+  const { count } = await supabase
+    .from("quotes")
+    .select("*", { count: "exact", head: true })
+    .eq("site_id", src.site_id);
+  const version = (count ?? 0) + 1;
+
+  // 새 견적 헤더(draft) 생성
+  const { data: newQuote, error: insertError } = await supabase
+    .from("quotes")
+    .insert({
+      tenant_id: tenantId,
+      site_id: src.site_id,
+      version,
+      status: "draft" as const,
+      subtotal: src.subtotal,
+      distance_factor: src.distance_factor,
+      difficulty_factor: src.difficulty_factor,
+      reserve_rate: src.reserve_rate,
+      contingency_rate: src.contingency_rate,
+      total_amount: src.total_amount,
+    })
+    .select("id")
+    .single();
+
+  if (insertError || !newQuote) return { ok: false, error: insertError?.message ?? "견적 복제에 실패했습니다" };
+
+  // 항목 복사 INSERT
+  if (sourceItems.length > 0) {
+    const { error: copyError } = await supabase.from("quote_items").insert(
+      sourceItems.map((item) => ({
+        tenant_id: tenantId,
+        quote_id: newQuote.id,
+        trade_id: item.trade_id,
+        description: item.description,
+        quantity: item.quantity,
+        unit: item.unit,
+        material_cost: item.material_cost,
+        labor_days: item.labor_days,
+        labor_cost: item.labor_cost,
+        line_total: item.line_total,
+      }))
+    );
+    if (copyError) {
+      // 롤백: 방금 만든 빈 견적 헤더 정리
+      await supabase.from("quotes").delete().eq("id", newQuote.id);
+      return { ok: false, error: copyError.message };
+    }
+  }
+
+  revalidatePath("/quotes");
+  return { ok: true, data: { quoteId: newQuote.id } };
 }
 
 /** 견적 상태 되돌리기 (confirmed → draft) */

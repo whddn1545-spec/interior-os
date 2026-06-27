@@ -50,11 +50,22 @@ export default async function PricesPage() {
         )}
 
         {hasAnyPrices && (
-          <PriceEditor
-            trades={tradesData}
-            prices={pricesData}
-            showSeedButton={false}
-          />
+          <>
+            <div className="bg-amber-50 border border-amber-200 rounded-2xl p-5 mb-6">
+              <h2 className="text-base font-bold text-amber-900 mb-1">
+                단가를 바꾸면 이렇게 적용돼요
+              </h2>
+              <p className="text-base text-amber-800 leading-relaxed">
+                여기서 단가를 바꿔도 <span className="font-semibold">이미 만들어 둔 견적서의 금액은 그대로</span>예요.
+                바뀐 단가는 <span className="font-semibold">새로 만드는 견적서부터</span> 적용됩니다.
+              </p>
+            </div>
+            <PriceEditor
+              trades={tradesData}
+              prices={pricesData}
+              showSeedButton={false}
+            />
+          </>
         )}
       </div>
     </div>

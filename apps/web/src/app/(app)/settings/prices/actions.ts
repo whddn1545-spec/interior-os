@@ -20,6 +20,24 @@ export async function upsertTradePrice(input: {
 
   const tenantId = await getTenantId(supabase, user);
 
+  // 서버 측 입력값 검증 (오타/이상값 방지)
+  if (!input.itemName || input.itemName.trim() === "") {
+    return { ok: false, error: "자재명을 입력해주세요" };
+  }
+  if (
+    !Number.isFinite(input.materialUnitPrice) ||
+    !Number.isFinite(input.laborDayRate) ||
+    !Number.isFinite(input.defaultDaysPerUnit)
+  ) {
+    return { ok: false, error: "단가와 작업일수는 숫자로 정확히 입력해주세요" };
+  }
+  if (input.materialUnitPrice < 0 || input.laborDayRate < 0 || input.defaultDaysPerUnit < 0) {
+    return { ok: false, error: "0보다 작은 값은 넣을 수 없어요" };
+  }
+  if (input.materialUnitPrice > 1000000000 || input.laborDayRate > 1000000000) {
+    return { ok: false, error: "단가가 너무 큽니다. 0을 더 누르지 않았는지 확인해주세요" };
+  }
+
   const { data, error } = await supabase
     .from("trade_prices")
     .upsert({

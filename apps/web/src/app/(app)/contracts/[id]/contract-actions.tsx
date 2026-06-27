@@ -2,7 +2,7 @@
 
 import { useState, useTransition } from "react";
 import { useRouter } from "next/navigation";
-import { FileTextIcon, CheckCircleIcon, MessageSquareIcon, CalendarPlusIcon } from "lucide-react";
+import { FileTextIcon, CheckCircleIcon, MessageSquareIcon, CalendarPlusIcon, Share2Icon } from "lucide-react";
 
 interface Props {
   contractId: string;
@@ -15,6 +15,51 @@ export function ContractActions({ contractId, status, siteId }: Props) {
   const [isPending, startTransition] = useTransition();
   const [showConfirm, setShowConfirm] = useState(false);
   const [error, setError] = useState<string | null>(null);
+  const [generatingPdf, setGeneratingPdf] = useState(false);
+  const [pdfUrl, setPdfUrl] = useState<string | null>(null);
+
+  async function handleGeneratePdf() {
+    setGeneratingPdf(true);
+    setError(null);
+    try {
+      const res = await fetch("/api/pdf/contract", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ contractId }),
+      });
+      if (!res.ok) {
+        const body = (await res.json()) as { error?: string };
+        setError(body.error ?? "PDF를 만들지 못했습니다");
+        return;
+      }
+      const data = (await res.json()) as { url?: string };
+      if (!data.url) {
+        setError("PDF 주소를 받지 못했습니다");
+        return;
+      }
+      setPdfUrl(data.url);
+      window.open(data.url, "_blank");
+      router.refresh();
+    } catch {
+      setError("PDF를 만드는 중 오류가 발생했습니다");
+    } finally {
+      setGeneratingPdf(false);
+    }
+  }
+
+  async function handleShare() {
+    if (!pdfUrl) return;
+    try {
+      if (navigator.share) {
+        await navigator.share({ title: "계약서", text: "인테리어 계약서를 확인해주세요", url: pdfUrl });
+      } else {
+        await navigator.clipboard.writeText(pdfUrl);
+        alert("링크가 복사되었어요");
+      }
+    } catch {
+      // 사용자가 공유를 취소한 경우 무시
+    }
+  }
 
   async function handleConfirm() {
     const supabaseUrl = process.env.NEXT_PUBLIC_SUPABASE_URL;
@@ -63,12 +108,22 @@ export function ContractActions({ contractId, status, siteId }: Props) {
             공사 일정 만들기
           </button>
           <button
-            onClick={() => window.open(`/api/pdf/contract/${contractId}`, "_blank")}
-            className="flex items-center justify-center gap-2 w-full bg-white text-blue-700 border-2 border-blue-600 rounded-2xl py-4 text-lg font-semibold"
+            onClick={handleGeneratePdf}
+            disabled={generatingPdf}
+            className="flex items-center justify-center gap-2 w-full bg-white text-blue-700 border-2 border-blue-600 rounded-2xl py-4 text-lg font-semibold disabled:opacity-50"
           >
             <FileTextIcon size={20} />
-            계약서 PDF 보기
+            {generatingPdf ? "PDF 생성 중..." : "계약서 PDF 보기"}
           </button>
+          {pdfUrl && (
+            <button
+              onClick={handleShare}
+              className="flex items-center justify-center gap-2 w-full bg-blue-50 text-blue-700 border border-blue-200 rounded-2xl py-4 text-lg font-semibold"
+            >
+              <Share2Icon size={20} />
+              PDF 링크 공유하기
+            </button>
+          )}
           <button
             onClick={() => router.push(`/messages?contractId=${contractId}&siteId=${siteId}`)}
             className="flex items-center justify-center gap-2 w-full bg-green-600 text-white rounded-2xl py-4 text-lg font-semibold"
