@@ -1,4 +1,4 @@
-const CACHE_NAME = "interior-os-v1";
+const CACHE_NAME = "interior-os-v2";
 
 // 앱 셸 — 항상 캐시
 const APP_SHELL = ["/", "/offline"];

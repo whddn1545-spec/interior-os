@@ -69,6 +69,26 @@ export const TUTORIAL_CONTENT = {
       { icon: "🔄", text: "날짜를 바꾸면 일정이 다시 정리돼요." },
     ],
   },
+  finance: {
+    icon: "📒",
+    title: "수입·지출 장부",
+    steps: [
+      { icon: "➕", text: "+ 버튼을 눌러 수입이나 지출을 기록해요." },
+      { icon: "📋", text: "이번 달 얼마 들어오고 나갔는지 한눈에 봐요." },
+      { icon: "🗑️", text: "잘못 입력한 것은 항목 옆 휴지통으로 지워요." },
+      { icon: "💡", text: "현장별로 분류하면 나중에 정산이 편해요." },
+    ],
+  },
+  contracts: {
+    icon: "📝",
+    title: "계약서 관리",
+    steps: [
+      { icon: "📄", text: "견적서를 확정하면 계약서를 만들 수 있어요." },
+      { icon: "✍️", text: "고객 서명을 받으면 계약 완료예요." },
+      { icon: "📤", text: "PDF로 저장하거나 카카오톡으로 보낼 수 있어요." },
+      { icon: "🔒", text: "서명된 계약서는 분쟁 시 증거가 돼요." },
+    ],
+  },
 } as const;
 
 export type TutorialKey = keyof typeof TUTORIAL_CONTENT;
