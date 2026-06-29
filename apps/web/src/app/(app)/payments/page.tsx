@@ -1,3 +1,5 @@
+import Link from "next/link";
+import { ArrowLeftIcon } from "lucide-react";
 import { getPaymentBoard, getQuotesMissingSchedule } from "./actions";
 import { PaymentCard } from "./payment-card";
 import { MissingScheduleBanner } from "./missing-schedule-banner";
@@ -38,6 +40,13 @@ export default async function PaymentsPage({
 
   return (
     <div className="mx-auto w-full max-w-2xl px-4 py-6 pb-24">
+      <Link
+        href="/"
+        className="mb-3 -ml-2 inline-flex h-14 items-center gap-2 rounded-xl px-2 text-base font-semibold text-gray-600 active:bg-gray-100"
+      >
+        <ArrowLeftIcon size={24} />
+        홈으로
+      </Link>
       {/* 상단 헤더 */}
       <header className="mb-6">
         <h1 className="text-2xl font-black text-gray-900">💰 받을 돈</h1>
