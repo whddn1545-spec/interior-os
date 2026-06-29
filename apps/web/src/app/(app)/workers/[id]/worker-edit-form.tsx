@@ -33,6 +33,7 @@ export function WorkerEditForm({ worker }: { worker: Worker }) {
   const router = useRouter();
   const [isPending, startTransition] = useTransition();
   const [isDeactivating, startDeactivating] = useTransition();
+  const [showDeactivateConfirm, setShowDeactivateConfirm] = useState(false);
   const [error, setError] = useState<string | null>(null);
   const [rating, setRating] = useState(worker.rating ?? 0);
 
@@ -53,7 +54,11 @@ export function WorkerEditForm({ worker }: { worker: Worker }) {
   }
 
   function handleDeactivate() {
-    if (!confirm("이 작업자를 목록에서 숨길까요? 나중에 다시 복구할 수 없어요.")) return;
+    setShowDeactivateConfirm(true);
+  }
+
+  function confirmDeactivate() {
+    setShowDeactivateConfirm(false);
     startDeactivating(async () => {
       await deactivateWorker(worker.id);
       router.push("/workers");
@@ -159,14 +164,25 @@ export function WorkerEditForm({ worker }: { worker: Worker }) {
         {isPending ? "저장 중..." : "저장하기"}
       </button>
 
-      <button
-        type="button"
-        onClick={handleDeactivate}
-        disabled={isDeactivating}
-        className="w-full py-3 border-2 border-red-300 text-red-600 rounded-xl text-base font-semibold disabled:opacity-50"
-      >
-        {isDeactivating ? "처리 중..." : "작업자 숨기기"}
-      </button>
+      {showDeactivateConfirm ? (
+        <div className="bg-red-50 border border-red-200 rounded-2xl p-4">
+          <p className="text-base font-semibold text-red-900 mb-1">작업자를 숨길까요?</p>
+          <p className="text-sm text-red-700 mb-3">목록에서 사라지며 복구할 수 없어요.</p>
+          <div className="flex gap-2">
+            <button type="button" onClick={() => setShowDeactivateConfirm(false)} className="flex-1 py-3 rounded-xl border border-gray-300 text-gray-700 text-base font-medium">아니요</button>
+            <button type="button" onClick={confirmDeactivate} disabled={isDeactivating} className="flex-1 py-3 rounded-xl bg-red-600 text-white text-base font-bold disabled:opacity-50">네, 숨기기</button>
+          </div>
+        </div>
+      ) : (
+        <button
+          type="button"
+          onClick={handleDeactivate}
+          disabled={isDeactivating}
+          className="w-full py-3 border-2 border-red-300 text-red-600 rounded-xl text-base font-semibold disabled:opacity-50"
+        >
+          {isDeactivating ? "처리 중..." : "작업자 숨기기"}
+        </button>
+      )}
     </form>
   );
 }

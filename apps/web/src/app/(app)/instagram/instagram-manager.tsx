@@ -84,7 +84,6 @@ export function InstagramManager({ recommendedPhotos, existingPosts }: Props) {
   }
 
   function handlePublish(postId: string) {
-    if (!confirm("정말 인스타그램에 게시할까요?")) return;
     startTransition(async () => {
       const result = await publishToInstagram(postId);
       if (!result.ok) setError(result.error ?? "게시 실패");
