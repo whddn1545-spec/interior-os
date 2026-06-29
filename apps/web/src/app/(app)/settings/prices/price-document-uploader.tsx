@@ -172,7 +172,10 @@ export function PriceDocumentUploader({ trades }: { trades: Trade[] }) {
           )}
         </button>
         <p className="text-sm text-gray-400 text-center mt-2">
-          단가표 사진, Excel 인쇄본, PDF 업로드 → AI가 자동 추출
+          단가표 사진을 찍어 올리면 AI가 자동으로 읽어줘요
+        </p>
+        <p className="text-xs text-gray-300 text-center mt-1">
+          PDF 지원은 추후 추가 예정
         </p>
       </div>
     );
