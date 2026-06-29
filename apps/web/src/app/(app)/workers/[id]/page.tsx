@@ -65,9 +65,9 @@ export default async function WorkerDetailPage({ params }: { params: Promise<{ i
         </div>
 
         {/* 배정 이력 */}
-        {assignments && assignments.length > 0 && (
-          <div>
-            <h2 className="text-xl font-semibold text-gray-800 mb-3">현장 배정 이력</h2>
+        <div>
+          <h2 className="text-xl font-semibold text-gray-800 mb-3">현장 배정 이력</h2>
+          {assignments && assignments.length > 0 ? (
             <div className="space-y-2">
               {(assignments as unknown as Record<string, unknown>[]).map((a) => {
                 const site = a.sites as { name: string } | null;
@@ -90,8 +90,21 @@ export default async function WorkerDetailPage({ params }: { params: Promise<{ i
                 );
               })}
             </div>
-          </div>
-        )}
+          ) : (
+            <div className="bg-white border border-gray-200 rounded-2xl px-4 py-6 text-center">
+              <p className="text-base text-gray-700">아직 배정된 현장이 없어요.</p>
+              <p className="text-base text-gray-500 mt-1">
+                일정 화면에서 이 작업자를 현장에 배정해보세요.
+              </p>
+              <Link
+                href="/schedule"
+                className="inline-flex items-center justify-center mt-4 bg-gray-900 text-white px-5 py-4 rounded-xl text-base font-medium"
+              >
+                일정으로 가기
+              </Link>
+            </div>
+          )}
+        </div>
       </div>
     </div>
   );

@@ -54,6 +54,18 @@ export default async function FinancePage() {
     .filter((e) => (e as { direction: string }).direction === "out")
     .reduce((s, e) => s + ((e as { amount: number }).amount ?? 0), 0);
 
+  // 이번 달 지출을 항목(category)별로 집계 — 데이터는 이미 entries에 들어와 있어 그룹핑만 한다
+  const OUT_CATEGORIES = ["material", "labor", "outsourcing", "etc"] as const;
+  const outByCategory = (entries ?? [])
+    .filter((e) => (e as { direction: string }).direction === "out")
+    .reduce<Record<string, number>>((acc, e) => {
+      const cat = (e as { category: string }).category ?? "etc";
+      const key = (OUT_CATEGORIES as readonly string[]).includes(cat) ? cat : "etc";
+      acc[key] = (acc[key] ?? 0) + ((e as { amount: number }).amount ?? 0);
+      return acc;
+    }, {});
+  const maxOutCategory = Math.max(1, ...OUT_CATEGORIES.map((c) => outByCategory[c] ?? 0));
+
   const siteList = (sites ?? []).map((s) => ({
     id: (s as { id: string }).id,
     name: (s as { name: string }).name,
@@ -106,6 +118,35 @@ export default async function FinancePage() {
           </span>
         </div>
       </div>
+
+      {/* 이번 달 지출 항목별 — 어디에 얼마 썼는지 한눈에 */}
+      {totalOut > 0 && (
+        <div className="bg-white border border-gray-200 rounded-2xl px-4 py-4 mb-6">
+          <p className="text-base font-semibold text-gray-700 mb-3">이번 달 지출 항목별</p>
+          <div className="space-y-3">
+            {OUT_CATEGORIES.map((c) => {
+              const value = outByCategory[c] ?? 0;
+              const ratio = Math.round((value / maxOutCategory) * 100);
+              return (
+                <div key={c}>
+                  <div className="flex items-baseline justify-between mb-1">
+                    <span className="text-base text-gray-700">{CATEGORY_LABEL[c]}</span>
+                    <span className="text-base font-bold text-gray-900">
+                      {value.toLocaleString("ko-KR")}원
+                    </span>
+                  </div>
+                  <div className="h-3 w-full rounded-full bg-gray-100 overflow-hidden">
+                    <div
+                      className="h-full rounded-full bg-red-400"
+                      style={{ width: `${value > 0 ? Math.max(ratio, 4) : 0}%` }}
+                    />
+                  </div>
+                </div>
+              );
+            })}
+          </div>
+        </div>
+      )}
 
       {/* 이번 달 내역 */}
       <div className="flex items-center justify-between mb-3">

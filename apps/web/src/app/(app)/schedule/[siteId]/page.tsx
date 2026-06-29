@@ -93,6 +93,15 @@ export default async function SchedulePage({ params }: { params: Promise<{ siteI
   const siteAddress = siteAny.address as string | null;
   const siteStatus = siteAny.status as string;
 
+  // 모든 작업이 끝난(end_date가 오늘 이전) in_progress 현장이면 본문 하단에 큰 '공사 완료' 버튼 노출
+  const todayStr = new Date().toISOString().split("T")[0];
+  const allTasksFinished =
+    !!hasTasks && (tasks ?? []).every((t) => {
+      const end = (t as unknown as Record<string, unknown>).end_date as string | null;
+      return !!end && end < todayStr;
+    });
+  const showCompletePrompt = siteStatus === "in_progress" && allTasksFinished;
+
   const workerList = (workers ?? []).map((w) => {
     const wAny = w as unknown as Record<string, unknown>;
     const wts = (wAny.worker_trades as { trades: { code: string } | null }[] | null) ?? [];
@@ -264,6 +273,21 @@ export default async function SchedulePage({ params }: { params: Promise<{ siteI
           />
         )}
       </div>
+
+      {/* 모든 작업이 끝난 진행 중 현장: 크고 명확한 공사 완료 버튼으로 발견성 향상 */}
+      {showCompletePrompt && (
+        <div className="px-4 pt-6">
+          <div className="max-w-2xl mx-auto bg-white rounded-2xl border border-gray-100 p-5 space-y-3">
+            <div>
+              <h2 className="text-lg font-bold text-gray-900">모든 작업 일정이 끝났어요</h2>
+              <p className="text-base text-gray-500 mt-1">
+                공사가 다 끝났다면 아래 버튼으로 이 현장을 공사 완료로 바꿔주세요.
+              </p>
+            </div>
+            <SiteStatusButton siteId={siteId} currentStatus={siteStatus} variant="block" />
+          </div>
+        </div>
+      )}
     </div>
   );
 }

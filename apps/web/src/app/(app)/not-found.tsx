@@ -1,0 +1,22 @@
+import Link from "next/link";
+import { SearchXIcon } from "lucide-react";
+
+export default function NotFound() {
+  return (
+    <div className="px-4 pt-16 pb-24 flex flex-col items-center text-center">
+      <SearchXIcon size={56} className="text-gray-400 mb-4" />
+      <h2 className="text-2xl font-bold text-gray-900 mb-2">찾는 화면이 없어요</h2>
+      <p className="text-lg text-gray-500 mb-8">
+        삭제되었거나 잘못된 주소예요.
+        <br />
+        아래 버튼을 눌러 처음 화면으로 가세요.
+      </p>
+      <Link
+        href="/"
+        className="bg-blue-600 text-white text-xl font-bold rounded-2xl px-10 py-5 active:bg-blue-700"
+      >
+        홈으로 가기
+      </Link>
+    </div>
+  );
+}

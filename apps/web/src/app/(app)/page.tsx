@@ -109,9 +109,43 @@ export default async function HomePage() {
     }
   }
 
-  // 신규 사용자 판단: 오늘 현장·미수금·최근 현장이 모두 0건이면 데이터가 없는 새 사용자
-  const isNewUser =
-    todayTasks.length === 0 && payments.length === 0 && recentSites.length === 0;
+  // 설정 완성도 확인 (count only, head:true — 행 본문을 가져오지 않아 가벼움)
+  // 단가표(trade_prices)와 고객·견적이 준비됐는지로 신규 여부를 판단한다.
+  let hasPriceBook = false;
+  try {
+    const { count } = await supabase
+      .from("trade_prices")
+      .select("id", { count: "exact", head: true })
+      .eq("is_active", true);
+    hasPriceBook = (count ?? 0) > 0;
+  } catch {
+    hasPriceBook = false;
+  }
+
+  let hasCustomer = false;
+  try {
+    const { count } = await supabase
+      .from("customers")
+      .select("id", { count: "exact", head: true });
+    hasCustomer = (count ?? 0) > 0;
+  } catch {
+    hasCustomer = false;
+  }
+
+  let hasQuote = false;
+  try {
+    const { count } = await supabase
+      .from("quotes")
+      .select("id", { count: "exact", head: true });
+    hasQuote = (count ?? 0) > 0;
+  } catch {
+    hasQuote = false;
+  }
+
+  // 신규(가이드 노출) 판단: 데이터 0건 기준이 아니라 '설정 완성도' 기준.
+  // 단가표·견적 중 하나라도 준비되지 않았으면, 현장을 막 만든 초보도 가이드를 계속 본다.
+  const setupComplete = hasPriceBook && hasQuote;
+  const isNewUser = !setupComplete;
 
   const onboardingSteps = [
     {
@@ -120,6 +154,7 @@ export default async function HomePage() {
       emoji: "💲",
       title: "단가표 설정",
       desc: "공정별 단가를 먼저 넣어야 견적을 만들 수 있어요",
+      done: hasPriceBook,
     },
     {
       href: "/customers/new",
@@ -127,6 +162,7 @@ export default async function HomePage() {
       emoji: "🧑",
       title: "고객 등록",
       desc: "견적을 보낼 고객을 등록해 주세요",
+      done: hasCustomer,
     },
     {
       href: "/quotes/new",
@@ -134,8 +170,11 @@ export default async function HomePage() {
       emoji: "📄",
       title: "첫 견적 만들기",
       desc: "단가표와 고객이 준비되면 견적을 작성해요",
+      done: hasQuote,
     },
   ];
+
+  const remainingSteps = onboardingSteps.filter((s) => !s.done).length;
 
   const quickActions = [
     { href: "/quotes/new", emoji: "📄", label: "새 견적", bg: "bg-blue-600", active: "active:bg-blue-700" },
@@ -269,29 +308,44 @@ export default async function HomePage() {
         </Link>
       </section>
 
-      {/* 신규 사용자 시작 가이드 — 데이터가 0건일 때만 노출 */}
+      {/* 시작 가이드 — 단가표·견적 설정이 끝나지 않은 동안 계속 노출 */}
       {isNewUser && (
         <section>
           <h2 className="text-xl font-bold text-gray-800 mb-1">🚀 이렇게 시작하세요</h2>
           <p className="text-base text-gray-500 mb-3">
-            아래 순서대로 따라 하면 첫 견적까지 끝나요
+            {remainingSteps > 0
+              ? `아래 순서대로 따라 하면 첫 견적까지 끝나요 (남은 단계 ${remainingSteps}개)`
+              : "아래 순서대로 따라 하면 첫 견적까지 끝나요"}
           </p>
           <div className="space-y-3">
-            {onboardingSteps.map((s) => (
-              <Link
-                key={s.href}
-                href={s.href}
-                className="flex items-center gap-4 bg-white border-2 border-blue-200 rounded-2xl px-5 py-4 active:bg-blue-50"
-              >
-                <span className="shrink-0 text-3xl">{s.emoji}</span>
-                <div className="min-w-0 flex-1">
-                  <p className="text-base font-bold text-blue-600">{s.step}</p>
-                  <p className="text-xl font-bold text-gray-900">{s.title}</p>
-                  <p className="text-base text-gray-500">{s.desc}</p>
+            {onboardingSteps.map((s) =>
+              s.done ? (
+                <div
+                  key={s.href}
+                  className="flex items-center gap-4 bg-green-50 border-2 border-green-200 rounded-2xl px-5 py-4"
+                >
+                  <span className="shrink-0 text-3xl">✅</span>
+                  <div className="min-w-0 flex-1">
+                    <p className="text-base font-bold text-green-700">{s.step} · 완료</p>
+                    <p className="text-xl font-bold text-gray-500 line-through">{s.title}</p>
+                  </div>
                 </div>
-                <span className="shrink-0 text-2xl text-gray-300">›</span>
-              </Link>
-            ))}
+              ) : (
+                <Link
+                  key={s.href}
+                  href={s.href}
+                  className="flex items-center gap-4 bg-white border-2 border-blue-200 rounded-2xl px-5 py-4 active:bg-blue-50"
+                >
+                  <span className="shrink-0 text-3xl">{s.emoji}</span>
+                  <div className="min-w-0 flex-1">
+                    <p className="text-base font-bold text-blue-600">{s.step}</p>
+                    <p className="text-xl font-bold text-gray-900">{s.title}</p>
+                    <p className="text-base text-gray-500">{s.desc}</p>
+                  </div>
+                  <span className="shrink-0 text-2xl text-gray-300">›</span>
+                </Link>
+              )
+            )}
           </div>
         </section>
       )}

@@ -3,7 +3,7 @@ import { redirect } from "next/navigation";
 import {
   HomeIcon,
   FileTextIcon,
-  WalletIcon,
+  CalendarIcon,
   UsersIcon,
   SettingsIcon,
 } from "lucide-react";
@@ -11,11 +11,13 @@ import { MoreMenu } from "@/components/more-menu";
 import { Toaster } from "@/components/ui/sonner";
 import { createClient } from "@/lib/supabase/server";
 
+// 매일 쓰는 핵심 동선 순서: 홈 → 현장(일정) → 견적 → 고객 → 더보기
+// '받을돈'은 홈 화면 '지금 받아야 할 돈' 섹션과 중복이라 탭에서 제외했다.
 const tabs = [
   { href: "/", label: "홈", icon: HomeIcon },
-  { href: "/customers", label: "고객", icon: UsersIcon },
+  { href: "/schedule", label: "현장", icon: CalendarIcon },
   { href: "/quotes", label: "견적", icon: FileTextIcon },
-  { href: "/payments", label: "받을돈", icon: WalletIcon },
+  { href: "/customers", label: "고객", icon: UsersIcon },
 ];
 
 export default async function AppLayout({ children }: { children: React.ReactNode }) {
