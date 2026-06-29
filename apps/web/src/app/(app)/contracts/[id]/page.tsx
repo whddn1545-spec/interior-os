@@ -69,7 +69,7 @@ export default async function ContractDetailPage({ params, searchParams }: { par
                 </div>
                 <div className="flex justify-between">
                   <span className="text-gray-500">연락처</span>
-                  <span className="font-medium">{quoteAny.sites.customers.phone}</span>
+                  <a href={`tel:${quoteAny.sites.customers.phone}`} className="font-medium text-blue-600">{quoteAny.sites.customers.phone}</a>
                 </div>
               </>
             )}
