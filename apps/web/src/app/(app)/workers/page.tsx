@@ -103,9 +103,18 @@ export default async function WorkersPage({
           <p className="text-xl mb-2">
             {query ? "조건에 맞는 작업자가 없어요" : "등록된 작업자가 없어요"}
           </p>
-          <p className="text-base">
+          <p className="text-base mb-6">
             {query ? "검색어를 바꿔보세요" : "함께 일하는 작업자를 추가해보세요"}
           </p>
+          {!query && (
+            <Link
+              href="/workers/new"
+              className="inline-flex items-center gap-2 bg-blue-600 text-white rounded-2xl px-8 py-4 text-lg font-bold active:bg-blue-700"
+            >
+              <PlusIcon size={20} />
+              작업자 추가하기
+            </Link>
+          )}
         </div>
       ) : (
         <ul className="space-y-2">

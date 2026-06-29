@@ -174,11 +174,20 @@ export default async function CustomersPage({
           <p className="text-xl mb-2">
             {query || activeGrade !== "all" ? "조건에 맞는 고객이 없어요" : "고객이 없어요"}
           </p>
-          <p className="text-base">
+          <p className="text-base mb-6">
             {query || activeGrade !== "all"
               ? "검색어나 필터를 바꿔보세요"
-              : '위의 "추가" 버튼으로 고객을 등록하세요'}
+              : "새 고객을 등록해보세요"}
           </p>
+          {!query && activeGrade === "all" && (
+            <Link
+              href="/customers/new"
+              className="inline-flex items-center gap-2 bg-blue-600 text-white rounded-2xl px-8 py-4 text-lg font-bold active:bg-blue-700"
+            >
+              <PlusIcon size={20} />
+              고객 추가하기
+            </Link>
+          )}
         </div>
       ) : (
         <ul className="space-y-2">
