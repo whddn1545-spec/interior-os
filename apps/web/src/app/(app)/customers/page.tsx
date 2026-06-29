@@ -1,5 +1,5 @@
 import Link from "next/link";
-import { PlusIcon, UploadIcon, ChevronRightIcon, SearchIcon, ArrowLeftIcon } from "lucide-react";
+import { PlusIcon, UploadIcon, ChevronRightIcon, SearchIcon, ArrowLeftIcon, PhoneIcon } from "lucide-react";
 import { createClient } from "@/lib/supabase/server";
 import { GradeClassifier } from "./grade-classifier";
 
@@ -213,7 +213,14 @@ export default async function CustomersPage({
                     </div>
                     <p className="text-base text-gray-500">{cAny.phone as string} · 현장 {count}건</p>
                   </div>
-                  <ChevronRightIcon size={20} className="text-gray-300 shrink-0" />
+                  <a
+                    href={`tel:${cAny.phone as string}`}
+                    onClick={(e) => e.stopPropagation()}
+                    className="flex items-center gap-1 bg-green-100 text-green-700 px-3 py-2 rounded-xl text-sm font-medium shrink-0"
+                  >
+                    <PhoneIcon size={16} />
+                    전화
+                  </a>
                 </Link>
               </li>
             );

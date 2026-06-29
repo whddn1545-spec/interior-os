@@ -282,15 +282,20 @@ export default async function HomePage() {
             {payments.map((p) => {
               const site = first(p.sites);
               const customer = first(site?.customers);
+              const isOverdue = p.due_date ? p.due_date < today : false;
               return (
-                <div
+                <Link
                   key={p.id}
-                  className="bg-white border border-red-200 rounded-2xl px-5 py-4 flex items-center justify-between"
+                  href="/payments"
+                  className={`block bg-white rounded-2xl px-5 py-4 flex items-center justify-between active:bg-red-50 ${isOverdue ? "border-2 border-red-500" : "border border-red-200"}`}
                 >
                   <div className="min-w-0">
-                    <p className="text-xl font-bold text-gray-900 truncate">
-                      {customer?.name ?? site?.name ?? "고객"}
-                    </p>
+                    <div className="flex items-center gap-2 mb-0.5">
+                      {isOverdue && <span className="text-xs font-bold text-white bg-red-500 px-2 py-0.5 rounded-full shrink-0">연체</span>}
+                      <p className="text-xl font-bold text-gray-900 truncate">
+                        {customer?.name ?? site?.name ?? "고객"}
+                      </p>
+                    </div>
                     <p className="text-base text-gray-500">
                       {p.stage_label}
                       {p.due_date ? ` · 약정일 ${p.due_date}` : ""}
@@ -299,7 +304,7 @@ export default async function HomePage() {
                   <p className="text-2xl font-black text-red-600 shrink-0 ml-3">
                     {Number(p.amount).toLocaleString("ko-KR")}원
                   </p>
-                </div>
+                </Link>
               );
             })}
           </div>
