@@ -39,6 +39,7 @@ export function WorkerCard({
   const router = useRouter();
   const [isPending, startTransition] = useTransition();
   const [feedback, setFeedback] = useState<string | null>(null);
+  const [showConfirm, setShowConfirm] = useState(false);
 
   const unsettled = worker.balance > 0;
 
@@ -47,12 +48,11 @@ export function WorkerCard({
       setFeedback("정산할 금액이 없어요");
       return;
     }
-    const ok = window.confirm(
-      `${worker.name}님 ${monthLabel} 정산을 완료 처리할까요?\n잔액 ${worker.balance.toLocaleString(
-        "ko-KR"
-      )}원이 정산 완료돼요.`
-    );
-    if (!ok) return;
+    setShowConfirm(true);
+  }
+
+  function confirmMarkPaid() {
+    setShowConfirm(false);
     setFeedback(null);
     startTransition(async () => {
       const res = await markWorkerPaid(worker.id, month);
@@ -149,6 +149,22 @@ export function WorkerCard({
           sites={sites}
         />
       </div>
+
+      {/* 정산 확인 */}
+      {showConfirm && (
+        <div className="mt-3 bg-green-50 border border-green-200 rounded-2xl p-4">
+          <p className="text-base font-semibold text-green-900 mb-1">
+            {worker.name}님 정산을 완료할까요?
+          </p>
+          <p className="text-sm text-green-700 mb-3">
+            잔액 {worker.balance.toLocaleString("ko-KR")}원이 정산 완료돼요.
+          </p>
+          <div className="flex gap-2">
+            <button onClick={() => setShowConfirm(false)} className="flex-1 py-3 rounded-xl border border-gray-300 text-gray-700 text-base font-medium">아니요</button>
+            <button onClick={confirmMarkPaid} disabled={isPending} className="flex-1 py-3 rounded-xl bg-green-600 text-white text-base font-bold disabled:opacity-50">네, 완료</button>
+          </div>
+        </div>
+      )}
 
       {/* 정산 / 명세 버튼 */}
       <div className="mt-3 flex gap-2">
