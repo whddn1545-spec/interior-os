@@ -30,6 +30,13 @@ export function Step1Customer({ onNext, initialCustomer }: Props) {
   // 디바운스 타이머와 마지막 요청 순번(레이스 가드)을 ref로 관리한다.
   // 느린 모바일에서 응답이 순서 뒤바뀌어 도착해도 가장 최근 요청 결과만 반영한다.
   const debounceRef = useRef<ReturnType<typeof setTimeout> | null>(null);
+
+  function formatPhone(raw: string) {
+    const digits = raw.replace(/\D/g, "").slice(0, 11);
+    if (digits.length <= 3) return digits;
+    if (digits.length <= 7) return `${digits.slice(0, 3)}-${digits.slice(3)}`;
+    return `${digits.slice(0, 3)}-${digits.slice(3, 7)}-${digits.slice(7)}`;
+  }
   const requestSeqRef = useRef(0);
 
   // 언마운트 시 대기 중인 타이머 정리
@@ -182,7 +189,7 @@ export function Step1Customer({ onNext, initialCustomer }: Props) {
             <input
               type="tel"
               value={newPhone}
-              onChange={(e) => setNewPhone(e.target.value)}
+              onChange={(e) => setNewPhone(formatPhone(e.target.value))}
               placeholder="010-0000-0000"
               className="w-full px-4 py-3 text-lg border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500"
             />
