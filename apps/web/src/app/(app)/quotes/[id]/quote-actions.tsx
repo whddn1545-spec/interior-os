@@ -224,7 +224,7 @@ export function QuoteActions({ quoteId, status, siteId, customerId, totalAmount 
         setError(result.error);
       } else {
         setShowContractDialog(false);
-        router.push(`/contracts/${result.data.contractId}`);
+        router.push(`/contracts/${result.data.contractId}?from=/quotes/${quoteId}`);
       }
     });
   }

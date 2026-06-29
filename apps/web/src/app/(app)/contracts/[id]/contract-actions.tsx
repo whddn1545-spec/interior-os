@@ -102,7 +102,7 @@ export function ContractActions({ contractId, status, siteId }: Props) {
       {(status === "confirmed" || status === "signed") && (
         <>
           <button
-            onClick={() => router.push(`/schedule/${siteId}`)}
+            onClick={() => router.push(`/schedule/${siteId}?from=/contracts/${contractId}`)}
             className="flex items-center justify-center gap-2 w-full bg-blue-600 text-white rounded-2xl py-5 text-xl font-bold"
           >
             <CalendarPlusIcon size={22} />
