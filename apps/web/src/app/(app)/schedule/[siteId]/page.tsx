@@ -25,8 +25,9 @@ const SITE_STATUS_LABEL: Record<string, string> = {
   canceled: "취소",
 };
 
-export default async function SchedulePage({ params }: { params: Promise<{ siteId: string }> }) {
+export default async function SchedulePage({ params, searchParams }: { params: Promise<{ siteId: string }>; searchParams: Promise<{ from?: string }> }) {
   const { siteId } = await params;
+  const { from } = await searchParams;
   const supabase = await createClient();
 
   const [
@@ -140,7 +141,7 @@ export default async function SchedulePage({ params }: { params: Promise<{ siteI
   return (
     <div className="min-h-screen bg-gray-50 pb-24">
       <header className="sticky top-0 bg-white border-b border-gray-100 z-10 px-4 py-3 flex items-center gap-3">
-        <Link href="/schedule" className="p-3 -ml-3 text-gray-600" aria-label="일정 목록으로">
+        <Link href={from ?? "/schedule"} className="p-3 -ml-3 text-gray-600" aria-label="뒤로 가기">
           <ArrowLeftIcon size={24} />
         </Link>
         <div className="flex-1 min-w-0">

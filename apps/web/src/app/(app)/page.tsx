@@ -201,9 +201,10 @@ export default async function HomePage() {
             <div className="space-y-2">
               <p className="text-base text-gray-400 mb-1">최근 진행 현장</p>
               {recentSites.map((site) => (
-                <div
+                <Link
                   key={site.id}
-                  className="bg-white border border-gray-200 rounded-2xl px-5 py-4 flex items-center justify-between"
+                  href={`/sites/${site.id}?from=/`}
+                  className="bg-white border border-gray-200 rounded-2xl px-5 py-4 flex items-center justify-between active:bg-gray-50"
                 >
                   <div className="min-w-0">
                     <p className="text-xl font-bold text-gray-900 truncate">{site.name}</p>
@@ -213,11 +214,12 @@ export default async function HomePage() {
                     href={mapHref(site.address, site.name)}
                     target="_blank"
                     rel="noopener noreferrer"
+                    onClick={(e) => e.stopPropagation()}
                     className="shrink-0 ml-3 bg-gray-100 text-gray-700 text-base font-semibold rounded-xl px-3 py-2"
                   >
                     지도 보기
                   </a>
-                </div>
+                </Link>
               ))}
             </div>
           ) : (
@@ -231,9 +233,10 @@ export default async function HomePage() {
               const site = first(task.sites);
               const worker = first(first(task.assignments)?.workers);
               return (
-                <div
+                <Link
                   key={task.id}
-                  className="bg-white border border-gray-200 rounded-2xl px-5 py-4"
+                  href={`/schedule/${task.site_id}?from=/`}
+                  className="block bg-white border border-gray-200 rounded-2xl px-5 py-4 active:bg-gray-50"
                 >
                   <p className="text-2xl font-bold text-gray-900">{site?.name ?? "현장"}</p>
                   <p className="text-base text-gray-500 mb-3">{task.title}</p>
@@ -255,11 +258,12 @@ export default async function HomePage() {
                     href={mapHref(site?.address, site?.name ?? task.title)}
                     target="_blank"
                     rel="noopener noreferrer"
+                    onClick={(e) => e.stopPropagation()}
                     className="inline-block bg-blue-50 text-blue-700 text-lg font-bold rounded-xl px-4 py-2.5"
                   >
                     🗺️ 지도 보기
                   </a>
-                </div>
+                </Link>
               );
             })}
           </div>
