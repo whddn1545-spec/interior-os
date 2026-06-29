@@ -1,6 +1,7 @@
 "use client";
 
 import { useState, useTransition } from "react";
+import Link from "next/link";
 import { useRouter } from "next/navigation";
 import { toast } from "sonner";
 import { markPaid, sendPaymentReminder, type PaymentBoardItem, type ReminderDraft } from "./actions";
@@ -121,8 +122,13 @@ export function PaymentCard({ schedule }: { schedule: PaymentBoardItem }) {
       )}
 
       {/* 고객 / 현장 */}
-      <p className="text-xl font-bold text-gray-900">{schedule.customerName}</p>
-      <p className="text-base text-gray-600">{schedule.siteName}</p>
+      <Link
+        href={`/sites/${schedule.siteId}?from=/payments`}
+        className="block group"
+      >
+        <p className="text-xl font-bold text-gray-900 group-active:text-blue-700">{schedule.customerName}</p>
+        <p className="text-base text-blue-600 underline decoration-blue-200">{schedule.siteName} →</p>
+      </Link>
 
       {/* 단계 배지 */}
       <span className={`mt-3 inline-block rounded-md px-3 py-1 text-sm font-bold ${stage.cls}`}>
