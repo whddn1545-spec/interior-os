@@ -175,7 +175,7 @@ export default async function SchedulePage({ params }: { params: Promise<{ siteI
 
           {/* 현장 종합 허브로 이동 — 견적·일정·사진·받을돈을 한 화면에서 */}
           <Link
-            href={`/sites/${siteId}`}
+            href={`/sites/${siteId}?from=/schedule/${siteId}`}
             className="flex items-center gap-2 -mx-1 px-3 py-4 rounded-xl bg-blue-50 text-blue-700 active:bg-blue-100"
           >
             <LayoutGridIcon size={20} className="shrink-0" />

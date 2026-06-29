@@ -96,7 +96,7 @@ export default async function PhotosPage() {
                 </Link>
                 {/* 현장 종합 허브로 이동 — 견적·일정·받을돈까지 한눈에 */}
                 <Link
-                  href={`/sites/${sAny.id as string}`}
+                  href={`/sites/${sAny.id as string}?from=/photos`}
                   className="flex items-center gap-2 border-t border-gray-100 px-4 py-4 text-blue-700 active:bg-blue-50"
                 >
                   <LayoutGridIcon size={18} className="shrink-0" />

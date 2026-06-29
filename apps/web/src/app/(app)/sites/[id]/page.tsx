@@ -59,10 +59,10 @@ export default async function SiteHubPage({
   searchParams,
 }: {
   params: Promise<{ id: string }>;
-  searchParams: Promise<{ tab?: string }>;
+  searchParams: Promise<{ tab?: string; from?: string }>;
 }) {
   const { id } = await params;
-  const { tab } = await searchParams;
+  const { tab, from } = await searchParams;
   const activeTab = (TABS.some((t) => t.key === tab) ? tab : "overview") as TabKey;
 
   const supabase = await createClient();
@@ -138,7 +138,7 @@ export default async function SiteHubPage({
     <div className="min-h-screen bg-gray-50 pb-24">
       {/* 헤더 */}
       <header className="sticky top-0 bg-white border-b border-gray-100 z-10 px-4 py-3 flex items-center gap-3">
-        <Link href="/customers" className="p-3 -ml-3 text-gray-600" aria-label="뒤로 가기">
+        <Link href={from ?? "/customers"} className="p-3 -ml-3 text-gray-600" aria-label="뒤로 가기">
           <ArrowLeftIcon size={24} />
         </Link>
         <div className="flex-1 min-w-0">
