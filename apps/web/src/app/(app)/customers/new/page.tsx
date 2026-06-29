@@ -20,6 +20,13 @@ export default function CustomerNewPage() {
 
   const [name, setName] = useState("");
   const [phone, setPhone] = useState("");
+
+  function formatPhone(raw: string) {
+    const digits = raw.replace(/\D/g, "").slice(0, 11);
+    if (digits.length <= 3) return digits;
+    if (digits.length <= 7) return `${digits.slice(0, 3)}-${digits.slice(3)}`;
+    return `${digits.slice(0, 3)}-${digits.slice(3, 7)}-${digits.slice(7)}`;
+  }
   const [address, setAddress] = useState("");
   const [source, setSource] = useState<"referral" | "online" | "repeat" | "etc">("referral");
   const [memo, setMemo] = useState("");
@@ -64,7 +71,7 @@ export default function CustomerNewPage() {
           <input
             type="tel"
             value={phone}
-            onChange={(e) => setPhone(e.target.value)}
+            onChange={(e) => setPhone(formatPhone(e.target.value))}
             placeholder="010-0000-0000"
             className="w-full border border-gray-200 rounded-2xl px-4 py-4 text-lg focus:outline-none focus:border-blue-400"
           />

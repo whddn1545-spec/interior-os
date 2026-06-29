@@ -126,7 +126,7 @@ export default async function QuotesPage({
             return (
               <li key={q.id} className="bg-white border border-gray-200 rounded-2xl px-4 py-4">
                 <Link
-                  href={`/quotes/${q.id}`}
+                  href={`/quotes/${q.id}?from=/quotes`}
                   className="block hover:opacity-80"
                 >
                   <div className="flex items-start justify-between gap-3">
