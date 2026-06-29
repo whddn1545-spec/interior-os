@@ -1,3 +1,5 @@
+import Link from "next/link";
+import { ArrowLeftIcon } from "lucide-react";
 import { createClient } from "@/lib/supabase/server";
 import { FactorsEditor } from "./factors-editor";
 
@@ -10,13 +12,20 @@ export default async function FactorsPage() {
     .order("distance_factor", { ascending: true });
 
   return (
-    <div className="px-4 pt-6 pb-24">
-      <h1 className="text-2xl font-bold text-gray-900 mb-2">거리·난이도 계수</h1>
-      <p className="text-sm text-gray-500 mb-6">
-        견적 금액에 곱해지는 계수예요. 현장 상황에 맞게 조정하세요.
-      </p>
+    <div className="min-h-screen bg-gray-50 pb-24">
+      <header className="sticky top-0 bg-white border-b border-gray-100 z-10 px-4 py-3 flex items-center gap-3">
+        <Link href="/settings" className="p-2 -ml-2 text-gray-600">
+          <ArrowLeftIcon size={24} />
+        </Link>
+        <h1 className="text-xl font-bold text-gray-900 flex-1">거리·난이도 계수</h1>
+      </header>
 
-      <FactorsEditor zones={(zones as unknown as { id: string; name: string; distance_factor: number }[]) ?? []} />
+      <div className="max-w-lg mx-auto px-4 pt-6">
+        <p className="text-base text-gray-500 mb-6">
+          견적 금액에 곱해지는 계수예요. 현장 상황에 맞게 조정하세요.
+        </p>
+        <FactorsEditor zones={(zones as unknown as { id: string; name: string; distance_factor: number }[]) ?? []} />
+      </div>
     </div>
   );
 }
