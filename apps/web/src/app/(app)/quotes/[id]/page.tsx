@@ -90,7 +90,12 @@ export default async function QuoteDetailPage({ params, searchParams }: { params
             <div className="space-y-2 text-base text-gray-700">
               <div className="flex justify-between">
                 <span className="text-gray-500">고객</span>
-                <span className="font-medium">{siteAny.customers?.name ?? "—"} {siteAny.customers?.phone ?? ""}</span>
+                <span className="font-medium">
+                  {siteAny.customers?.name ?? "—"}
+                  {siteAny.customers?.phone && (
+                    <> · <a href={`tel:${siteAny.customers.phone}`} className="text-blue-600">{siteAny.customers.phone}</a></>
+                  )}
+                </span>
               </div>
               <div className="flex justify-between">
                 <span className="text-gray-500">주소</span>
