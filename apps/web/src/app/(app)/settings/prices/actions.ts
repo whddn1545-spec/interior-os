@@ -124,9 +124,9 @@ export async function analyzePriceDocument(
     return { ok: false, error: "파일을 읽을 수 없어요" };
   }
 
-  const allowed = ["image/jpeg", "image/png", "image/webp", "image/gif", "application/pdf"];
+  const allowed = ["image/jpeg", "image/png", "image/webp", "image/gif"];
   if (!allowed.includes(mediaType)) {
-    return { ok: false, error: "JPEG, PNG, WebP, PDF 파일만 지원해요. HEIC는 사진 앱에서 JPEG로 내보내 주세요." };
+    return { ok: false, error: "JPEG, PNG, WebP 이미지만 지원해요. PDF는 스크린샷으로 찍어 올려주세요. HEIC는 사진 앱 → 내보내기 → JPEG로 변환해주세요." };
   }
 
   try {

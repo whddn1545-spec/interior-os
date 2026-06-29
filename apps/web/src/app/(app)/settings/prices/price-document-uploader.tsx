@@ -43,15 +43,14 @@ export function PriceDocumentUploader({ trades }: { trades: Trade[] }) {
     if (!file) return;
     e.target.value = "";
 
-    const allowed = ["image/jpeg", "image/png", "image/webp", "image/gif", "application/pdf"];
+    const allowed = ["image/jpeg", "image/png", "image/webp", "image/gif"];
     if (!allowed.includes(file.type)) {
-      setError("JPEG, PNG, WebP, PDF만 지원해요. HEIC는 사진 앱 → 내보내기 → JPEG로 변환해주세요.");
+      setError("JPEG, PNG, WebP 이미지만 지원해요. PDF는 스크린샷으로 찍어 올려주세요. HEIC는 사진 앱 → 내보내기 → JPEG로 변환해주세요.");
       return;
     }
 
-    const maxMb = file.type === "application/pdf" ? 32 : 4.5;
-    if (file.size > maxMb * 1024 * 1024) {
-      setError(`파일이 너무 커요 (최대 ${maxMb}MB)`);
+    if (file.size > 4.5 * 1024 * 1024) {
+      setError("파일이 너무 커요 (최대 4.5MB)");
       return;
     }
 
@@ -150,7 +149,7 @@ export function PriceDocumentUploader({ trades }: { trades: Trade[] }) {
         <input
           ref={fileInputRef}
           type="file"
-          accept="image/jpeg,image/png,image/webp,image/gif,application/pdf"
+          accept="image/jpeg,image/png,image/webp,image/gif"
           className="hidden"
           onChange={handleFileChange}
         />

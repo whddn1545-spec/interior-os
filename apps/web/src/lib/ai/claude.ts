@@ -1,24 +1,7 @@
 import "server-only";
-import Anthropic from "@anthropic-ai/sdk";
+import OpenAI from "openai";
 
-let _client: Anthropic | null = null;
-
-function getClient(): Anthropic {
-  if (!process.env.ANTHROPIC_API_KEY) {
-    throw new Error("ANTHROPIC_API_KEY가 설정되지 않았습니다");
-  }
-  if (!_client) {
-    _client = new Anthropic({ apiKey: process.env.ANTHROPIC_API_KEY });
-  }
-  return _client;
-}
-
-export type SupportedMediaType =
-  | "image/jpeg"
-  | "image/png"
-  | "image/webp"
-  | "image/gif"
-  | "application/pdf";
+export type SupportedMediaType = "image/jpeg" | "image/png" | "image/webp" | "image/gif";
 
 export interface ExtractedPriceItem {
   tradeCode: string;
@@ -57,70 +40,90 @@ const TRADE_GUIDE = `
   film: 시트지, 필름, 래핑, 인테리어필름 등
   other: 위 항목에 해당 없는 경우`;
 
+let _client: OpenAI | null = null;
+function getClient() {
+  if (!process.env.OPENAI_API_KEY) throw new Error("OPENAI_API_KEY가 설정되지 않았습니다");
+  if (!_client) _client = new OpenAI({ apiKey: process.env.OPENAI_API_KEY });
+  return _client;
+}
+
+const EXTRACT_TOOL: OpenAI.Chat.ChatCompletionTool = {
+  type: "function",
+  function: {
+    name: "extract_price_table",
+    description: "단가표 이미지에서 공종별 자재명·단가·인건비·작업일수를 추출합니다.",
+    parameters: {
+      type: "object",
+      properties: {
+        items: {
+          type: "array",
+          items: {
+            type: "object",
+            properties: {
+              tradeCode: { type: "string", description: `공종 코드 (${TRADE_CODES.join(", ")})` },
+              tradeNameFromDoc: { type: "string", description: "문서에 표기된 원래 공종명" },
+              itemName: { type: "string", description: "자재명 또는 세부 항목명" },
+              materialUnitPrice: { type: "number", description: "자재 단가(원, 정수)" },
+              laborDayRate: { type: "number", description: "인건비 일당(원, 정수)" },
+              defaultDaysPerUnit: { type: "number", description: "단위당 작업일수 (소수 가능)" },
+              confidence: { type: "string", enum: ["high", "medium", "low"], description: "인식 신뢰도" },
+              note: { type: "string", description: "특이사항 (선택)" },
+            },
+            required: ["tradeCode", "tradeNameFromDoc", "itemName", "materialUnitPrice", "laborDayRate", "defaultDaysPerUnit", "confidence"],
+          },
+        },
+      },
+      required: ["items"],
+    },
+  },
+};
+
+const SYSTEM_PROMPT = `당신은 인테리어 단가표 이미지에서 데이터를 추출하는 전문 파서입니다.
+
+추출 규칙:
+- 금액은 원화 정수, 통화기호·쉼표 제거. 예) "3만원" → 30000
+- 일당·작업일수가 없으면 0 설정 후 confidence를 "low"로
+- tradeCode는 반드시 다음 중 하나: ${TRADE_CODES.join(", ")}
+  공종 매핑:${TRADE_GUIDE}
+- confidence: 명확하면 "high", 일부 추측 "medium", 흐리거나 불확실 "low"
+- extract_price_table 함수를 반드시 사용하여 결과 반환`;
+
 export async function extractPricesFromDocument(
   base64: string,
   mediaType: SupportedMediaType
 ): Promise<PriceExtractionResult> {
   const client = getClient();
 
-  const systemPrompt = `당신은 인테리어 단가표 문서에서 데이터를 추출하는 파서입니다.
-이미지 또는 PDF에서 공종별 자재 단가, 인건비(일당), 단위당 작업일수를 추출해 JSON으로만 반환합니다.
-
-추출 규칙:
-- 금액은 원화 정수, 통화기호·쉼표·단위 제거. 예) "3만원" → 30000, "30,000원" → 30000
-- 평당·㎡당 단가가 보이면 그대로 추출(자재 단가)
-- 일당이 없으면 0, 작업일수가 없으면 0으로 설정하고 confidence를 "low"로
-- tradeCode는 반드시 다음 중 하나: ${TRADE_CODES.join(", ")}
-  공종 매핑 기준:${TRADE_GUIDE}
-- confidence: 명확히 읽히면 "high", 일부 추측이면 "medium", 흐리거나 잘 모르면 "low"
-- 마크다운 없이 JSON만 반환`;
-
-  const exampleJson = `{"items":[{"tradeCode":"flooring","tradeNameFromDoc":"강마루","itemName":"강마루(브라운)","materialUnitPrice":30000,"laborDayRate":250000,"defaultDaysPerUnit":0.12,"confidence":"high","note":""}]}`;
-
-  const userContent: Anthropic.MessageParam["content"] =
-    mediaType === "application/pdf"
-      ? [
-          {
-            type: "document",
-            source: { type: "base64", media_type: "application/pdf", data: base64 },
-          } as Anthropic.DocumentBlockParam,
-          {
-            type: "text",
-            text: `이 단가표 문서에서 모든 공종·자재 항목을 추출하세요. 다음 JSON 스키마로만 반환하세요:\n${exampleJson}`,
-          },
-        ]
-      : [
-          {
-            type: "image",
-            source: {
-              type: "base64",
-              media_type: mediaType as Anthropic.Base64ImageSource["media_type"],
-              data: base64,
-            },
-          } as Anthropic.ImageBlockParam,
-          {
-            type: "text",
-            text: `이 단가표 이미지에서 모든 공종·자재 항목을 추출하세요. 다음 JSON 스키마로만 반환하세요:\n${exampleJson}`,
-          },
-        ];
-
-  const response = await client.messages.create({
-    model: "claude-sonnet-4-6",
+  const response = await client.chat.completions.create({
+    model: "gpt-4o",
     max_tokens: 4096,
-    system: systemPrompt,
-    messages: [{ role: "user", content: userContent }],
+    messages: [
+      { role: "system", content: SYSTEM_PROMPT },
+      {
+        role: "user",
+        content: [
+          {
+            type: "image_url",
+            image_url: { url: `data:${mediaType};base64,${base64}`, detail: "high" },
+          },
+          {
+            type: "text",
+            text: "이 단가표 이미지에서 모든 공종·자재 항목을 추출해주세요. extract_price_table 함수로 반환하세요.",
+          },
+        ],
+      },
+    ],
+    tools: [EXTRACT_TOOL],
+    tool_choice: { type: "function", function: { name: "extract_price_table" } },
   });
 
-  const rawText =
-    response.content[0]?.type === "text" ? response.content[0].text : "";
+  const toolCall = response.choices[0]?.message?.tool_calls?.[0];
+  if (!toolCall || toolCall.type !== "function" || !toolCall.function?.arguments) {
+    return { items: [], parseError: "AI가 항목을 추출하지 못했어요. 더 선명한 사진을 올려주세요." };
+  }
 
   try {
-    const cleaned = rawText
-      .replace(/^```json\s*/i, "")
-      .replace(/^```\s*/i, "")
-      .replace(/\s*```$/i, "")
-      .trim();
-    const parsed = JSON.parse(cleaned) as PriceExtractionResult;
+    const parsed = JSON.parse(toolCall.function.arguments) as { items: ExtractedPriceItem[] };
     if (!Array.isArray(parsed.items)) {
       return { items: [], parseError: "응답 형식이 맞지 않아요" };
     }
