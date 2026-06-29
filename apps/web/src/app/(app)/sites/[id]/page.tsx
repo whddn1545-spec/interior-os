@@ -251,7 +251,7 @@ export default async function SiteHubPage({
                 </span>
               </Link>
               <Link
-                href={`/photos/${id}`}
+                href={`/photos/${id}?from=/sites/${id}`}
                 className="flex flex-col items-center justify-center gap-1 bg-white border border-gray-100 rounded-2xl py-5 active:bg-gray-50"
               >
                 <CameraIcon size={26} className="text-purple-600" />
@@ -361,7 +361,7 @@ export default async function SiteHubPage({
         {/* 사진 탭 */}
         {activeTab === "photos" && (
           <Link
-            href={`/photos/${id}`}
+            href={`/photos/${id}?from=/sites/${id}`}
             className="flex items-center gap-3 bg-white rounded-2xl p-4 border border-gray-100 active:bg-gray-50"
           >
             <CameraIcon size={26} className="text-purple-600 shrink-0" />

@@ -10,8 +10,9 @@ function formatDateKR(dateStr: string): string {
   return `${d.getFullYear()}년 ${d.getMonth() + 1}월 ${d.getDate()}일`;
 }
 
-export default async function SitePhotosPage({ params }: { params: Promise<{ siteId: string }> }) {
+export default async function SitePhotosPage({ params, searchParams }: { params: Promise<{ siteId: string }>; searchParams: Promise<{ from?: string }> }) {
   const { siteId } = await params;
+  const { from } = await searchParams;
   const supabase = await createClient();
 
   const { data: site } = await supabase
@@ -61,7 +62,7 @@ export default async function SitePhotosPage({ params }: { params: Promise<{ sit
   return (
     <div className="px-4 pt-6 pb-24">
       <div className="flex items-center gap-3 mb-4">
-        <Link href="/photos" className="p-2 -ml-2 text-gray-600">
+        <Link href={from ?? "/photos"} className="p-2 -ml-2 text-gray-600">
           <ArrowLeftIcon size={24} />
         </Link>
         <div>

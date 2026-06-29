@@ -234,7 +234,7 @@ export default async function SchedulePage({ params, searchParams }: { params: P
               <span className="text-sm text-gray-500">{contract ? "보기" : "없음"}</span>
             </Link>
             <Link
-              href={`/photos/${siteId}`}
+              href={`/photos/${siteId}?from=/schedule/${siteId}`}
               className="flex flex-col items-center justify-center gap-1 bg-gray-50 rounded-2xl py-4 active:bg-gray-100"
             >
               <ImageIcon size={22} className="text-purple-600" />
