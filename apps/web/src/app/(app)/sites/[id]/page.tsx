@@ -165,7 +165,10 @@ export default async function SiteHubPage({
           return (
             <Link
               key={t.key}
-              href={t.key === "overview" ? `/sites/${id}` : `/sites/${id}?tab=${t.key}`}
+              href={t.key === "overview"
+                ? (from ? `/sites/${id}?from=${encodeURIComponent(from)}` : `/sites/${id}`)
+                : (from ? `/sites/${id}?tab=${t.key}&from=${encodeURIComponent(from)}` : `/sites/${id}?tab=${t.key}`)
+              }
               className={`flex min-h-[56px] flex-1 min-w-[72px] items-center justify-center gap-1 px-3 text-base font-bold border-b-2 ${
                 isActive ? "border-blue-700 text-blue-700" : "border-transparent text-gray-500"
               }`}
