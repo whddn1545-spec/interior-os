@@ -5,8 +5,9 @@ import { createClient } from "@/lib/supabase/server";
 import { formatKRW } from "@interior-os/core/pricing";
 import { ContractActions } from "./contract-actions";
 
-export default async function ContractDetailPage({ params }: { params: Promise<{ id: string }> }) {
+export default async function ContractDetailPage({ params, searchParams }: { params: Promise<{ id: string }>; searchParams: Promise<{ from?: string }> }) {
   const { id } = await params;
+  const { from } = await searchParams;
   const supabase = await createClient();
 
   const { data: contract } = await supabase
@@ -43,7 +44,7 @@ export default async function ContractDetailPage({ params }: { params: Promise<{
   return (
     <div className="min-h-screen bg-gray-50 pb-24">
       <header className="sticky top-0 bg-white border-b border-gray-100 z-10 px-4 py-3 flex items-center gap-3">
-        <Link href="/quotes" className="p-2 -ml-2 text-gray-600">
+        <Link href={from ?? "/quotes"} className="p-2 -ml-2 text-gray-600">
           <ArrowLeftIcon size={24} />
         </Link>
         <div className="flex-1">

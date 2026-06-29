@@ -207,7 +207,7 @@ export default async function QuoteDetailPage({ params }: { params: Promise<{ id
             {/* 이 견적으로 만든 계약서 보기 (역방향 링크) */}
             {contractAny && (
               <Link
-                href={`/contracts/${contractAny.id}`}
+                href={`/contracts/${contractAny.id}?from=/quotes/${id}`}
                 className="bg-white rounded-2xl p-4 border border-gray-100 flex items-center gap-3 min-h-[56px] active:bg-gray-50"
               >
                 <FileTextIcon size={24} className="text-purple-600 shrink-0" />

@@ -305,7 +305,7 @@ export default async function SiteHubPage({
 
             {contractAny && (
               <Link
-                href={`/contracts/${contractAny.id}`}
+                href={`/contracts/${contractAny.id}?from=/sites/${id}`}
                 className="flex items-center gap-3 bg-white rounded-2xl p-4 border border-gray-100 active:bg-gray-50"
               >
                 <FileSignatureIcon size={24} className="text-green-600 shrink-0" />

@@ -224,7 +224,7 @@ export default async function SchedulePage({ params, searchParams }: { params: P
               </span>
             </Link>
             <Link
-              href={contract ? `/contracts/${contract.id}` : `/quotes/${latestQuote?.id ?? ""}`}
+              href={contract ? `/contracts/${contract.id}?from=/schedule/${siteId}` : `/quotes/${latestQuote?.id ?? ""}`}
               className={`flex flex-col items-center justify-center gap-1 bg-gray-50 rounded-2xl py-4 active:bg-gray-100 ${
                 !contract && !latestQuote ? "pointer-events-none opacity-50" : ""
               }`}
