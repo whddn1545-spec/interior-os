@@ -1,7 +1,8 @@
 import { createClient } from "@/lib/supabase/server";
 import Link from "next/link";
-import { ArrowLeftIcon, PlusIcon } from "lucide-react";
+import { ArrowLeftIcon } from "lucide-react";
 import { PriceEditor } from "./price-editor";
+import { PriceDocumentUploader } from "./price-document-uploader";
 
 export default async function PricesPage() {
   const supabase = await createClient();
@@ -35,9 +36,12 @@ export default async function PricesPage() {
       </header>
 
       <div className="max-w-lg mx-auto px-4 pt-6">
+        {/* AI 단가 추출 — 항상 상단에 노출 */}
+        <PriceDocumentUploader trades={tradesData} />
+
         {!hasAnyPrices && (
           <div className="bg-blue-50 border border-blue-200 rounded-2xl p-5 mb-6">
-            <h2 className="text-lg font-bold text-blue-800 mb-2">단가표를 먼저 입력해주세요</h2>
+            <h2 className="text-lg font-bold text-blue-800 mb-2">직접 입력도 할 수 있어요</h2>
             <p className="text-base text-blue-700 mb-4">
               업계 평균 기본값을 불러온 후 내 사업에 맞게 수정하세요.
             </p>

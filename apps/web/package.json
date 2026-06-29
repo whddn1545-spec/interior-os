@@ -9,6 +9,7 @@
     "lint": "eslint"
   },
   "dependencies": {
+    "@anthropic-ai/sdk": "^0.105.0",
     "@base-ui/react": "^1.5.0",
     "@interior-os/core": "workspace:*",
     "@interior-os/db": "workspace:*",

@@ -4,6 +4,7 @@ import { createClient } from "@/lib/supabase/server";
 import { getTenantId } from "@/lib/supabase/get-tenant";
 import { revalidatePath } from "next/cache";
 import type { ActionResult } from "../../quotes/new/actions";
+import type { ExtractedPriceItem } from "@/lib/ai/claude";
 
 /** 단가표 항목 수정 */
 export async function upsertTradePrice(input: {
@@ -102,6 +103,81 @@ export async function seedDefaultPrices(): Promise<ActionResult<{ count: number 
       effective_from: new Date().toISOString().split("T")[0],
       is_active: true,
     }));
+
+  const { error } = await supabase.from("trade_prices").insert(toInsert);
+  if (error) return { ok: false, error: error.message };
+
+  revalidatePath("/settings/prices");
+  return { ok: true, data: { count: toInsert.length } };
+}
+
+/** 사진·문서에서 단가표 AI 추출 */
+export async function analyzePriceDocument(
+  base64: string,
+  mediaType: string
+): Promise<ActionResult<{ items: ExtractedPriceItem[] }>> {
+  const supabase = await createClient();
+  const { data: { user } } = await supabase.auth.getUser();
+  if (!user) return { ok: false, error: "로그인이 필요합니다" };
+
+  if (!base64 || base64.length < 100) {
+    return { ok: false, error: "파일을 읽을 수 없어요" };
+  }
+
+  const allowed = ["image/jpeg", "image/png", "image/webp", "image/gif", "application/pdf"];
+  if (!allowed.includes(mediaType)) {
+    return { ok: false, error: "JPEG, PNG, WebP, PDF 파일만 지원해요. HEIC는 사진 앱에서 JPEG로 내보내 주세요." };
+  }
+
+  try {
+    const { extractPricesFromDocument } = await import("@/lib/ai/claude");
+    const result = await extractPricesFromDocument(
+      base64,
+      mediaType as Parameters<typeof extractPricesFromDocument>[1]
+    );
+
+    if (result.parseError) {
+      return { ok: false, error: result.parseError };
+    }
+    if (result.items.length === 0) {
+      return { ok: false, error: "단가 항목을 찾을 수 없어요. 더 선명한 사진이나 다른 문서를 올려주세요." };
+    }
+
+    return { ok: true, data: { items: result.items } };
+  } catch (e) {
+    const msg = e instanceof Error ? e.message : String(e);
+    return { ok: false, error: `분석 중 오류가 발생했어요: ${msg}` };
+  }
+}
+
+/** AI 추출 결과를 단가표에 일괄 저장 */
+export async function bulkSaveExtractedPrices(
+  items: Array<{
+    tradeId: string;
+    itemName: string;
+    materialUnitPrice: number;
+    laborDayRate: number;
+    defaultDaysPerUnit: number;
+  }>
+): Promise<ActionResult<{ count: number }>> {
+  const supabase = await createClient();
+  const { data: { user } } = await supabase.auth.getUser();
+  if (!user) return { ok: false, error: "로그인이 필요합니다" };
+
+  const tenantId = await getTenantId(supabase, user);
+
+  if (!items.length) return { ok: false, error: "저장할 항목이 없어요" };
+
+  const toInsert = items.map((item) => ({
+    tenant_id: tenantId,
+    trade_id: item.tradeId,
+    item_name: item.itemName,
+    material_unit_price: item.materialUnitPrice,
+    labor_day_rate: item.laborDayRate,
+    default_days_per_unit: item.defaultDaysPerUnit,
+    effective_from: new Date().toISOString().split("T")[0],
+    is_active: true,
+  }));
 
   const { error } = await supabase.from("trade_prices").insert(toInsert);
   if (error) return { ok: false, error: error.message };
