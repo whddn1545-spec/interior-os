@@ -3,6 +3,7 @@
 import { useState, useTransition } from "react";
 import { useRouter } from "next/navigation";
 import { FileTextIcon, CheckCircleIcon, MessageSquareIcon, CalendarPlusIcon, Share2Icon } from "lucide-react";
+import { toast } from "sonner";
 
 interface Props {
   contractId: string;
@@ -54,7 +55,7 @@ export function ContractActions({ contractId, status, siteId }: Props) {
         await navigator.share({ title: "계약서", text: "인테리어 계약서를 확인해주세요", url: pdfUrl });
       } else {
         await navigator.clipboard.writeText(pdfUrl);
-        alert("링크가 복사되었어요");
+        toast.success("링크가 복사되었어요");
       }
     } catch {
       // 사용자가 공유를 취소한 경우 무시

@@ -1,5 +1,5 @@
 import Link from "next/link";
-import { ChevronRightIcon } from "lucide-react";
+import { ChevronRightIcon, ArrowLeftIcon } from "lucide-react";
 import { TUTORIAL_CONTENT, type TutorialKey } from "@/lib/tutorial/tutorial-content";
 
 const PAGE_LINKS: Partial<Record<TutorialKey, string>> = {
@@ -30,11 +30,16 @@ export default function HelpCenterPage() {
   const keys = Object.keys(TUTORIAL_CONTENT) as TutorialKey[];
 
   return (
-    <div className="px-4 pt-6 pb-24 space-y-6">
-      <div>
-        <h1 className="text-3xl font-black text-gray-900">도움말</h1>
-        <p className="text-lg text-gray-500">궁금한 메뉴를 눌러보세요</p>
-      </div>
+    <div className="pb-24">
+      <header className="sticky top-0 bg-white border-b border-gray-100 z-10 px-4 py-3 flex items-center gap-3">
+        <Link href="/settings" className="p-2 -ml-2 text-gray-600">
+          <ArrowLeftIcon size={24} />
+        </Link>
+        <h1 className="text-xl font-bold text-gray-900 flex-1">도움말</h1>
+      </header>
+
+      <div className="px-4 pt-6 space-y-6">
+      <p className="text-lg text-gray-500">궁금한 메뉴를 눌러보세요</p>
 
       {/* 빠른 이동 */}
       <section>
@@ -112,6 +117,7 @@ export default function HelpCenterPage() {
         <p className="text-lg font-bold text-gray-800 mb-1">더 궁금한 게 있으신가요?</p>
         <p className="text-base text-gray-500">앱을 사용하다 막히면 언제든 물어보세요</p>
       </section>
+      </div>
     </div>
   );
 }

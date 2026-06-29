@@ -5,6 +5,7 @@ import {
   getCurrentMonthLabel,
 } from "./actions";
 import Link from "next/link";
+import { ArrowLeftIcon } from "lucide-react";
 import { WorkerCard } from "./worker-card";
 import { HelpButton } from "@/components/tutorial/HelpButton";
 
@@ -26,16 +27,22 @@ export default async function WorkerAttendancePage() {
   const totalDue = workers.reduce((sum, w) => sum + w.balance, 0);
 
   return (
-    <div className="mx-auto w-full max-w-2xl px-4 py-6 pb-24">
-      {/* 헤더 */}
-      <header className="mb-6">
-        <h1 className="text-2xl font-black text-gray-900">👷 작업자 장부</h1>
-        <p className="mt-1 text-base text-gray-500">{monthLabel}</p>
-        <p className="mt-3 text-sm text-gray-500">이번달 총 지급예정</p>
-        <p className="text-4xl font-black text-orange-600">
-          {totalDue.toLocaleString("ko-KR")}원
-        </p>
+    <div className="min-h-screen bg-gray-50 pb-24">
+      <header className="sticky top-0 bg-white border-b border-gray-100 z-10 px-4 py-3 flex items-center gap-3">
+        <Link href="/workers" className="p-2 -ml-2 text-gray-600">
+          <ArrowLeftIcon size={24} />
+        </Link>
+        <div className="flex-1 min-w-0">
+          <h1 className="text-xl font-bold text-gray-900">작업자 장부</h1>
+          <p className="text-sm text-gray-500">{monthLabel}</p>
+        </div>
+        <div className="text-right">
+          <p className="text-xs text-gray-400">이번달 지급예정</p>
+          <p className="text-lg font-black text-orange-600">{totalDue.toLocaleString("ko-KR")}원</p>
+        </div>
       </header>
+
+      <div className="mx-auto w-full max-w-2xl px-4 py-6">
 
       {error && (
         <p className="mb-4 rounded-xl bg-red-50 px-4 py-3 text-sm font-medium text-red-600">
@@ -70,6 +77,7 @@ export default async function WorkerAttendancePage() {
       )}
 
       <HelpButton tutorialKey="workers" />
+      </div>
     </div>
   );
 }

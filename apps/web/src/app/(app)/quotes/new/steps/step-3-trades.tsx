@@ -38,6 +38,7 @@ export function Step3Trades({ distanceFactor, difficultyFactor, defaultAreaPyeon
   const [selected, setSelected] = useState<Map<string, { price: TradePrice; quantity: string }>>(new Map());
   const [isPending, startTransition] = useTransition();
   const [hasPrices, setHasPrices] = useState(true);
+  const [nextError, setNextError] = useState<string | null>(null);
 
   useEffect(() => {
     startTransition(async () => {
@@ -101,9 +102,10 @@ export function Step3Trades({ distanceFactor, difficultyFactor, defaultAreaPyeon
       }));
 
     if (items.length === 0) {
-      alert("수량을 1 이상 입력한 공종이 없어요.\n체크한 항목의 수량을 입력해주세요.");
+      setNextError("체크한 항목의 수량을 1 이상 입력해주세요");
       return;
     }
+    setNextError(null);
     onNext(items);
   }
 
@@ -213,6 +215,12 @@ export function Step3Trades({ distanceFactor, difficultyFactor, defaultAreaPyeon
             <span>예상 합계</span>
             <span>{formatKRW(preview.total)}</span>
           </div>
+        </div>
+      )}
+
+      {nextError && (
+        <div className="bg-red-50 border border-red-200 rounded-xl px-4 py-3 text-red-700 text-base">
+          {nextError}
         </div>
       )}
 

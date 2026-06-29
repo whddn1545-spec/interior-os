@@ -7,6 +7,7 @@ import { confirmQuote } from "../new/actions";
 import { revertQuoteToDraft, generateQuotePdf, createContractFromQuote, deleteQuote, duplicateQuote, getQuoteForEdit, updateQuoteItems } from "./actions";
 import type { EditableQuoteItem } from "./actions";
 import { calcQuote, formatKRW } from "@interior-os/core/pricing";
+import { toast } from "sonner";
 
 interface Props {
   quoteId: string;
@@ -199,7 +200,7 @@ export function QuoteActions({ quoteId, status, siteId, customerId, totalAmount 
         await navigator.share({ title: "견적서", text: "인테리어 견적서를 확인해주세요", url: pdfUrl });
       } else {
         await navigator.clipboard.writeText(pdfUrl);
-        alert("링크가 복사되었어요");
+        toast.success("링크가 복사되었어요");
       }
     } catch {
       // 사용자가 공유 취소한 경우 무시
