@@ -15,16 +15,17 @@ import {
   SparklesIcon,
   ImageIcon,
   XIcon,
+  WalletIcon,
 } from "lucide-react";
 
 // 자주 쓰는 기능은 큰 아이콘으로 크게.
-// '일정'은 하단 탭('현장')으로 승격됐으므로 여기서 뺐다.
 const primaryItems = [
   { href: "/workers", label: "작업자", icon: HardHatIcon },
+  { href: "/payments", label: "잔금 확인", icon: WalletIcon },
   { href: "/messages", label: "문자", icon: MessageSquareIcon },
   { href: "/photos", label: "사진", icon: CameraIcon },
-  { href: "/finance", label: "매출", icon: DollarSignIcon },
   { href: "/settings", label: "설정", icon: SettingsIcon },
+  { href: "/finance", label: "매출", icon: DollarSignIcon },
 ];
 
 // 가끔 쓰는 부가 기능은 작은 목록으로 아래에 정리.

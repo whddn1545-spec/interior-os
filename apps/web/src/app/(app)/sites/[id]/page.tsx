@@ -282,7 +282,7 @@ export default async function SiteHubPage({
             <Link
               href={
                 latestQuote
-                  ? `/quotes/${latestQuote.id}`
+                  ? `/quotes/${latestQuote.id}?from=/sites/${id}`
                   : customer?.id
                     ? `/quotes/new?customerId=${customer.id}`
                     : "/quotes/new"
