@@ -338,7 +338,7 @@ export default async function SiteHubPage({
               quoteList.map((q) => (
                 <Link
                   key={q.id}
-                  href={`/quotes/${q.id}`}
+                  href={`/quotes/${q.id}?from=/sites/${id}`}
                   className="flex items-center gap-3 bg-white border border-gray-200 rounded-2xl px-4 py-4 active:bg-gray-50"
                 >
                   <FileTextIcon size={22} className="text-blue-600 shrink-0" />
