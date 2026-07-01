@@ -3,7 +3,9 @@ import Link from "next/link";
 import { ArrowLeftIcon, CheckCircleIcon, AlertTriangleIcon, FileTextIcon, SendIcon, ChevronRightIcon, LayoutGridIcon } from "lucide-react";
 import { createClient } from "@/lib/supabase/server";
 import { QuoteActions } from "./quote-actions";
+import { QuoteMessageSheet } from "./quote-message-sheet";
 import { formatKRW } from "@interior-os/core/pricing";
+import { getTenantPlan, isPro } from "@/lib/plan";
 
 export default async function QuoteDetailPage({ params, searchParams }: { params: Promise<{ id: string }>; searchParams: Promise<{ from?: string }> }) {
   const { id } = await params;
@@ -36,6 +38,11 @@ export default async function QuoteDetailPage({ params, searchParams }: { params
     id: string; name: string; address: string; customer_id: string | null;
     customers: { name: string; phone: string } | null;
   } | null;
+
+  // Pro 플랜 확인 (AI 문자 생성 게이트용)
+  const { data: { user } } = await supabase.auth.getUser();
+  const plan = user ? await getTenantPlan(supabase, user) : "basic";
+  const proUser = isPro(plan);
 
   // 이 견적으로 만든 계약서 조회 (역방향 링크용, DB 변경 없이 quote_id 조인)
   const { data: contract } = await supabase
@@ -266,6 +273,11 @@ export default async function QuoteDetailPage({ params, searchParams }: { params
               )}
             </div>
           </div>
+        )}
+
+        {/* AI 견적 안내 문자 — confirmed/sent/accepted 상태에서 표시 */}
+        {(status === "confirmed" || status === "sent" || status === "accepted") && (
+          <QuoteMessageSheet quoteId={id} isPro={proUser} />
         )}
 
         {/* 인터랙티브 액션 */}

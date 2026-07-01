@@ -478,3 +478,86 @@ export async function revertQuoteToDraft(quoteId: string): Promise<ActionResult<
   revalidatePath(`/quotes/${quoteId}`);
   return { ok: true, data: undefined };
 }
+
+// ─── AI 견적 안내 문자 생성 ──────────────────────────────────────────────
+export type QuoteMessageResult =
+  | { ok: true; message: string }
+  | { ok: false; proRequired: true }
+  | { ok: false; proRequired?: false; error: string };
+
+export async function generateQuoteMessage(
+  quoteId: string
+): Promise<QuoteMessageResult> {
+  const supabase = await createClient();
+  const { data: { user } } = await supabase.auth.getUser();
+  if (!user) return { ok: false, error: "로그인이 필요합니다" };
+
+  const tenantId = await getTenantId(supabase, user);
+
+  // Pro 플랜 확인
+  const { getTenantPlan, isPro } = await import("@/lib/plan");
+  const plan = await getTenantPlan(supabase, user);
+  if (!isPro(plan)) {
+    return { ok: false, proRequired: true };
+  }
+
+  // 견적 + 항목 + 현장 + 업체 정보 조회
+  const [{ data: quote }, { data: items }, { data: tenant }] = await Promise.all([
+    supabase
+      .from("quotes")
+      .select("total_amount, sites(name, customers(name))")
+      .eq("id", quoteId)
+      .single(),
+    supabase
+      .from("quote_items")
+      .select("description, quantity, unit, line_total, trades(name_ko)")
+      .eq("quote_id", quoteId)
+      .order("created_at"),
+    supabase
+      .from("tenants")
+      .select("business_name")
+      .eq("id", tenantId)
+      .single(),
+  ]);
+
+  if (!quote) return { ok: false, error: "견적을 찾을 수 없어요", proRequired: false };
+
+  const q = quote as unknown as {
+    total_amount: number;
+    sites: { name: string; customers: { name: string } | null } | null;
+  };
+  const tenantAny = tenant as unknown as { business_name: string } | null;
+  const itemList = (items as unknown as { description: string; quantity: number; unit: string; line_total: number; trades: { name_ko: string } | null }[]) ?? [];
+
+  const itemSummary = itemList
+    .map((it) => `- ${it.trades?.name_ko ?? ""} ${it.description} ${it.quantity}${it.unit} (${it.line_total.toLocaleString("ko-KR")}원)`)
+    .join("\n");
+
+  const customerName = q.sites?.customers?.name ?? "고객";
+  const siteName = q.sites?.name ?? "현장";
+  const businessName = tenantAny?.business_name ?? "시공사";
+  const totalAmount = q.total_amount.toLocaleString("ko-KR");
+
+  const { invokeAI } = await import("@/lib/ai/gateway");
+
+  const res = await invokeAI({
+    task: "quote_message",
+    promptVersion: "v1",
+    model: "gpt-4o-mini",
+    maxTokens: 300,
+    systemPrompt:
+      "인테리어 리모델링 전문 업체의 견적 담당자입니다. " +
+      "고객에게 보낼 견적 안내 문자를 작성하세요. " +
+      "친근하고 전문적으로, 200자 이내로, 공사 항목을 자연스럽게 요약해서 설명하세요. " +
+      "광고성 문구·이모티콘 과다 사용 금지. 끝에 연락 요청 문구 포함.",
+    userMessage:
+      `업체명: ${businessName}\n` +
+      `고객명: ${customerName}님\n` +
+      `현장명: ${siteName}\n` +
+      `총 견적금액: ${totalAmount}원 (부가세 별도)\n\n` +
+      `공사 항목:\n${itemSummary}\n\n` +
+      "위 내용을 바탕으로 견적 안내 문자를 작성해주세요.",
+  });
+
+  return { ok: true, message: res.textContent.trim() };
+}
