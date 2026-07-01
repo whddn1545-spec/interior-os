@@ -12,7 +12,7 @@ export default async function AppLayout({ children }: { children: React.ReactNod
   return (
     <div className="flex flex-col min-h-screen bg-background">
       {/* 상단 헤더 */}
-      <header className="sticky top-0 z-40 flex items-center justify-between bg-card/95 backdrop-blur border-b border-border px-4 h-14">
+      <header className="sticky top-0 z-40 flex items-center justify-between bg-card/85 backdrop-blur-xl saturate-150 border-b border-border/60 px-4 h-14">
         <Link href="/" className="text-lg font-black text-primary">
           InteriorOS
         </Link>

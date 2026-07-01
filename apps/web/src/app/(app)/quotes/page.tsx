@@ -1,7 +1,7 @@
 import Link from "next/link";
-import { PlusIcon } from "lucide-react";
 import { createClient } from "@/lib/supabase/server";
 import { QuoteListActions } from "./quote-list-actions";
+import { Fab } from "@/components/fab";
 
 const STATUS_FILTERS = [
   { key: "all", label: "전체" },
@@ -64,16 +64,8 @@ export default async function QuotesPage({
 
   return (
     <div className="px-4 pt-6 pb-24">
-      <div className="flex items-center justify-between mb-6">
-        <h1 className="text-2xl font-bold text-gray-900">견적</h1>
-        <Link
-          href="/quotes/new"
-          className="flex items-center gap-1.5 bg-primary text-white px-4 py-2.5 rounded-xl text-base font-semibold"
-        >
-          <PlusIcon size={18} />
-          새 견적
-        </Link>
-      </div>
+      <h1 className="text-[28px] font-black tracking-tight text-foreground mb-6">견적</h1>
+      <Fab href="/quotes/new" label="새 견적" />
 
       {/* 이번달 요약 */}
       <div className="grid grid-cols-2 gap-3 mb-6">

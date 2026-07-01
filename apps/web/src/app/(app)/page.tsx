@@ -236,7 +236,7 @@ export default async function HomePage() {
                 <Link
                   key={task.id}
                   href={`/schedule/${task.site_id}?from=/`}
-                  className="relative block overflow-hidden bg-card border border-border rounded-2xl pl-5 pr-4 py-4 shadow-sm active:bg-muted transition-colors"
+                  className="relative block overflow-hidden bg-card border border-border rounded-2xl pl-5 pr-4 py-4 shadow-sm active:bg-muted active:scale-[0.98] transition-all duration-200"
                 >
                   <span className="absolute left-0 top-0 bottom-0 w-1.5 bg-primary" />
                   <p className="text-2xl font-bold text-foreground">{site?.name ?? "현장"}</p>
@@ -289,7 +289,7 @@ export default async function HomePage() {
                 <Link
                   key={p.id}
                   href="/payments"
-                  className={`block bg-card rounded-2xl px-5 py-4 flex items-center justify-between active:bg-muted transition-colors ${isOverdue ? "border-2 border-loss" : "border border-loss/30"}`}
+                  className={`block bg-card rounded-2xl px-5 py-4 flex items-center justify-between active:bg-muted active:scale-[0.98] transition-all duration-200 ${isOverdue ? "border-2 border-loss" : "border border-loss/30"}`}
                 >
                   <div className="min-w-0">
                     <div className="flex items-center gap-2 mb-0.5">
@@ -345,7 +345,7 @@ export default async function HomePage() {
                 <Link
                   key={s.href}
                   href={s.href}
-                  className="flex items-center gap-4 bg-card border-2 border-primary/30 rounded-2xl px-5 py-4 active:bg-accent transition-colors"
+                  className="flex items-center gap-4 bg-card border-2 border-primary/30 rounded-2xl px-5 py-4 active:bg-accent active:scale-[0.98] transition-all duration-200"
                 >
                   <span className="shrink-0 text-3xl">{s.emoji}</span>
                   <div className="min-w-0 flex-1">
@@ -369,7 +369,7 @@ export default async function HomePage() {
             <Link
               key={a.href}
               href={a.href}
-              className="flex flex-col items-center gap-2 bg-card border border-border rounded-2xl py-6 active:bg-muted transition-colors"
+              className="flex flex-col items-center gap-2 bg-card border border-border rounded-2xl py-6 active:bg-muted active:scale-[0.98] transition-all duration-200 shadow-sm"
             >
               <span className="flex items-center justify-center w-14 h-14 rounded-full bg-primary/10 text-3xl">
                 {a.emoji}

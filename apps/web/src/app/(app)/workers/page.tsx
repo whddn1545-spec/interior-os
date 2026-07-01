@@ -1,5 +1,6 @@
 import Link from "next/link";
 import { PlusIcon, PhoneIcon, ChevronRightIcon, BookOpenIcon, SettingsIcon, SearchIcon, ArrowLeftIcon } from "lucide-react";
+import { Fab } from "@/components/fab";
 import { createClient } from "@/lib/supabase/server";
 
 export default async function WorkersPage({
@@ -41,24 +42,16 @@ export default async function WorkersPage({
       </Link>
 
       <div className="flex items-center justify-between mb-4">
-        <h1 className="text-2xl font-bold text-gray-900">작업자</h1>
-        <div className="flex items-center gap-2">
-          <Link
-            href="/settings"
-            aria-label="설정"
-            className="flex items-center justify-center w-12 h-12 rounded-xl bg-gray-100 text-gray-600 active:bg-gray-200"
-          >
-            <SettingsIcon size={22} />
-          </Link>
-          <Link
-            href="/workers/new"
-            className="flex items-center gap-1.5 bg-primary text-white px-4 py-3 rounded-xl text-base font-semibold"
-          >
-            <PlusIcon size={18} />
-            추가
-          </Link>
-        </div>
+        <h1 className="text-[28px] font-black tracking-tight text-foreground">작업자</h1>
+        <Link
+          href="/settings"
+          aria-label="설정"
+          className="flex items-center justify-center w-12 h-12 rounded-xl bg-muted text-muted-foreground active:bg-accent"
+        >
+          <SettingsIcon size={22} />
+        </Link>
       </div>
+      <Fab href="/workers/new" label="새 작업자" />
 
       {/* 출역 장부 바로가기 */}
       <Link

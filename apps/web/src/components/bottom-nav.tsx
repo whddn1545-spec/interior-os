@@ -21,7 +21,7 @@ export function BottomNav() {
   }
 
   return (
-    <nav className="fixed bottom-0 inset-x-0 z-50 bg-card/95 backdrop-blur border-t border-border pb-[env(safe-area-inset-bottom)]">
+    <nav className="fixed bottom-0 inset-x-0 z-50 bg-card/85 backdrop-blur-xl saturate-150 border-t border-border/60 pb-[env(safe-area-inset-bottom)]">
       <ul className="flex">
         {tabs.map(({ href, label, icon: Icon, exact, also }) => {
           const active = isActive(href, exact, also);

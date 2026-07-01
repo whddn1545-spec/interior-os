@@ -88,13 +88,14 @@ export default async function SiteHubPage({
   };
   const customer = siteAny.customers;
 
-  // 현장 1건에 묶인 견적·계약·사진수·일정수·결제스케줄을 한 번에 조회 (조회 전용)
+  // 현장 1건에 묶인 견적·계약·사진수·일정수·결제스케줄·지출내역을 한 번에 조회
   const [
     { data: quotes },
     { data: contract },
     { count: photoCount },
     { count: taskCount },
     { data: payments },
+    { data: financeEntries },
   ] = await Promise.all([
     supabase
       .from("quotes")
@@ -115,6 +116,10 @@ export default async function SiteHubPage({
       .select("id, stage_label, amount, due_date, paid_at, paid_amount")
       .eq("site_id", id)
       .order("due_date", { ascending: true }),
+    supabase
+      .from("finance_entries")
+      .select("direction, amount, category")
+      .eq("site_id", id),
   ]);
 
   const quoteList =
@@ -134,6 +139,17 @@ export default async function SiteHubPage({
   const paidTotal = paymentList
     .filter((p) => p.paid_at)
     .reduce((sum, p) => sum + Number(p.paid_amount ?? p.amount ?? 0), 0);
+
+  // Live P&L 계산
+  type FinanceEntry = { direction: string; amount: number; category: string };
+  const entries = (financeEntries as FinanceEntry[] | null) ?? [];
+  const totalExpenses = entries
+    .filter((e) => e.direction === "out")
+    .reduce((sum, e) => sum + Number(e.amount ?? 0), 0);
+  const budget = latestQuote?.total_amount ?? 0;
+  const estimatedMargin = budget > 0 ? budget - totalExpenses : null;
+  const burnRate = budget > 0 ? Math.min(100, Math.round((totalExpenses / budget) * 100)) : null;
+  const marginRate = budget > 0 ? Math.round(((budget - totalExpenses) / budget) * 100) : null;
 
   return (
     <div className="min-h-screen bg-gray-50 pb-24">
@@ -276,19 +292,95 @@ export default async function SiteHubPage({
               </Link>
             </div>
 
+            {/* Live P&L 손익 위젯 */}
+            {budget > 0 && (
+              <div className="bg-card rounded-2xl p-4 border border-border space-y-3">
+                <div className="flex items-center justify-between">
+                  <h2 className="text-base font-bold text-foreground">📊 현장 손익 현황</h2>
+                  {burnRate !== null && (
+                    <span
+                      className={`text-sm font-bold px-2.5 py-1 rounded-full ${
+                        burnRate >= 90
+                          ? "bg-loss/15 text-loss"
+                          : burnRate >= 70
+                            ? "bg-warning/20 text-warning-foreground"
+                            : "bg-profit/12 text-profit"
+                      }`}
+                    >
+                      예산 {burnRate}% 소진
+                    </span>
+                  )}
+                </div>
+
+                {/* 게이지 바 */}
+                {burnRate !== null && (
+                  <div className="space-y-1">
+                    <div className="h-3 bg-muted rounded-full overflow-hidden">
+                      <div
+                        className={`h-full rounded-full transition-all ${
+                          burnRate >= 90 ? "bg-loss" : burnRate >= 70 ? "bg-warning" : "bg-profit"
+                        }`}
+                        style={{ width: `${burnRate}%` }}
+                      />
+                    </div>
+                    <div className="flex justify-between text-xs text-muted-foreground">
+                      <span>지출 0</span>
+                      <span>견적 {formatKRW(budget)}</span>
+                    </div>
+                  </div>
+                )}
+
+                {/* 수치 요약 */}
+                <div className="grid grid-cols-3 gap-2 pt-1">
+                  <div className="text-center">
+                    <p className="text-xs text-muted-foreground mb-1">견적 금액</p>
+                    <p className="text-base font-black tabular-nums text-foreground">{formatKRW(budget)}</p>
+                  </div>
+                  <div className="text-center border-x border-border">
+                    <p className="text-xs text-muted-foreground mb-1">실제 지출</p>
+                    <p className="text-base font-black tabular-nums text-foreground">{formatKRW(totalExpenses)}</p>
+                  </div>
+                  <div className="text-center">
+                    <p className="text-xs text-muted-foreground mb-1">예상 마진</p>
+                    <p
+                      className={`text-base font-black tabular-nums ${
+                        (estimatedMargin ?? 0) >= 0 ? "text-profit" : "text-loss"
+                      }`}
+                    >
+                      {estimatedMargin !== null
+                        ? `${estimatedMargin >= 0 ? "+" : ""}${formatKRW(estimatedMargin)}`
+                        : "—"}
+                    </p>
+                  </div>
+                </div>
+
+                {marginRate !== null && (
+                  <p className={`text-sm font-semibold text-center ${marginRate >= 0 ? "text-profit" : "text-loss"}`}>
+                    {marginRate >= 0
+                      ? `마진율 ${marginRate}% · 남습니다 👍`
+                      : `⚠️ 마진율 ${marginRate}% · 예산 초과 위험`}
+                  </p>
+                )}
+
+                {totalExpenses === 0 && (
+                  <p className="text-sm text-muted-foreground text-center">지출을 기록하면 실시간 손익을 볼 수 있어요</p>
+                )}
+              </div>
+            )}
+
             {/* 받을 돈 요약 */}
             {paymentList.length > 0 && (
               <Link
                 href={from ? `/sites/${id}?tab=finance&from=${encodeURIComponent(from)}` : `/sites/${id}?tab=finance`}
-                className="flex items-center gap-3 bg-white rounded-2xl p-4 border border-gray-100 active:bg-gray-50"
+                className="flex items-center gap-3 bg-card rounded-2xl p-4 border border-border active:bg-muted transition-colors"
               >
                 <WalletIcon size={24} className="text-primary shrink-0" />
                 <div className="flex-1">
-                  <p className="text-base font-semibold text-gray-900">미수금</p>
-                  <p className="text-sm text-gray-500">받을 돈 자세히 보기</p>
+                  <p className="text-base font-semibold text-foreground">미수금</p>
+                  <p className="text-sm text-muted-foreground">받을 돈 자세히 보기</p>
                 </div>
-                <p className="text-lg font-bold text-primary/90 shrink-0">{formatKRW(outstanding)}</p>
-                <ChevronRightIcon size={20} className="text-gray-300 shrink-0" />
+                <p className="text-lg font-bold text-loss shrink-0">{formatKRW(outstanding)}</p>
+                <ChevronRightIcon size={20} className="text-muted-foreground shrink-0" />
               </Link>
             )}
 

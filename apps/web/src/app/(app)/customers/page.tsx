@@ -1,5 +1,6 @@
 import Link from "next/link";
 import { PlusIcon, UploadIcon, ChevronRightIcon, SearchIcon, ArrowLeftIcon, PhoneIcon } from "lucide-react";
+import { Fab } from "@/components/fab";
 import { createClient } from "@/lib/supabase/server";
 import { GradeClassifier } from "./grade-classifier";
 
@@ -79,25 +80,19 @@ export default async function CustomersPage({
       </Link>
 
       <div className="flex items-center justify-between mb-6">
-        <h1 className="text-2xl font-bold text-gray-900">고객</h1>
+        <h1 className="text-[28px] font-black tracking-tight text-foreground">고객</h1>
         <div className="flex gap-2">
           <GradeClassifier />
           <Link
             href="/customers/import"
-            className="flex items-center gap-1.5 bg-gray-100 text-gray-700 px-3 py-2.5 rounded-xl text-base font-semibold"
+            className="flex items-center gap-1.5 bg-muted text-foreground px-3 py-2.5 rounded-xl text-base font-semibold"
           >
             <UploadIcon size={18} />
             가져오기
           </Link>
-          <Link
-            href="/customers/new"
-            className="flex items-center gap-1.5 bg-primary text-white px-4 py-2.5 rounded-xl text-base font-semibold"
-          >
-            <PlusIcon size={18} />
-            추가
-          </Link>
         </div>
       </div>
+      <Fab href="/customers/new" label="새 고객" />
 
       {/* 통계 (전체 기준) */}
       <div className="grid grid-cols-3 gap-3 mb-6">

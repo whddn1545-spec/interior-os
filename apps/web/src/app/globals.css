@@ -57,6 +57,14 @@
   --radius-4xl: calc(var(--radius) * 2.6);
 }
 
+@utility shadow-primary-glow {
+  box-shadow: 0 10px 25px -5px oklch(0.52 0.13 42 / 0.4), 0 8px 10px -6px oklch(0.52 0.13 42 / 0.1);
+}
+
+@utility shadow-profit-glow {
+  box-shadow: 0 10px 25px -5px oklch(0.55 0.12 155 / 0.4), 0 8px 10px -6px oklch(0.55 0.12 155 / 0.1);
+}
+
 :root {
   --radius: 0.75rem;
 
