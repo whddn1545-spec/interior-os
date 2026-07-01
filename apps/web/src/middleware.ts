@@ -1,7 +1,7 @@
 import { createServerClient } from "@supabase/ssr";
 import { NextResponse, type NextRequest } from "next/server";
 
-export async function proxy(request: NextRequest) {
+export async function middleware(request: NextRequest) {
   let supabaseResponse = NextResponse.next({ request });
 
   const supabase = createServerClient(
@@ -36,8 +36,14 @@ export async function proxy(request: NextRequest) {
     pathname.startsWith("/signup") ||
     pathname.startsWith("/onboarding");
 
-  // 비로그인 → 로그인 페이지
-  if (!user && !isAuthPage) {
+  // 비로그인 → 로그인 페이지 (단, 웹훅, 크론, 고객용 서명/견적 링크 등 public 접근 허용)
+  const isPublicApi = 
+    pathname.startsWith("/api/webhooks") || 
+    pathname.startsWith("/api/cron") || 
+    pathname.startsWith("/api/pwa-icon") || 
+    pathname.startsWith("/c/") || 
+    pathname.startsWith("/q/");
+  if (!user && !isAuthPage && !isPublicApi) {
     const url = request.nextUrl.clone();
     url.pathname = "/login";
     return NextResponse.redirect(url);
