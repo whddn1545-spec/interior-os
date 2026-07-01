@@ -40,11 +40,11 @@ export async function generateMoodboard(input: {
       method: "POST",
       headers: { "Content-Type": "application/json", Authorization: `Bearer ${apiKey}` },
       body: JSON.stringify({
-        model: "gpt-image-2",
+        model: "dall-e-3",
         prompt,
         n: 1,
         size: "1024x1024",
-        quality: "medium",
+        quality: "standard",
         response_format: "b64_json",
       }),
     });
@@ -109,12 +109,12 @@ export async function generateVisualization(formData: FormData): Promise<{ ok: b
     const imageBlob = new Blob([bytes], { type: imageFile.type || "image/jpeg" });
 
     const fd = new FormData();
-    fd.append("model", "gpt-image-2");
-    fd.append("image", imageBlob, "before.jpg");
+    // OpenAI images/edits API는 dall-e-2 만 지원합니다
+    fd.append("model", "dall-e-2");
+    fd.append("image", imageBlob, "before.png"); // PNG 필수이므로 .png로 설정
     fd.append("prompt", prompt);
     fd.append("n", "1");
     fd.append("size", "1024x1024");
-    fd.append("quality", "high");
     fd.append("response_format", "b64_json");
 
     const response = await fetch("https://api.openai.com/v1/images/edits", {
