@@ -1,6 +1,7 @@
 import Link from "next/link";
 import { createClient } from "@/lib/supabase/server";
 import { HelpButton } from "@/components/tutorial/HelpButton";
+import { PwaInstallBanner } from "@/components/pwa-install-banner";
 
 export const dynamic = "force-dynamic";
 
@@ -149,6 +150,22 @@ export default async function HomePage() {
     acceptedQuotes = [];
   }
 
+  // 4b. 고객이 서명한 계약 (최근 7일)
+  type SignedContract = { id: string; sites: { id: string; name: string } | null };
+  let signedContracts: SignedContract[] = [];
+  try {
+    const { data } = await supabase
+      .from("contracts")
+      .select("id, sites(id, name)")
+      .eq("status", "signed")
+      .gte("updated_at", sevenDaysAgo)
+      .order("updated_at", { ascending: false })
+      .limit(5);
+    signedContracts = (data as unknown as SignedContract[]) ?? [];
+  } catch {
+    signedContracts = [];
+  }
+
   // 5. 미처리 A/S 건수
   let openAsCount = 0;
   try {
@@ -254,7 +271,11 @@ export default async function HomePage() {
   ];
 
   return (
-    <div className="px-4 pt-6 pb-24 space-y-6">
+    <div className="pt-4 pb-24 space-y-6">
+      {/* PWA 설치 안내 배너 */}
+      <PwaInstallBanner />
+
+      <div className="px-4 space-y-6">
       {/* 날짜 + 이번달 KPI */}
       <div>
         <h1 className="text-[28px] font-black tracking-tight text-foreground">오늘의 업무</h1>
@@ -457,6 +478,36 @@ export default async function HomePage() {
         </section>
       )}
 
+      {/* 고객 서명 완료 알림 */}
+      {signedContracts.length > 0 && (
+        <section>
+          <h2 className="text-xl font-bold text-foreground mb-3">🖊️ 고객이 서명한 계약</h2>
+          <div className="space-y-2">
+            {signedContracts.map((c) => {
+              const site = first(c.sites);
+              return (
+                <Link
+                  key={c.id}
+                  href={`/contracts/${c.id}?from=/`}
+                  className="flex items-center gap-3 bg-purple-50 border border-purple-200 rounded-2xl px-5 py-4 active:opacity-80"
+                >
+                  <span className="text-2xl shrink-0">✍️</span>
+                  <div className="flex-1 min-w-0">
+                    <p className="text-base font-bold text-foreground truncate">
+                      {site?.name ?? "현장"}
+                    </p>
+                    <p className="text-sm text-purple-700 font-semibold">고객이 계약서에 서명했어요!</p>
+                  </div>
+                </Link>
+              );
+            })}
+          </div>
+          <p className="text-sm text-muted-foreground mt-2 text-center">
+            공사 일정을 잡고 계약금을 청구해보세요
+          </p>
+        </section>
+      )}
+
       {/* A/S 처리 알림 */}
       {openAsCount > 0 && (
         <section>
@@ -538,6 +589,7 @@ export default async function HomePage() {
       </section>
 
       <HelpButton tutorialKey="home" />
+      </div>
     </div>
   );
 }
