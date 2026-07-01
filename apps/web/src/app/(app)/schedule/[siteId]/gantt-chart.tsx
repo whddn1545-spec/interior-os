@@ -44,6 +44,7 @@ export function GanttChart({ tasks, siteId, siteName }: Props) {
 
   const [localTasks, setLocalTasks] = useState(tasks);
   useEffect(() => {
+    // eslint-disable-next-line react-hooks/set-state-in-effect
     setLocalTasks(tasks);
   }, [tasks]);
 

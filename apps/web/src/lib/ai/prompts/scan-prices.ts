@@ -108,7 +108,7 @@ ${tradeListText}
     tenantId,
   });
 
-  if (!result.toolInputs || !Array.isArray((result.toolInputs as any).items)) {
+  if (!result.toolInputs || !Array.isArray((result.toolInputs as unknown as { items: unknown }).items)) {
     throw new Error("AI failed to return scan_pricebook tool call");
   }
 

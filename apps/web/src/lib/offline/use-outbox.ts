@@ -29,7 +29,9 @@ export function useOutbox() {
   }, [isSyncing, isOnline, refreshCount]);
 
   useEffect(() => {
+    // eslint-disable-next-line react-hooks/set-state-in-effect
     void refreshCount();
+
 
     function handleOnline() {
       setIsOnline(true);

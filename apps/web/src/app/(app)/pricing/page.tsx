@@ -31,7 +31,9 @@ function PricingContent() {
 
   useEffect(() => {
     const e = searchParams.get("error");
+    // eslint-disable-next-line react-hooks/set-state-in-effect
     if (e === "canceled") setError("결제가 취소되었어요. 다시 시도해주세요.");
+    // eslint-disable-next-line react-hooks/set-state-in-effect
     else if (e) setError(decodeURIComponent(e));
   }, [searchParams]);
 
