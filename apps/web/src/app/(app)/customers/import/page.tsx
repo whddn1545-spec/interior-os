@@ -42,7 +42,11 @@ export default function CustomerImportPage() {
 
     const rows: ImportRow[] = preview.rows
       .filter((r) => !(skipDuplicates && r.isDuplicate))
-      .map((row) => { const r = { ...row }; delete r.isDuplicate; return r; });
+      .map((row) => {
+        // eslint-disable-next-line @typescript-eslint/no-unused-vars
+        const { isDuplicate, ...rest } = row;
+        return rest;
+      });
 
     startTransition(async () => {
       setError(null);

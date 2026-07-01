@@ -23,14 +23,14 @@ InteriorOS는 수기 장부와 엑셀에 의존하는 파편화된 영세 인테
 
 ## 🛠️ 기술 스택 (Tech Stack)
 
-* **Framework**: Next.js 14 (App Router)
+* **Framework**: Next.js 16 (App Router, Turbopack)
 * **Language**: TypeScript
 * **Styling**: Tailwind CSS v4, oklch 기반 Premium Glassmorphism UI
 * **Database & Auth**: Supabase (PostgreSQL, RLS)
 * **AI Models**: 
-  * `gpt-4o` (종이 단가표 스캔 - Vision)
-  * `claude-3-5-sonnet` (현장 사진 태깅 - Vision)
-  * `claude-3-opus` (이메일, 문자 메시지 생성)
+  * `gpt-4o`, `gpt-4o-mini` (단가표 스캔 및 견적 검토)
+  * `claude-3-5-sonnet`, `claude-3-opus` (현장 사진 태깅, 메시지 생성)
+  * `dall-e-3`, `dall-e-2` (무드보드 시각화 생성)
 * **Architecture**: Monorepo (Turborepo), Edge Runtime 기반 AI Gateway
 * **Deployment**: Vercel (PWA 지원)
 
