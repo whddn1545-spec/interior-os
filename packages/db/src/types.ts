@@ -163,6 +163,14 @@ export type ConsultationNoteRow = {
   audio_duration_seconds: number | null;
   created_at: string;
 };
+export type AsRequestRow = {
+  id: string; tenant_id: string; site_id: string;
+  title: string; description: string | null;
+  status: "open" | "in_progress" | "closed";
+  warranty_type: "repair" | "inspection" | "complaint";
+  resolved_at: string | null;
+  created_at: string; updated_at: string;
+};
 
 // Nullable 필드를 optional로 변환 (Supabase CLI 생성 타입과 동일한 패턴)
 type NullableToOptional<T> =
@@ -204,6 +212,7 @@ export type Database = {
       payment_schedules:   T<PaymentScheduleRow>;
       worker_attendance:   T<WorkerAttendanceRow>;
       consultation_notes:  T<ConsultationNoteRow, InsertBase<ConsultationNoteRow>, never>;
+      as_requests:         T<AsRequestRow>;
     };
     Views: { [_ in never]: never };
     Functions: { [_ in never]: never };

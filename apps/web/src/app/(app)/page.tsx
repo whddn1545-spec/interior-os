@@ -93,7 +93,19 @@ export default async function HomePage() {
     payments = [];
   }
 
-  // 3. 최근 현장 (오늘 현장이 없을 때 fallback)
+  // 3. 미처리 A/S 건수
+  let openAsCount = 0;
+  try {
+    const { count } = await supabase
+      .from("as_requests")
+      .select("id", { count: "exact", head: true })
+      .neq("status", "closed");
+    openAsCount = count ?? 0;
+  } catch {
+    openAsCount = 0;
+  }
+
+  // 4. 최근 현장 (오늘 현장이 없을 때 fallback)
   let recentSites: RecentSite[] = [];
   if (todayTasks.length === 0) {
     try {
@@ -318,6 +330,25 @@ export default async function HomePage() {
           받을 돈 전체 보기
         </Link>
       </section>
+
+      {/* A/S 처리 알림 */}
+      {openAsCount > 0 && (
+        <section>
+          <Link
+            href="/sites"
+            className="flex items-center gap-3 bg-warning/10 border border-warning/30 rounded-2xl px-5 py-4 active:opacity-80"
+          >
+            <span className="text-2xl">🔧</span>
+            <div className="flex-1 min-w-0">
+              <p className="text-base font-bold text-foreground">미처리 A/S {openAsCount}건</p>
+              <p className="text-sm text-muted-foreground">완공 현장 A/S 요청을 처리해주세요</p>
+            </div>
+            <span className="bg-warning text-warning-foreground text-sm font-bold px-2.5 py-1 rounded-full shrink-0">
+              {openAsCount}
+            </span>
+          </Link>
+        </section>
+      )}
 
       {/* 시작 가이드 */}
       {isNewUser && (

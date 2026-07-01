@@ -12,6 +12,7 @@ import {
   WalletIcon,
   PhoneIcon,
   SparklesIcon,
+  ShieldCheckIcon,
 } from "lucide-react";
 import { createClient } from "@/lib/supabase/server";
 import { formatKRW } from "@interior-os/core/pricing";
@@ -89,7 +90,7 @@ export default async function SiteHubPage({
   };
   const customer = siteAny.customers;
 
-  // 현장 1건에 묶인 견적·계약·사진수·일정수·결제스케줄·지출내역을 한 번에 조회
+  // 현장 1건에 묶인 견적·계약·사진수·일정수·결제스케줄·지출내역·A/S를 한 번에 조회
   const [
     { data: quotes },
     { data: contract },
@@ -97,6 +98,7 @@ export default async function SiteHubPage({
     { count: taskCount },
     { data: payments },
     { data: financeEntries },
+    { count: openAsCount },
   ] = await Promise.all([
     supabase
       .from("quotes")
@@ -121,6 +123,11 @@ export default async function SiteHubPage({
       .from("finance_entries")
       .select("direction, amount, category")
       .eq("site_id", id),
+    supabase
+      .from("as_requests")
+      .select("id", { count: "exact", head: true })
+      .eq("site_id", id)
+      .neq("status", "closed"),
   ]);
 
   const quoteList =
@@ -423,6 +430,30 @@ export default async function SiteHubPage({
                   </p>
                 </div>
                 <ChevronRightIcon size={20} className="text-gray-300 shrink-0" />
+              </Link>
+            )}
+
+            {/* A/S 보증 관리 — 공사 완료 시 표시 */}
+            {siteAny.status === "done" && (
+              <Link
+                href={`/sites/${id}/warranty`}
+                className="flex items-center gap-3 bg-card rounded-2xl p-4 border border-border active:bg-muted"
+              >
+                <ShieldCheckIcon size={24} className="text-profit shrink-0" />
+                <div className="flex-1">
+                  <p className="text-base font-semibold text-foreground">A/S 보증 관리</p>
+                  <p className="text-sm text-muted-foreground">
+                    {(openAsCount ?? 0) > 0
+                      ? `처리 중 ${openAsCount}건 · 점검 문자 보내기`
+                      : "A/S 접수 및 점검 안내 문자"}
+                  </p>
+                </div>
+                {(openAsCount ?? 0) > 0 && (
+                  <span className="bg-warning text-warning-foreground text-sm font-bold px-2.5 py-1 rounded-full shrink-0">
+                    {openAsCount}
+                  </span>
+                )}
+                <ChevronRightIcon size={20} className="text-muted-foreground/40 shrink-0" />
               </Link>
             )}
 
