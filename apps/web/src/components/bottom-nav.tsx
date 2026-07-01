@@ -7,7 +7,7 @@ import { MoreMenu } from "./more-menu";
 
 const tabs = [
   { href: "/", label: "홈", icon: HomeIcon, exact: true, also: [] as string[] },
-  { href: "/schedule", label: "현장", icon: CalendarIcon, exact: false, also: ["/sites"] },
+  { href: "/sites", label: "현장", icon: CalendarIcon, exact: false, also: ["/schedule"] },
   { href: "/quotes", label: "견적", icon: FileTextIcon, exact: false, also: [] as string[] },
   { href: "/customers", label: "고객", icon: UsersIcon, exact: false, also: [] as string[] },
 ];

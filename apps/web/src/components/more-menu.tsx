@@ -16,21 +16,23 @@ import {
   ImageIcon,
   XIcon,
   WalletIcon,
+  CalendarIcon,
 } from "lucide-react";
 
 // 자주 쓰는 기능은 큰 아이콘으로 크게.
 const primaryItems = [
   { href: "/workers", label: "작업자", icon: HardHatIcon },
   { href: "/payments", label: "잔금 확인", icon: WalletIcon },
+  { href: "/schedule", label: "일정", icon: CalendarIcon },
   { href: "/messages", label: "문자", icon: MessageSquareIcon },
   { href: "/photos", label: "사진", icon: CameraIcon },
-  { href: "/settings", label: "설정", icon: SettingsIcon },
   { href: "/finance", label: "매출", icon: DollarSignIcon },
 ];
 
 // 가끔 쓰는 부가 기능은 작은 목록으로 아래에 정리.
 const secondaryItems = [
-  { href: "/workers/attendance", label: "장부", icon: ClipboardListIcon },
+  { href: "/settings", label: "설정·단가표", icon: SettingsIcon },
+  { href: "/workers/attendance", label: "출역 장부", icon: ClipboardListIcon },
   { href: "/materials", label: "자재산출", icon: CalculatorIcon },
   { href: "/moodboard", label: "AI 시각화", icon: SparklesIcon },
   { href: "/instagram", label: "인스타", icon: ImageIcon },

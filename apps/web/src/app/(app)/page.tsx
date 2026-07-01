@@ -93,7 +93,30 @@ export default async function HomePage() {
     payments = [];
   }
 
-  // 3. 미처리 A/S 건수
+  // 3. 이번달 KPI
+  const startOfMonth = new Date(now.getFullYear(), now.getMonth(), 1).toISOString().split("T")[0];
+  let monthIncome = 0;
+  let activeCount = 0;
+  try {
+    const [incomeRes, activeSitesRes] = await Promise.all([
+      supabase
+        .from("finance_entries")
+        .select("amount")
+        .eq("direction", "in")
+        .gte("paid_at", startOfMonth),
+      supabase
+        .from("sites")
+        .select("id", { count: "exact", head: true })
+        .in("status", ["contracted", "in_progress"]),
+    ]);
+    monthIncome = (incomeRes.data ?? []).reduce((s, e) => s + Number((e as { amount: number }).amount), 0);
+    activeCount = activeSitesRes.count ?? 0;
+  } catch {
+    monthIncome = 0;
+    activeCount = 0;
+  }
+
+  // 4. 미처리 A/S 건수
   let openAsCount = 0;
   try {
     const { count } = await supabase
@@ -199,10 +222,34 @@ export default async function HomePage() {
 
   return (
     <div className="px-4 pt-6 pb-24 space-y-6">
-      {/* 날짜 헤더 */}
+      {/* 날짜 + 이번달 KPI */}
       <div>
         <h1 className="text-[28px] font-black tracking-tight text-foreground">오늘의 업무</h1>
-        <p className="text-base text-muted-foreground mt-0.5">{formatKoreanDate(now)}</p>
+        <p className="text-base text-muted-foreground mt-0.5 mb-4">{formatKoreanDate(now)}</p>
+        <div className="grid grid-cols-2 gap-2">
+          <Link
+            href="/sites?status=in_progress"
+            className="bg-card border border-border rounded-2xl p-4 active:bg-muted"
+          >
+            <p className="text-3xl font-black text-profit tabular-nums">{activeCount}</p>
+            <p className="text-sm text-muted-foreground mt-0.5">진행중 현장</p>
+          </Link>
+          <Link
+            href="/finance"
+            className="bg-card border border-border rounded-2xl p-4 active:bg-muted"
+          >
+            <p className="text-xl font-black text-primary tabular-nums truncate">
+              {monthIncome > 0
+                ? monthIncome >= 100000000
+                  ? `${(monthIncome / 100000000).toFixed(1)}억`
+                  : monthIncome >= 10000000
+                    ? `${Math.round(monthIncome / 1000000)}백만`
+                    : `${Math.round(monthIncome / 10000)}만`
+                : "—"}
+            </p>
+            <p className="text-sm text-muted-foreground mt-0.5">이번달 입금</p>
+          </Link>
+        </div>
       </div>
 
       {/* 섹션 1: 오늘 진행 현장 */}
