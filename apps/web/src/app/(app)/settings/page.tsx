@@ -2,6 +2,7 @@ import Link from "next/link";
 import { ChevronRightIcon, TagIcon, MapPinIcon, SmartphoneIcon, CreditCardIcon, LogOutIcon, HardHatIcon, CalculatorIcon, SparklesIcon, HelpCircleIcon, ZapIcon, CheckIcon } from "lucide-react";
 import { createClient } from "@/lib/supabase/server";
 import { BusinessInfoCard } from "./business-info-form";
+import { ThemeToggle } from "@/components/theme-toggle";
 
 const MENU = [
   { href: "/settings/prices", icon: TagIcon, label: "단가표", desc: "공종별 자재비·인건비 단가" },
@@ -106,6 +107,7 @@ export default async function SettingsPage({
             <ChevronRightIcon size={18} className="text-muted-foreground/50 shrink-0" />
           </Link>
         ))}
+        <ThemeToggle />
       </div>
 
       {/* 로그아웃 */}
