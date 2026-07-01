@@ -16,6 +16,6 @@ export default function robots(): MetadataRoute.Robots {
         '/schedule/*'
       ],
     },
-    sitemap: 'https://interioros.com/sitemap.xml',
+    sitemap: `${process.env.NEXT_PUBLIC_SITE_URL || 'https://interior-os.vercel.app'}/sitemap.xml`,
   }
 }
