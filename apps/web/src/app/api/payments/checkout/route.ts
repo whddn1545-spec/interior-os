@@ -7,8 +7,8 @@ const TOSS_CLIENT_KEY = process.env.NEXT_PUBLIC_TOSS_CLIENT_KEY ?? "";
 
 // 서버 측 플랜 가격 정의 — 클라이언트에서 받은 price는 무시
 const PLAN_PRICES: Record<string, number> = {
-  pro: 29000,
-  team: 69000,
+  pro: 39000,
+  team: 79000,
 };
 
 const PLAN_NAMES: Record<string, string> = {

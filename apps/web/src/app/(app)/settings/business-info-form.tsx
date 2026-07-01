@@ -18,7 +18,7 @@ export function BusinessInfoCard({ businessName, ownerName, plan }: Props) {
   const [error, setError] = useState<string | null>(null);
   const [saved, setSaved] = useState(false);
 
-  const planLabel = plan === "basic" ? "기본 요금제" : plan;
+  const planLabel = plan === "pro" ? "Pro 플랜" : plan === "team" ? "Team 플랜" : "무료 플랜";
 
   function handleSubmit(e: React.FormEvent<HTMLFormElement>) {
     e.preventDefault();

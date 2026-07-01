@@ -4,6 +4,7 @@ import { useState, useTransition } from "react";
 import { useRouter } from "next/navigation";
 import { PlusIcon, CheckCircleIcon, Loader2Icon, MessageSquareIcon, ClockIcon, XCircleIcon } from "lucide-react";
 import { createAsRequest, updateAsStatus, generateInspectionMessage } from "./actions";
+import { ProGate } from "@/components/pro-gate";
 
 type AsRequest = {
   id: string;
@@ -55,6 +56,7 @@ export function WarrantyClient({
   const [msgLoading, setMsgLoading] = useState(false);
   const [inspectionMsg, setInspectionMsg] = useState<string | null>(null);
   const [msgCopied, setMsgCopied] = useState(false);
+  const [showProGate, setShowProGate] = useState(false);
 
   const openCount = requests.filter((r) => r.status !== "closed").length;
 
@@ -83,6 +85,7 @@ export function WarrantyClient({
     setMsgLoading(true); setInspectionMsg(null); setMsgCopied(false);
     const res = await generateInspectionMessage(siteId, customerName ?? "고객", siteName, endDate, businessName);
     setMsgLoading(false);
+    if (res.proRequired) { setShowProGate(true); return; }
     if (res.ok) setInspectionMsg(res.message ?? "");
   }
 
@@ -95,6 +98,11 @@ export function WarrantyClient({
 
   return (
     <div className="space-y-4">
+      <ProGate
+        feature="AI 점검 안내 문자"
+        isOpen={showProGate}
+        onClose={() => setShowProGate(false)}
+      />
       {/* 점검 문자 발송 */}
       <div className="bg-card rounded-2xl border border-border p-4">
         <h3 className="text-base font-bold text-foreground mb-1">무상 점검 안내 문자</h3>

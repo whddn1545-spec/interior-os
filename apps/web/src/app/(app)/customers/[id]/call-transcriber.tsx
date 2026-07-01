@@ -1,8 +1,9 @@
 "use client";
 
 import { useRef, useState, useTransition } from "react";
-import { MicIcon, UploadIcon, CheckCircleIcon, XCircleIcon, Loader2Icon, ChevronDownIcon, ChevronUpIcon } from "lucide-react";
+import { MicIcon, UploadIcon, CheckCircleIcon, XCircleIcon, Loader2Icon, ChevronDownIcon, ChevronUpIcon, SparklesIcon, LockIcon } from "lucide-react";
 import { saveConsultationNote, type ConsultationNote } from "./actions";
+import { ProGate, ProBadge } from "@/components/pro-gate";
 
 interface TranscriptionResult {
   rawTranscript: string;
@@ -15,6 +16,9 @@ interface TranscriptionResult {
 
 interface Props {
   customerId: string;
+  isPro: boolean;
+  monthUsed: number;
+  monthLimit: number;
 }
 
 type Stage = "idle" | "transcribing" | "done" | "error";
@@ -28,7 +32,8 @@ function formatDuration(sec: number | null): string {
   return m > 0 ? `${m}분 ${s}초` : `${s}초`;
 }
 
-export function CallTranscriber({ customerId }: Props) {
+export function CallTranscriber({ customerId, isPro, monthUsed, monthLimit }: Props) {
+  const isLimited = !isPro && monthUsed >= monthLimit;
   const fileRef = useRef<HTMLInputElement>(null);
   const [stage, setStage] = useState<Stage>("idle");
   const [result, setResult] = useState<TranscriptionResult | null>(null);
@@ -99,11 +104,27 @@ export function CallTranscriber({ customerId }: Props) {
       <div className="px-4 py-3 flex items-center gap-2 border-b border-border">
         <MicIcon size={18} className="text-primary shrink-0" />
         <h3 className="text-base font-bold text-foreground">통화 녹음 → AI 상담 문서화</h3>
+        {!isPro && <ProBadge />}
       </div>
 
       <div className="p-4">
+        {/* Pro 한도 초과 시 업그레이드 유도 */}
+        {isLimited && (
+          <ProGate feature="AI 상담 문서화">
+            <div className="border-2 border-dashed border-primary/30 rounded-xl p-6 text-center">
+              <LockIcon size={28} className="mx-auto mb-2 text-primary/50" />
+              <p className="text-base font-bold text-foreground mb-1">이번 달 {monthLimit}건 모두 사용했어요</p>
+              <p className="text-sm text-muted-foreground mb-3">Pro로 업그레이드하면 무제한으로 사용할 수 있어요</p>
+              <div className="flex items-center justify-center gap-1.5 text-primary font-bold">
+                <SparklesIcon size={15} />
+                Pro 업그레이드 보기
+              </div>
+            </div>
+          </ProGate>
+        )}
+
         {/* 업로드 존 */}
-        {stage === "idle" && (
+        {!isLimited && stage === "idle" && (
           <div
             className="border-2 border-dashed border-border rounded-xl p-6 text-center cursor-pointer active:bg-muted transition-colors"
             onClick={() => fileRef.current?.click()}

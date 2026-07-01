@@ -3,90 +3,46 @@
 import { Suspense, useEffect, useState, useTransition } from "react";
 import { useSearchParams } from "next/navigation";
 import Link from "next/link";
-import { ArrowLeftIcon, CheckIcon } from "lucide-react";
+import { ArrowLeftIcon, CheckIcon, SparklesIcon, ZapIcon } from "lucide-react";
 
-const SUPPORT_CONTACT = process.env.NEXT_PUBLIC_SUPPORT_EMAIL ?? "고객센터";
+const FREE_FEATURES = [
+  "견적서 월 5건",
+  "고객 20명",
+  "현장 20개",
+  "PDF 출력",
+  "일정 관리",
+];
 
-const PLANS = [
-  {
-    id: "basic",
-    name: "Basic",
-    price: 0,
-    priceLabel: "무료",
-    desc: "처음 시작하는 사업자",
-    color: "border-border",
-    features: [
-      "견적 월 5건",
-      "고객 50명",
-      "PDF 출력",
-      "일정 관리",
-      "AI 기능 제한",
-    ],
-    limits: ["AI 견적서 생성 월 5회", "사진 관리 기본"],
-  },
-  {
-    id: "pro",
-    name: "Pro",
-    price: 29000,
-    priceLabel: "29,000원/월",
-    desc: "1인 인테리어 사업자",
-    color: "border-blue-500",
-    badge: "추천",
-    features: [
-      "견적 무제한",
-      "고객 무제한",
-      "AI 견적서/계약서 무제한",
-      "SMS 월 200건",
-      "Vision AI 사진 분류",
-      "인스타그램 마케팅",
-      "자재 수량 산출",
-      "무드보드 월 10회",
-    ],
-    limits: [],
-  },
-  {
-    id: "team",
-    name: "Team",
-    price: 69000,
-    priceLabel: "69,000원/월",
-    desc: "팀·소형 업체",
-    color: "border-purple-500",
-    features: [
-      "Pro 모든 기능",
-      "팀원 5명",
-      "SMS 무제한",
-      "무드보드 무제한",
-      "관리자 대시보드",
-      "우선 고객 지원",
-    ],
-    limits: [],
-  },
+const PRO_FEATURES = [
+  "견적·고객·현장 무제한",
+  "AI 통화 녹음 상담 문서화 무제한",
+  "AI 완공 리포트 자동 생성",
+  "AI 점검 안내 문자 작성",
+  "AI 견적서 생성 무제한",
+  "사진 관리 무제한",
+  "무드보드 AI 시각화 무제한",
+  "인스타그램 마케팅 AI",
 ];
 
 function PricingContent() {
   const searchParams = useSearchParams();
-  const [selectedPlan, setSelectedPlan] = useState<string | null>(null);
   const [isPending, startTransition] = useTransition();
   const [error, setError] = useState<string | null>(null);
 
   useEffect(() => {
-    if (searchParams.get("error") === "canceled") {
-      // eslint-disable-next-line react-hooks/set-state-in-effect
-      setError("결제가 취소되었어요. 다시 시도해주세요.");
-    }
+    const e = searchParams.get("error");
+    if (e === "canceled") setError("결제가 취소되었어요. 다시 시도해주세요.");
+    else if (e) setError(decodeURIComponent(e));
   }, [searchParams]);
 
-  function handleSubscribe(planId: string, price: number) {
-    if (price === 0) return;
-    setSelectedPlan(planId);
-
+  function handleSubscribe() {
     startTransition(async () => {
       setError(null);
       try {
         const res = await fetch("/api/payments/checkout", {
           method: "POST",
           headers: { "Content-Type": "application/json" },
-          body: JSON.stringify({ planId, price }),
+          body: JSON.stringify({ planId: "pro" }),
         });
 
         if (!res.ok) {
@@ -98,15 +54,13 @@ function PricingContent() {
           clientKey: string; orderId: string; amount: number; orderName: string;
         };
 
-        // 토스페이먼츠 위젯 로드 (동적 import)
-        // 토스페이먼츠 SDK CDN 동적 로드
         await new Promise<void>((resolve, reject) => {
           if (document.getElementById("tosspay-sdk")) { resolve(); return; }
           const s = document.createElement("script");
           s.id = "tosspay-sdk";
           s.src = "https://js.tosspayments.com/v2/standard";
           s.onload = () => resolve();
-          s.onerror = () => reject(new Error("토스페이먼츠 SDK 로드 실패"));
+          s.onerror = () => reject(new Error("결제 모듈 로드 실패"));
           document.head.appendChild(s);
         });
 
@@ -127,84 +81,119 @@ function PricingContent() {
         });
       } catch (e) {
         setError((e as Error).message);
-        setSelectedPlan(null);
       }
     });
   }
 
   return (
-    <div className="min-h-screen bg-muted pb-24">
-      <header className="sticky top-0 bg-card border-b border-border z-10 px-4 py-3 flex items-center gap-3">
+    <div className="min-h-screen bg-background pb-24">
+      <header className="sticky top-0 bg-card/95 backdrop-blur border-b border-border z-10 px-4 py-3 flex items-center gap-3">
         <Link href="/settings" className="p-3 -ml-3 text-muted-foreground">
           <ArrowLeftIcon size={24} />
         </Link>
         <h1 className="text-xl font-bold text-foreground">요금제</h1>
       </header>
 
-      <div className="max-w-lg mx-auto px-4 pt-6 space-y-4">
-        <div className="text-center mb-6">
-          <p className="text-2xl font-bold text-foreground mb-1">InteriorOS 요금제</p>
-          <p className="text-base text-muted-foreground">부가세 포함 · 언제든 해지 가능</p>
+      <div className="max-w-lg mx-auto px-4 pt-8 space-y-5">
+        {/* 히어로 */}
+        <div className="text-center pb-2">
+          <div className="inline-flex items-center gap-2 bg-primary/10 text-primary px-4 py-1.5 rounded-full text-sm font-bold mb-3">
+            <SparklesIcon size={14} />
+            AI 기능 무제한
+          </div>
+          <h2 className="text-[28px] font-black text-foreground leading-tight">
+            현장에서 바로 쓰는<br />인테리어 AI 도구
+          </h2>
+          <p className="text-base text-muted-foreground mt-2">부가세 포함 · 언제든 해지 가능</p>
         </div>
 
         {error && (
-          <div className="bg-red-50 border border-loss/30 rounded-xl px-4 py-3 text-loss text-base">
+          <div className="bg-loss/10 border border-loss/30 rounded-xl px-4 py-3 text-loss text-base">
             {error}
           </div>
         )}
 
-        {PLANS.map((plan) => (
-          <div
-            key={plan.id}
-            className={`bg-card rounded-2xl border-2 p-5 relative ${plan.color}`}
-          >
-            {plan.badge && (
-              <span className="absolute -top-3 left-4 bg-primary text-white text-sm font-bold px-3 py-1 rounded-full">
-                {plan.badge}
-              </span>
-            )}
-            <div className="flex items-start justify-between mb-4">
-              <div>
-                <h3 className="text-xl font-black text-foreground">{plan.name}</h3>
-                <p className="text-sm text-muted-foreground">{plan.desc}</p>
-              </div>
-              <div className="text-right">
-                <p className="text-2xl font-black text-foreground">{plan.priceLabel}</p>
-              </div>
+        {/* Free 플랜 */}
+        <div className="bg-card rounded-2xl border border-border p-5">
+          <div className="flex items-center justify-between mb-4">
+            <div>
+              <h3 className="text-xl font-black text-foreground">무료</h3>
+              <p className="text-sm text-muted-foreground">시작해보기</p>
             </div>
-
-            <ul className="space-y-2 mb-5">
-              {plan.features.map((f, i) => (
-                <li key={i} className="flex items-start gap-2 text-base text-foreground/90">
-                  <CheckIcon size={18} className="text-green-500 shrink-0 mt-0.5" />
-                  {f}
-                </li>
-              ))}
-            </ul>
-
-            {plan.price === 0 ? (
-              <button
-                className="w-full py-3 border-2 border-border text-muted-foreground rounded-xl text-base font-semibold"
-                disabled
-              >
-                현재 무료 플랜
-              </button>
-            ) : (
-              <button
-                onClick={() => handleSubscribe(plan.id, plan.price)}
-                disabled={isPending && selectedPlan === plan.id}
-                className={`w-full py-4 rounded-xl text-base font-bold text-white disabled:opacity-50 ${
-                  plan.id === "pro" ? "bg-primary" : "bg-purple-600"
-                }`}
-              >
-                {isPending && selectedPlan === plan.id ? "결제 창 열기 중..." : `${plan.priceLabel} 시작하기`}
-              </button>
-            )}
+            <p className="text-2xl font-black text-foreground">₩0</p>
           </div>
-        ))}
+          <ul className="space-y-2.5 mb-5">
+            {FREE_FEATURES.map((f) => (
+              <li key={f} className="flex items-center gap-2 text-base text-foreground/80">
+                <CheckIcon size={16} className="text-muted-foreground shrink-0" />
+                {f}
+              </li>
+            ))}
+          </ul>
+          <div className="w-full py-3 text-center border border-border rounded-xl text-base font-semibold text-muted-foreground">
+            현재 플랜
+          </div>
+        </div>
 
-        <p className="text-center text-base text-muted-foreground/70 mt-4">
-          결제 관련 문의: {SUPPORT_CONTACT}
+        {/* Pro 플랜 */}
+        <div className="bg-card rounded-2xl border-2 border-primary p-5 relative">
+          <span className="absolute -top-3 left-4 bg-primary text-primary-foreground text-sm font-bold px-3 py-1 rounded-full flex items-center gap-1">
+            <ZapIcon size={12} />
+            가장 인기
+          </span>
+          <div className="flex items-start justify-between mb-4">
+            <div>
+              <h3 className="text-xl font-black text-foreground">Pro</h3>
+              <p className="text-sm text-muted-foreground">1인 인테리어 사업자</p>
+            </div>
+            <div className="text-right">
+              <p className="text-[28px] font-black text-foreground leading-none">₩39,000</p>
+              <p className="text-sm text-muted-foreground">/월</p>
+            </div>
+          </div>
+          <ul className="space-y-2.5 mb-6">
+            {PRO_FEATURES.map((f) => (
+              <li key={f} className="flex items-center gap-2.5 text-base text-foreground">
+                <CheckIcon size={16} className="text-profit shrink-0" />
+                {f}
+              </li>
+            ))}
+          </ul>
+          <button
+            onClick={handleSubscribe}
+            disabled={isPending}
+            className="w-full h-14 rounded-xl bg-primary text-primary-foreground text-lg font-bold disabled:opacity-60 flex items-center justify-center gap-2 active:bg-primary/90"
+          >
+            {isPending ? (
+              <span className="flex items-center gap-2">
+                <span className="w-5 h-5 border-2 border-primary-foreground/40 border-t-primary-foreground rounded-full animate-spin" />
+                결제 창 열기 중...
+              </span>
+            ) : (
+              <>
+                <SparklesIcon size={18} />
+                Pro 시작하기
+              </>
+            )}
+          </button>
+          <p className="text-center text-xs text-muted-foreground mt-3">
+            카드 결제 · 언제든 해지 · 환불 3일 이내
+          </p>
+        </div>
+
+        {/* 팀 플랜 CTA */}
+        <div className="bg-muted rounded-2xl p-4 flex items-center justify-between">
+          <div>
+            <p className="text-base font-bold text-foreground">팀·업체용 Team 플랜</p>
+            <p className="text-sm text-muted-foreground">팀원 5명 · SMS 무제한 · ₩79,000/월</p>
+          </div>
+          <Link href="/help" className="text-primary text-sm font-semibold shrink-0">
+            문의하기 →
+          </Link>
+        </div>
+
+        <p className="text-center text-sm text-muted-foreground/60 pb-4">
+          결제 문의: {process.env.NEXT_PUBLIC_SUPPORT_EMAIL ?? "support@interior-os.com"}
         </p>
       </div>
     </div>

@@ -3,6 +3,7 @@
 import { createClient } from "@/lib/supabase/server";
 import { getTenantId } from "@/lib/supabase/get-tenant";
 import { invokeAI } from "@/lib/ai/gateway";
+import { getTenantPlan, isPro } from "@/lib/plan";
 import { revalidatePath } from "next/cache";
 
 export async function createAsRequest(
@@ -59,10 +60,15 @@ export async function generateInspectionMessage(
   siteName: string,
   endDate: string | null,
   businessName: string
-): Promise<{ ok: boolean; message?: string; error?: string }> {
+): Promise<{ ok: boolean; message?: string; error?: string; proRequired?: boolean }> {
   const supabase = await createClient();
   const { data: { user } } = await supabase.auth.getUser();
   if (!user) return { ok: false, error: "로그인이 필요합니다" };
+
+  const plan = await getTenantPlan(supabase, user);
+  if (!isPro(plan)) {
+    return { ok: false, proRequired: true, error: "Pro 플랜 전용 기능입니다" };
+  }
 
   const monthsAgo = endDate
     ? Math.floor((Date.now() - new Date(endDate).getTime()) / (1000 * 60 * 60 * 24 * 30))

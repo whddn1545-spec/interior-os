@@ -1,5 +1,5 @@
 import Link from "next/link";
-import { ChevronRightIcon, TagIcon, MapPinIcon, SmartphoneIcon, CreditCardIcon, LogOutIcon, HardHatIcon, CalculatorIcon, SparklesIcon, HelpCircleIcon } from "lucide-react";
+import { ChevronRightIcon, TagIcon, MapPinIcon, SmartphoneIcon, CreditCardIcon, LogOutIcon, HardHatIcon, CalculatorIcon, SparklesIcon, HelpCircleIcon, ZapIcon, CheckIcon } from "lucide-react";
 import { createClient } from "@/lib/supabase/server";
 import { BusinessInfoCard } from "./business-info-form";
 
@@ -14,7 +14,12 @@ const MENU = [
   { href: "/help", icon: HelpCircleIcon, label: "도움말", desc: "사용법·따라하기 안내 보기" },
 ];
 
-export default async function SettingsPage() {
+export default async function SettingsPage({
+  searchParams,
+}: {
+  searchParams: Promise<{ payment?: string }>;
+}) {
+  const { payment } = await searchParams;
   const supabase = await createClient();
   const { data: { user } } = await supabase.auth.getUser();
 
@@ -30,6 +35,17 @@ export default async function SettingsPage() {
     <div className="px-4 pt-6 pb-24">
       <h1 className="text-2xl font-bold text-foreground mb-6">설정</h1>
 
+      {/* 결제 성공 배너 */}
+      {payment === "success" && (
+        <div className="bg-profit/10 border border-profit/30 rounded-2xl p-4 mb-5 flex items-center gap-3">
+          <CheckIcon size={20} className="text-profit shrink-0" />
+          <div>
+            <p className="text-base font-bold text-foreground">Pro 업그레이드 완료! 🎉</p>
+            <p className="text-sm text-muted-foreground">모든 AI 기능을 무제한으로 사용할 수 있어요</p>
+          </div>
+        </div>
+      )}
+
       {/* 사업자 정보 (누르면 수정) */}
       {t && (
         <BusinessInfoCard
@@ -37,6 +53,37 @@ export default async function SettingsPage() {
           ownerName={t.owner_name}
           plan={t.plan}
         />
+      )}
+
+      {/* Basic 플랜 업그레이드 배너 */}
+      {t?.plan === "basic" && (
+        <Link
+          href="/pricing"
+          className="block bg-primary rounded-2xl p-4 mb-5 text-primary-foreground active:bg-primary/90"
+        >
+          <div className="flex items-center gap-3">
+            <div className="w-10 h-10 bg-primary-foreground/20 rounded-xl flex items-center justify-center shrink-0">
+              <ZapIcon size={20} className="text-primary-foreground" />
+            </div>
+            <div className="flex-1 min-w-0">
+              <p className="text-base font-bold">Pro로 업그레이드</p>
+              <p className="text-sm text-primary-foreground/80">AI 기능 무제한 · ₩39,000/월</p>
+            </div>
+            <div className="shrink-0">
+              <span className="bg-primary-foreground/20 text-primary-foreground text-sm font-bold px-3 py-1.5 rounded-xl">
+                시작 →
+              </span>
+            </div>
+          </div>
+          <div className="flex flex-wrap gap-x-4 gap-y-1 mt-3">
+            {["통화 문서화", "완공 리포트", "점검 문자", "무제한 기능"].map((f) => (
+              <span key={f} className="flex items-center gap-1 text-xs text-primary-foreground/80">
+                <CheckIcon size={10} />
+                {f}
+              </span>
+            ))}
+          </div>
+        </Link>
       )}
 
       {/* 메뉴 */}

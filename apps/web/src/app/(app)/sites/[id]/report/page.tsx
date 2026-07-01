@@ -1,10 +1,11 @@
 import { notFound } from "next/navigation";
 import Link from "next/link";
 import { unstable_cache } from "next/cache";
-import { ArrowLeftIcon, PrinterIcon, ShareIcon } from "lucide-react";
+import { ArrowLeftIcon, PrinterIcon, ShareIcon, SparklesIcon } from "lucide-react";
 import { createClient } from "@/lib/supabase/server";
 import { invokeAI } from "@/lib/ai/gateway";
 import { formatKRW } from "@interior-os/core/pricing";
+import { getTenantPlan, isPro } from "@/lib/plan";
 
 export const dynamic = "force-dynamic";
 
@@ -54,6 +55,7 @@ async function generateNarrative(data: {
 export default async function ReportPage({ params }: { params: Promise<{ id: string }> }) {
   const { id } = await params;
   const supabase = await createClient();
+  const { data: { user } } = await supabase.auth.getUser();
 
   const { data: site } = await supabase
     .from("sites")
@@ -74,6 +76,7 @@ export default async function ReportPage({ params }: { params: Promise<{ id: str
     { data: quotes },
     { data: photos },
     { data: financeEntries },
+    plan,
   ] = await Promise.all([
     supabase.from("tenants").select("business_name, owner_name").eq("id", siteAny.tenant_id).single(),
     supabase
@@ -92,6 +95,7 @@ export default async function ReportPage({ params }: { params: Promise<{ id: str
       .from("finance_entries")
       .select("direction, amount")
       .eq("site_id", id),
+    user ? getTenantPlan(supabase, user) : Promise.resolve("basic" as const),
   ]);
 
   const tenantAny = tenant as unknown as { business_name: string; owner_name: string } | null;
@@ -123,7 +127,8 @@ export default async function ReportPage({ params }: { params: Promise<{ id: str
     if (signed?.signedUrl) photoUrls.push(signed.signedUrl);
   }
 
-  // AI 완공 소감 (사이트별 캐시 — 1시간)
+  // AI 완공 소감 — Pro 플랜만 생성
+  const proUser = isPro(plan);
   const getCachedNarrative = unstable_cache(
     () => generateNarrative({
       siteName: siteAny.name,
@@ -139,7 +144,7 @@ export default async function ReportPage({ params }: { params: Promise<{ id: str
     [`report-narrative-${id}`],
     { revalidate: 3600, tags: [`report-${id}`] }
   );
-  const narrative = await getCachedNarrative();
+  const narrative = proUser ? await getCachedNarrative() : null;
 
   const today = new Date().toLocaleDateString("ko-KR", { year: "numeric", month: "long", day: "numeric" });
 
@@ -273,7 +278,7 @@ export default async function ReportPage({ params }: { params: Promise<{ id: str
         )}
 
         {/* 5. AI 완공 소감 */}
-        {narrative && (
+        {narrative ? (
           <div className="bg-primary/8 rounded-2xl p-5 border border-primary/20 print:border-border print:bg-muted print:rounded-none">
             <h3 className="text-lg font-bold text-primary mb-3 print:text-foreground print:border-b print:border-border print:pb-2">
               시공 소감
@@ -282,6 +287,18 @@ export default async function ReportPage({ params }: { params: Promise<{ id: str
               {narrative}
             </div>
           </div>
+        ) : !proUser && (
+          <Link
+            href="/pricing"
+            className="block bg-primary/8 rounded-2xl p-5 border border-primary/30 text-center print:hidden"
+          >
+            <SparklesIcon size={24} className="mx-auto mb-2 text-primary" />
+            <p className="text-base font-bold text-foreground mb-1">Pro에서 AI 시공 소감 자동 작성</p>
+            <p className="text-sm text-muted-foreground mb-3">GPT-4o가 현장 데이터로 완공 소감을 대신 써드려요</p>
+            <span className="inline-block bg-primary text-primary-foreground text-sm font-bold px-5 py-2.5 rounded-xl">
+              Pro 업그레이드 · ₩39,000/월
+            </span>
+          </Link>
         )}
 
         {/* 6. 푸터 */}

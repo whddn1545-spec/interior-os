@@ -4,12 +4,17 @@ import { ArrowLeftIcon, ChevronRightIcon, FileTextIcon, PhoneIcon, MicIcon } fro
 import { createClient } from "@/lib/supabase/server";
 import { CustomerEditForm } from "./customer-edit-form";
 import { CallTranscriber } from "./call-transcriber";
+import { getTenantPlan, isPro, PLAN_LIMITS } from "@/lib/plan";
 
 export default async function CustomerDetailPage({ params }: { params: Promise<{ id: string }> }) {
   const { id } = await params;
   const supabase = await createClient();
+  const { data: { user } } = await supabase.auth.getUser();
 
-  const [{ data: customer }, { data: sites }, { data: notes }] = await Promise.all([
+  const now = new Date();
+  const startOfMonth = new Date(now.getFullYear(), now.getMonth(), 1).toISOString();
+
+  const [{ data: customer }, { data: sites }, { data: notes }, plan, { count: monthNoteCount }] = await Promise.all([
     supabase.from("customers").select("*").eq("id", id).single(),
     supabase
       .from("sites")
@@ -22,6 +27,12 @@ export default async function CustomerDetailPage({ params }: { params: Promise<{
       .eq("customer_id", id)
       .order("created_at", { ascending: false })
       .limit(10),
+    user ? getTenantPlan(supabase, user) : Promise.resolve("basic" as const),
+    supabase
+      .from("consultation_notes")
+      .select("id", { count: "exact", head: true })
+      .eq("customer_id", id)
+      .gte("created_at", startOfMonth),
   ]);
 
   if (!customer) notFound();
@@ -161,7 +172,12 @@ export default async function CustomerDetailPage({ params }: { params: Promise<{
         )}
 
         {/* AI 통화 문서화 */}
-        <CallTranscriber customerId={id} />
+        <CallTranscriber
+          customerId={id}
+          isPro={isPro(plan)}
+          monthUsed={monthNoteCount ?? 0}
+          monthLimit={PLAN_LIMITS.basic.consultationNotesPerMonth}
+        />
 
         {/* 현장 이력 */}
         <div>
