@@ -75,7 +75,7 @@ export function BusinessInfoCard({ businessName, ownerName, plan }: Props) {
                   <button
                     type="button"
                     onClick={() => setOpen(false)}
-                    className="p-2 text-gray-400"
+                    className="p-3 text-gray-400 active:bg-gray-100 rounded-xl"
                     aria-label="닫기"
                   >
                     <XIcon size={24} />

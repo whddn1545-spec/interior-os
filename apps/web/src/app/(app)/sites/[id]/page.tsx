@@ -10,6 +10,7 @@ import {
   MapPinIcon,
   UserIcon,
   WalletIcon,
+  PhoneIcon,
 } from "lucide-react";
 import { createClient } from "@/lib/supabase/server";
 import { formatKRW } from "@interior-os/core/pricing";
@@ -148,6 +149,16 @@ export default async function SiteHubPage({
             {SITE_STATUS_LABEL[siteAny.status] ?? siteAny.status}
           </p>
         </div>
+        {customer?.phone && (
+          <a
+            href={`tel:${customer.phone}`}
+            className="flex items-center gap-1 bg-green-100 text-green-700 px-3 py-2.5 rounded-xl text-base font-semibold shrink-0"
+            aria-label="고객 전화"
+          >
+            <PhoneIcon size={16} />
+            전화
+          </a>
+        )}
       </header>
 
       {/* 탭 */}
@@ -244,7 +255,7 @@ export default async function SiteHubPage({
             {/* 바로가기 (일정 / 사진) */}
             <div className="grid grid-cols-2 gap-3">
               <Link
-                href={`/schedule/${id}`}
+                href={`/schedule/${id}?from=/sites/${id}`}
                 className="flex flex-col items-center justify-center gap-1 bg-white border border-gray-100 rounded-2xl py-5 active:bg-gray-50"
               >
                 <CalendarIcon size={26} className="text-green-600" />
@@ -268,7 +279,7 @@ export default async function SiteHubPage({
             {/* 받을 돈 요약 */}
             {paymentList.length > 0 && (
               <Link
-                href={`/sites/${id}?tab=finance`}
+                href={from ? `/sites/${id}?tab=finance&from=${encodeURIComponent(from)}` : `/sites/${id}?tab=finance`}
                 className="flex items-center gap-3 bg-white rounded-2xl p-4 border border-gray-100 active:bg-gray-50"
               >
                 <WalletIcon size={24} className="text-blue-600 shrink-0" />

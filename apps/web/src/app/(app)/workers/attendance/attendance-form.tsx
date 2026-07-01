@@ -64,7 +64,7 @@ export function AttendanceForm({
       <button
         type="button"
         onClick={() => setOpen(true)}
-        className="flex flex-1 items-center justify-center rounded-xl bg-blue-600 py-4 text-base font-bold text-white"
+        className="flex flex-1 items-center justify-center rounded-xl bg-blue-600 py-4 text-base font-bold text-white active:bg-blue-700"
       >
         + 오늘 출역 기록
       </button>
@@ -129,7 +129,7 @@ export function AttendanceForm({
               type="button"
               onClick={handleSubmit}
               disabled={isPending || sites.length === 0}
-              className="flex h-14 flex-1 items-center justify-center rounded-xl bg-blue-600 text-lg font-bold text-white disabled:opacity-50"
+              className="flex h-14 flex-1 items-center justify-center rounded-xl bg-blue-600 text-lg font-bold text-white disabled:opacity-50 active:bg-blue-700"
             >
               {isPending ? "기록 중..." : "기록하기"}
             </button>
@@ -139,7 +139,7 @@ export function AttendanceForm({
                 setOpen(false);
                 setFeedback(null);
               }}
-              className="flex h-14 flex-1 items-center justify-center rounded-xl bg-gray-200 text-lg font-bold text-gray-700"
+              className="flex h-14 flex-1 items-center justify-center rounded-xl bg-gray-200 text-lg font-bold text-gray-700 active:bg-gray-300"
             >
               취소
             </button>

@@ -4,6 +4,7 @@ import { useState, useTransition } from "react";
 import { useRouter } from "next/navigation";
 import { ArrowLeftIcon } from "lucide-react";
 import Link from "next/link";
+import { formatPhone } from "@/lib/utils";
 import { toast } from "sonner";
 import { createWorker } from "./actions";
 
@@ -32,14 +33,6 @@ export default function WorkerNewPage() {
   const [phone, setPhone] = useState("");
   const [company, setCompany] = useState("");
   const [selectedTrades, setSelectedTrades] = useState<string[]>([]);
-
-  // 입력하는 동안 010-0000-0000 형태로 자동 정리
-  function formatPhone(value: string) {
-    const digits = value.replace(/\D/g, "").slice(0, 11);
-    if (digits.length < 4) return digits;
-    if (digits.length < 8) return `${digits.slice(0, 3)}-${digits.slice(3)}`;
-    return `${digits.slice(0, 3)}-${digits.slice(3, 7)}-${digits.slice(7)}`;
-  }
 
   function toggleTrade(code: string) {
     setAllowNoTrade(false);
@@ -81,7 +74,7 @@ export default function WorkerNewPage() {
   return (
     <div className="px-4 pt-6 pb-24">
       <div className="flex items-center gap-3 mb-6">
-        <Link href="/workers" className="p-2 -ml-2 text-gray-600">
+        <Link href="/workers" className="p-3 -ml-3 text-gray-600">
           <ArrowLeftIcon size={24} />
         </Link>
         <h1 className="text-2xl font-bold text-gray-900">작업자 추가</h1>

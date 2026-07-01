@@ -115,6 +115,7 @@ export default function MaterialsPage() {
           <div className="flex gap-3 items-center">
             <input
               type="number"
+              inputMode="decimal"
               min={1}
               max={200}
               value={areaPyeong}

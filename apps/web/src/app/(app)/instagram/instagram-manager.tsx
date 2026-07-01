@@ -164,9 +164,9 @@ export function InstagramManager({ recommendedPhotos, existingPosts }: Props) {
                           <button
                             onClick={() => handleConfirm(post.id)}
                             disabled={isPending}
-                            className="flex-1 flex items-center justify-center gap-1 py-2 bg-blue-600 text-white rounded-xl text-sm font-semibold"
+                            className="flex-1 flex items-center justify-center gap-1 py-3 bg-blue-600 text-white rounded-xl text-base font-semibold active:bg-blue-700"
                           >
-                            <CheckIcon size={16} />
+                            <CheckIcon size={18} />
                             확정하기
                           </button>
                         )}
@@ -174,9 +174,9 @@ export function InstagramManager({ recommendedPhotos, existingPosts }: Props) {
                           <button
                             onClick={() => handlePublish(post.id)}
                             disabled={isPending}
-                            className="flex-1 flex items-center justify-center gap-1 py-2 bg-purple-600 text-white rounded-xl text-sm font-semibold"
+                            className="flex-1 flex items-center justify-center gap-1 py-3 bg-purple-600 text-white rounded-xl text-base font-semibold active:bg-purple-700"
                           >
-                            <SendIcon size={16} />
+                            <SendIcon size={18} />
                             인스타 게시
                           </button>
                         )}

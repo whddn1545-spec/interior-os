@@ -1,5 +1,5 @@
 import Link from "next/link";
-import { PlusIcon, PhoneIcon, ChevronRightIcon, BookOpenIcon, SettingsIcon, SearchIcon } from "lucide-react";
+import { PlusIcon, PhoneIcon, ChevronRightIcon, BookOpenIcon, SettingsIcon, SearchIcon, ArrowLeftIcon } from "lucide-react";
 import { createClient } from "@/lib/supabase/server";
 
 export default async function WorkersPage({
@@ -31,6 +31,15 @@ export default async function WorkersPage({
 
   return (
     <div className="px-4 pt-6 pb-24">
+      {/* 홈으로 돌아가기 (더보기 메뉴로 진입 시 길 잃지 않도록) */}
+      <Link
+        href="/"
+        className="mb-3 -ml-2 inline-flex h-14 items-center gap-2 rounded-xl px-2 text-base font-semibold text-gray-600 active:bg-gray-100"
+      >
+        <ArrowLeftIcon size={24} />
+        홈으로
+      </Link>
+
       <div className="flex items-center justify-between mb-4">
         <h1 className="text-2xl font-bold text-gray-900">작업자</h1>
         <div className="flex items-center gap-2">
@@ -127,7 +136,7 @@ export default async function WorkersPage({
               <li key={wAny.id as string}>
                 <Link
                   href={`/workers/${wAny.id as string}`}
-                  className="flex items-center gap-3 bg-white border border-gray-200 rounded-2xl px-4 py-4">
+                  className="flex items-center gap-3 bg-white border border-gray-200 rounded-2xl px-4 py-4 active:bg-gray-50">
                   <div className="w-12 h-12 bg-gray-100 rounded-full flex items-center justify-center text-xl font-bold text-gray-600 shrink-0">
                     {(wAny.name as string).charAt(0)}
                   </div>
@@ -146,7 +155,7 @@ export default async function WorkersPage({
                   <a
                     href={`tel:${wAny.phone as string}`}
                     onClick={(e) => e.stopPropagation()}
-                    className="flex items-center gap-1 bg-green-100 text-green-700 px-3 py-2 rounded-xl text-sm font-medium shrink-0"
+                    className="flex items-center gap-1 bg-green-100 text-green-700 px-3 py-2.5 rounded-xl text-base font-semibold shrink-0"
                   >
                     <PhoneIcon size={16} />
                     전화

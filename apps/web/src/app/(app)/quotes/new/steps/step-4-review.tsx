@@ -197,13 +197,13 @@ export function Step4Review({ siteId, siteName, items, distanceFactor, difficult
       <div className="flex gap-3">
         <button
           onClick={onBack}
-          className="flex-1 py-4 text-lg border border-gray-300 rounded-xl text-gray-600 font-medium"
+          className="flex-1 py-4 text-lg border border-gray-300 rounded-xl text-gray-600 font-medium active:bg-gray-100"
         >
           ◀ 다시 볼게요
         </button>
         <button
           onClick={() => setShowConfirmDialog(true)}
-          className="flex-1 py-4 text-lg bg-blue-600 text-white rounded-xl font-bold"
+          className="flex-1 py-4 text-lg bg-blue-600 text-white rounded-xl font-bold active:bg-blue-700"
         >
           이 금액으로 확정
         </button>
@@ -226,14 +226,14 @@ export function Step4Review({ siteId, siteName, items, distanceFactor, difficult
               <button
                 onClick={() => setShowConfirmDialog(false)}
                 disabled={isPending}
-                className="flex-1 py-4 text-lg border border-gray-300 rounded-xl text-gray-600"
+                className="flex-1 py-4 text-lg border border-gray-300 rounded-xl text-gray-600 active:bg-gray-100"
               >
                 아니요
               </button>
               <button
                 onClick={handleConfirm}
                 disabled={isPending}
-                className="flex-1 py-4 text-lg bg-blue-600 text-white rounded-xl font-bold disabled:opacity-50"
+                className="flex-1 py-4 text-lg bg-blue-600 text-white rounded-xl font-bold disabled:opacity-50 active:bg-blue-700"
               >
                 {isPending ? "확정 중..." : "네, 확정"}
               </button>

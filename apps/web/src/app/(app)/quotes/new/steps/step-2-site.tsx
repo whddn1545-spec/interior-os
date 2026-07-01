@@ -108,6 +108,7 @@ export function Step2Site({ customerId, onNext, onBack }: Props) {
           <div className="relative">
             <input
               type="number"
+              inputMode="decimal"
               value={areaPyeong}
               onChange={(e) => setAreaPyeong(e.target.value)}
               placeholder="33"

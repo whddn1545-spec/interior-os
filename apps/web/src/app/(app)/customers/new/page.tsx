@@ -3,6 +3,7 @@
 import { useState, useTransition } from "react";
 import { useRouter } from "next/navigation";
 import { ArrowLeftIcon } from "lucide-react";
+import { formatPhone } from "@/lib/utils";
 import Link from "next/link";
 import { createCustomer } from "./actions";
 
@@ -21,12 +22,6 @@ export default function CustomerNewPage() {
   const [name, setName] = useState("");
   const [phone, setPhone] = useState("");
 
-  function formatPhone(raw: string) {
-    const digits = raw.replace(/\D/g, "").slice(0, 11);
-    if (digits.length <= 3) return digits;
-    if (digits.length <= 7) return `${digits.slice(0, 3)}-${digits.slice(3)}`;
-    return `${digits.slice(0, 3)}-${digits.slice(3, 7)}-${digits.slice(7)}`;
-  }
   const [address, setAddress] = useState("");
   const [source, setSource] = useState<"referral" | "online" | "repeat" | "etc">("referral");
   const [memo, setMemo] = useState("");
@@ -48,7 +43,7 @@ export default function CustomerNewPage() {
   return (
     <div className="px-4 pt-6 pb-24">
       <div className="flex items-center gap-3 mb-6">
-        <Link href="/customers" className="p-2 -ml-2 text-gray-600">
+        <Link href="/customers" className="p-3 -ml-3 text-gray-600">
           <ArrowLeftIcon size={24} />
         </Link>
         <h1 className="text-2xl font-bold text-gray-900">고객 추가</h1>

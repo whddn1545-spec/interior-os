@@ -48,10 +48,10 @@ export function FinanceEntryItem({ id, direction, amount, paidAt, siteName, memo
           </p>
           <button
             onClick={() => setConfirmDelete(true)}
-            className="p-2 text-gray-300 hover:text-red-400 transition-colors"
+            className="p-3 -mr-1 text-gray-300 active:text-red-400"
             aria-label="삭제"
           >
-            <Trash2Icon size={18} />
+            <Trash2Icon size={20} />
           </button>
         </div>
       </div>
@@ -63,13 +63,13 @@ export function FinanceEntryItem({ id, direction, amount, paidAt, siteName, memo
             <button
               onClick={handleDelete}
               disabled={isPending}
-              className="flex-1 bg-red-500 text-white py-2.5 rounded-xl text-base font-semibold disabled:opacity-50"
+              className="flex-1 bg-red-500 text-white py-2.5 rounded-xl text-base font-semibold disabled:opacity-50 active:bg-red-600"
             >
               {isPending ? "삭제 중..." : "삭제"}
             </button>
             <button
               onClick={() => setConfirmDelete(false)}
-              className="flex-1 border border-gray-300 text-gray-700 py-2.5 rounded-xl text-base font-semibold"
+              className="flex-1 border border-gray-300 text-gray-700 py-2.5 rounded-xl text-base font-semibold active:bg-gray-100"
             >
               취소
             </button>

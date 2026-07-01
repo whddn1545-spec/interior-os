@@ -44,7 +44,7 @@ export default async function ContractDetailPage({ params, searchParams }: { par
   return (
     <div className="min-h-screen bg-gray-50 pb-24">
       <header className="sticky top-0 bg-white border-b border-gray-100 z-10 px-4 py-3 flex items-center gap-3">
-        <Link href={from ?? "/quotes"} className="p-2 -ml-2 text-gray-600">
+        <Link href={from ?? "/quotes"} className="p-3 -ml-3 text-gray-600">
           <ArrowLeftIcon size={24} />
         </Link>
         <div className="flex-1">

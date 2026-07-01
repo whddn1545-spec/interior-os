@@ -64,7 +64,7 @@ export function MissingScheduleBanner({ quotes }: { quotes: MissingScheduleQuote
               type="button"
               onClick={() => handleGenerate(q)}
               disabled={isPending}
-              className="mt-3 flex w-full items-center justify-center rounded-xl bg-amber-600 py-4 text-lg font-bold text-white disabled:opacity-50"
+              className="mt-3 flex w-full items-center justify-center rounded-xl bg-amber-600 py-4 text-lg font-bold text-white disabled:opacity-50 active:bg-amber-700"
             >
               {pendingId === q.quoteId ? "추가하는 중..." : "잔금 일정 만들기"}
             </button>

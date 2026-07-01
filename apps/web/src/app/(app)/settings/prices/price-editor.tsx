@@ -166,16 +166,16 @@ export function PriceEditor({ trades, prices, showSeedButton }: Props) {
                         <div className="flex gap-2 shrink-0">
                           <button
                             onClick={() => startEdit(price)}
-                            className="px-3 py-2 bg-gray-100 text-gray-700 rounded-lg text-sm font-medium"
+                            className="px-4 py-3 bg-gray-100 text-gray-700 rounded-xl text-base font-medium active:bg-gray-200"
                           >
                             수정
                           </button>
                           <button
                             onClick={() => handleDelete(price.id)}
                             disabled={isPending}
-                            className="p-2 bg-red-50 text-red-500 rounded-lg"
+                            className="p-3 bg-red-50 text-red-500 rounded-xl active:bg-red-100"
                           >
-                            <TrashIcon size={16} />
+                            <TrashIcon size={18} />
                           </button>
                         </div>
                       </div>
@@ -198,7 +198,7 @@ export function PriceEditor({ trades, prices, showSeedButton }: Props) {
                 {addingTradeId !== trade.id && (
                   <button
                     onClick={() => startAdd(trade.id)}
-                    className="flex items-center gap-1.5 text-blue-600 font-medium text-base mt-1"
+                    className="flex items-center gap-2 text-blue-600 font-semibold text-base mt-1 py-3 px-1 active:opacity-70"
                   >
                     <PlusIcon size={18} />
                     단가 추가

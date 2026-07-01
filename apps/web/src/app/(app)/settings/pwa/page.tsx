@@ -34,7 +34,7 @@ export default function PwaGuidePage() {
     return (
       <div className="px-4 pt-6 pb-24">
         <div className="flex items-center gap-3 mb-6">
-          <Link href="/settings" className="p-2 -ml-2 text-gray-600">
+          <Link href="/settings" className="p-3 -ml-3 text-gray-600">
             <ArrowLeftIcon size={24} />
           </Link>
           <h1 className="text-2xl font-bold text-gray-900">홈 화면에 추가</h1>
@@ -51,7 +51,7 @@ export default function PwaGuidePage() {
   return (
     <div className="px-4 pt-6 pb-24">
       <div className="flex items-center gap-3 mb-6">
-        <Link href="/settings" className="p-2 -ml-2 text-gray-600">
+        <Link href="/settings" className="p-3 -ml-3 text-gray-600">
           <ArrowLeftIcon size={24} />
         </Link>
         <h1 className="text-2xl font-bold text-gray-900">홈 화면에 추가</h1>

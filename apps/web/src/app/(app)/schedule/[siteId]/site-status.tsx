@@ -76,7 +76,7 @@ export function SiteStatusButton({ siteId, currentStatus, variant = "header" }: 
         <button
           onClick={() => setShowConfirm(true)}
           disabled={isPending}
-          className={`px-3 py-2 rounded-xl text-base font-semibold disabled:opacity-50 ${next.color}`}
+          className={`px-3 py-2.5 rounded-xl text-base font-semibold disabled:opacity-50 active:opacity-80 ${next.color}`}
         >
           {next.label}
         </button>

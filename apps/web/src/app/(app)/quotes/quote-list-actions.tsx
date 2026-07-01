@@ -54,7 +54,7 @@ export function QuoteListActions({ quoteId }: Props) {
           type="button"
           onClick={handleDuplicate}
           disabled={isPending}
-          className="flex flex-1 items-center justify-center gap-1.5 bg-gray-100 text-gray-700 rounded-xl py-4 text-base font-semibold disabled:opacity-50"
+          className="flex flex-1 items-center justify-center gap-1.5 bg-gray-100 text-gray-700 rounded-xl py-4 text-base font-semibold disabled:opacity-50 active:bg-gray-200"
         >
           <CopyIcon size={18} />
           {isPending ? "처리 중..." : "복제"}
@@ -63,7 +63,7 @@ export function QuoteListActions({ quoteId }: Props) {
           type="button"
           onClick={() => setShowDeleteDialog(true)}
           disabled={isPending}
-          className="flex flex-1 items-center justify-center gap-1.5 bg-red-50 text-red-600 border border-red-200 rounded-xl py-4 text-base font-semibold disabled:opacity-50"
+          className="flex flex-1 items-center justify-center gap-1.5 bg-red-50 text-red-600 border border-red-200 rounded-xl py-4 text-base font-semibold disabled:opacity-50 active:bg-red-100"
         >
           <Trash2Icon size={18} />
           삭제
@@ -85,7 +85,7 @@ export function QuoteListActions({ quoteId }: Props) {
                 type="button"
                 onClick={handleDelete}
                 disabled={isPending}
-                className="w-full bg-red-600 text-white rounded-2xl py-5 text-xl font-bold disabled:opacity-50"
+                className="w-full bg-red-600 text-white rounded-2xl py-5 text-xl font-bold disabled:opacity-50 active:bg-red-700"
               >
                 {isPending ? "삭제 중..." : "네, 삭제합니다"}
               </button>
@@ -93,7 +93,7 @@ export function QuoteListActions({ quoteId }: Props) {
                 type="button"
                 onClick={() => setShowDeleteDialog(false)}
                 disabled={isPending}
-                className="w-full bg-gray-100 text-gray-700 rounded-2xl py-4 text-lg font-medium disabled:opacity-50"
+                className="w-full bg-gray-100 text-gray-700 rounded-2xl py-4 text-lg font-medium disabled:opacity-50 active:bg-gray-200"
               >
                 아니요, 그대로 둘게요
               </button>

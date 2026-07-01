@@ -16,7 +16,7 @@ export default async function WorkerDetailPage({ params }: { params: Promise<{ i
       .single(),
     supabase
       .from("assignments")
-      .select("id, start_date, end_date, status, sites(name), trades(name_ko)")
+      .select("id, site_id, start_date, end_date, status, sites(id, name), trades(name_ko)")
       .eq("worker_id", id)
       .order("start_date", { ascending: false })
       .limit(10),
@@ -35,13 +35,13 @@ export default async function WorkerDetailPage({ params }: { params: Promise<{ i
   return (
     <div className="min-h-screen bg-gray-50 pb-24">
       <header className="sticky top-0 bg-white border-b border-gray-100 z-10 px-4 py-3 flex items-center gap-3">
-        <Link href="/workers" className="p-2 -ml-2 text-gray-600">
+        <Link href="/workers" className="p-3 -ml-3 text-gray-600">
           <ArrowLeftIcon size={24} />
         </Link>
         <h1 className="text-xl font-bold text-gray-900 flex-1">{w.name as string}</h1>
         <a
           href={`tel:${w.phone as string}`}
-          className="flex items-center gap-1 bg-green-100 text-green-700 px-3 py-2 rounded-xl text-sm font-medium"
+          className="flex items-center gap-1 bg-green-100 text-green-700 px-3 py-2.5 rounded-xl text-base font-semibold"
         >
           <PhoneIcon size={16} />
           전화
@@ -70,23 +70,25 @@ export default async function WorkerDetailPage({ params }: { params: Promise<{ i
           {assignments && assignments.length > 0 ? (
             <div className="space-y-2">
               {(assignments as unknown as Record<string, unknown>[]).map((a) => {
-                const site = a.sites as { name: string } | null;
+                const site = a.sites as { id: string; name: string } | null;
                 const trade = a.trades as { name_ko: string } | null;
                 return (
-                  <div key={a.id as string} className="bg-white border border-gray-200 rounded-2xl px-4 py-3">
-                    <div className="flex items-center justify-between">
-                      <div>
-                        <p className="text-base font-semibold text-gray-900">{site?.name ?? "-"}</p>
-                        <p className="text-sm text-gray-500">
-                          {trade?.name_ko ?? ""} · {a.start_date as string}
-                          {a.end_date ? ` ~ ${a.end_date as string}` : ""}
-                        </p>
-                      </div>
-                      <span className="text-sm font-medium text-gray-500">
-                        {STATUS_LABEL[a.status as string] ?? a.status as string}
-                      </span>
+                  <Link
+                    key={a.id as string}
+                    href={site ? `/sites/${site.id}?from=/workers/${id}` : `/workers/${id}`}
+                    className="flex items-center justify-between bg-white border border-gray-200 rounded-2xl px-4 py-3 active:bg-gray-50"
+                  >
+                    <div>
+                      <p className="text-base font-semibold text-gray-900">{site?.name ?? "-"}</p>
+                      <p className="text-sm text-gray-500">
+                        {trade?.name_ko ?? ""} · {a.start_date as string}
+                        {a.end_date ? ` ~ ${a.end_date as string}` : ""}
+                      </p>
                     </div>
-                  </div>
+                    <span className="text-sm font-medium text-gray-500">
+                      {STATUS_LABEL[a.status as string] ?? a.status as string}
+                    </span>
+                  </Link>
                 );
               })}
             </div>

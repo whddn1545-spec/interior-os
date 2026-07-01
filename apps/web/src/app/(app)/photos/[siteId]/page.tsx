@@ -60,16 +60,17 @@ export default async function SitePhotosPage({ params, searchParams }: { params:
   }
 
   return (
-    <div className="px-4 pt-6 pb-24">
-      <div className="flex items-center gap-3 mb-4">
-        <Link href={from ?? "/photos"} className="p-2 -ml-2 text-gray-600">
+    <div className="pb-24">
+      <header className="sticky top-0 bg-white border-b border-gray-100 z-10 px-4 py-3 flex items-center gap-3">
+        <Link href={from ?? "/photos"} className="p-3 -ml-3 text-gray-600">
           <ArrowLeftIcon size={24} />
         </Link>
-        <div>
-          <h1 className="text-2xl font-bold text-gray-900">{s.name as string}</h1>
+        <div className="flex-1 min-w-0">
+          <h1 className="text-xl font-bold text-gray-900 truncate">{s.name as string}</h1>
           <p className="text-sm text-gray-500">사진 {photoList.length}장</p>
         </div>
-      </div>
+      </header>
+      <div className="px-4 pt-6">
 
       {/* 분쟁방패 배너 */}
       {photoList.length > 0 && (
@@ -125,6 +126,7 @@ export default async function SitePhotosPage({ params, searchParams }: { params:
           ))}
         </div>
       )}
+      </div>
     </div>
   );
 }

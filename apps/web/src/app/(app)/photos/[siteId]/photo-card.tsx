@@ -68,9 +68,9 @@ export function PhotoCard({ photo, siteId, trades, signedUrl }: PhotoCardProps) 
           )}
           <button
             onClick={() => setOpen(true)}
-            className="absolute bottom-2 right-2 bg-white/90 text-gray-700 p-1.5 rounded-lg shadow"
+            className="absolute bottom-2 right-2 bg-white/90 text-gray-700 p-2.5 rounded-xl shadow active:bg-gray-100"
           >
-            <PencilIcon size={14} />
+            <PencilIcon size={18} />
           </button>
         </div>
         <div className="p-2">
@@ -94,7 +94,7 @@ export function PhotoCard({ photo, siteId, trades, signedUrl }: PhotoCardProps) 
           <div className="bg-white w-full rounded-t-3xl p-6 pb-10">
             <div className="flex items-center justify-between mb-5">
               <h2 className="text-xl font-bold text-gray-900">사진 분류 수정</h2>
-              <button onClick={() => setOpen(false)} className="p-2 text-gray-400">
+              <button onClick={() => setOpen(false)} className="p-3 text-gray-400 active:bg-gray-100 rounded-xl">
                 <XIcon size={24} />
               </button>
             </div>

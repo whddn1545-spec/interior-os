@@ -3,6 +3,7 @@
 import { useState, useRef, useEffect, useTransition } from "react";
 import { SearchIcon, PlusIcon, UserIcon } from "lucide-react";
 import { searchCustomers, createCustomer } from "../actions";
+import { formatPhone } from "@/lib/utils";
 
 interface CustomerOption {
   id: string;
@@ -31,12 +32,6 @@ export function Step1Customer({ onNext, initialCustomer }: Props) {
   // 느린 모바일에서 응답이 순서 뒤바뀌어 도착해도 가장 최근 요청 결과만 반영한다.
   const debounceRef = useRef<ReturnType<typeof setTimeout> | null>(null);
 
-  function formatPhone(raw: string) {
-    const digits = raw.replace(/\D/g, "").slice(0, 11);
-    if (digits.length <= 3) return digits;
-    if (digits.length <= 7) return `${digits.slice(0, 3)}-${digits.slice(3)}`;
-    return `${digits.slice(0, 3)}-${digits.slice(3, 7)}-${digits.slice(7)}`;
-  }
   const requestSeqRef = useRef(0);
 
   // 언마운트 시 대기 중인 타이머 정리
@@ -144,7 +139,7 @@ export function Step1Customer({ onNext, initialCustomer }: Props) {
             <li key={c.id}>
               <button
                 onClick={() => onNext(c)}
-                className="w-full flex items-center gap-4 bg-white border border-gray-200 rounded-xl px-4 py-4 text-left hover:border-blue-400 active:bg-blue-50"
+                className="w-full flex items-center gap-4 bg-white border border-gray-200 rounded-xl px-4 py-4 text-left active:border-blue-400 active:bg-blue-50"
               >
                 <div className="w-12 h-12 bg-blue-100 rounded-full flex items-center justify-center shrink-0">
                   <UserIcon size={22} className="text-blue-600" />
@@ -163,7 +158,7 @@ export function Step1Customer({ onNext, initialCustomer }: Props) {
       {!showNewForm && (
         <button
           onClick={() => setShowNewForm(true)}
-          className="w-full flex items-center gap-3 border-2 border-dashed border-gray-300 rounded-xl px-4 py-4 text-lg text-gray-500 hover:border-blue-400 hover:text-blue-600"
+          className="w-full flex items-center gap-3 border-2 border-dashed border-gray-300 rounded-xl px-4 py-4 text-lg text-gray-500 active:border-blue-400 active:text-blue-600"
         >
           <PlusIcon size={24} />
           새 고객 추가

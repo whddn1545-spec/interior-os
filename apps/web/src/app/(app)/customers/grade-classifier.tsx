@@ -77,7 +77,7 @@ export function GradeClassifier() {
           <div className="bg-white w-full rounded-t-3xl p-6 pb-10 max-h-[90vh] overflow-y-auto">
             <div className="flex items-center justify-between mb-4">
               <h2 className="text-xl font-bold text-gray-900">AI 고객 등급 추천</h2>
-              <button onClick={() => setOpen(false)} className="p-2 text-gray-400">
+              <button onClick={() => setOpen(false)} className="p-3 text-gray-400 active:bg-gray-100 rounded-xl">
                 <XIcon size={24} />
               </button>
             </div>

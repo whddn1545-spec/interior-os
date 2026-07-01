@@ -158,36 +158,40 @@ export function Step3Trades({ distanceFactor, difficultyFactor, defaultAreaPyeon
                 const isSelected = selected.has(key);
                 const entry = selected.get(key);
                 return (
-                  <div key={key} className="px-4 py-3 border-b border-gray-100 last:border-0">
-                    <div className="flex items-center gap-3">
-                      <button
-                        onClick={() => toggle(price)}
-                        className={`w-7 h-7 rounded-md border-2 flex items-center justify-center shrink-0 ${
-                          isSelected ? "border-blue-500 bg-blue-500" : "border-gray-300"
-                        }`}
-                      >
-                        {isSelected && <span className="text-white text-lg leading-none">✓</span>}
-                      </button>
-                      <div className="flex-1">
-                        <p className="text-base font-medium text-gray-800">{price.itemName}</p>
+                  <div key={key} className={`border-b border-gray-100 last:border-0 ${isSelected ? "bg-blue-50" : ""}`}>
+                    {/* 전체 행 탭으로 선택/해제 */}
+                    <button
+                      onClick={() => toggle(price)}
+                      className="w-full flex items-center gap-3 px-4 py-4 text-left active:bg-blue-100"
+                    >
+                      <div className={`w-8 h-8 rounded-lg border-2 flex items-center justify-center shrink-0 ${
+                        isSelected ? "border-blue-500 bg-blue-500" : "border-gray-300"
+                      }`}>
+                        {isSelected && <span className="text-white text-xl font-bold leading-none">✓</span>}
+                      </div>
+                      <div className="flex-1 min-w-0">
+                        <p className="text-base font-semibold text-gray-900">{price.itemName}</p>
                         <p className="text-sm text-gray-400">
                           자재 {(price.materialUnitPrice).toLocaleString()}원/{UNIT_LABEL[price.unit] ?? price.unit}
                           {" · "}일당 {(price.laborDayRate).toLocaleString()}원
                         </p>
                       </div>
-                      {isSelected && (
-                        <div className="flex items-center gap-1">
-                          <input
-                            type="number"
-                            value={entry?.quantity ?? ""}
-                            onChange={(e) => setQty(key, e.target.value)}
-                            min="0"
-                            className="w-20 px-2 py-1.5 text-lg border border-gray-300 rounded-lg text-right focus:outline-none focus:ring-2 focus:ring-blue-500"
-                          />
-                          <span className="text-base text-gray-500">{UNIT_LABEL[price.unit] ?? price.unit}</span>
-                        </div>
-                      )}
-                    </div>
+                    </button>
+                    {/* 수량 입력 — 선택 시 하단에 별도 노출 */}
+                    {isSelected && (
+                      <div className="flex items-center gap-2 px-4 pb-3 pl-16">
+                        <span className="text-base text-gray-600">수량</span>
+                        <input
+                          type="number"
+                          inputMode="decimal"
+                          value={entry?.quantity ?? ""}
+                          onChange={(e) => setQty(key, e.target.value)}
+                          min="0"
+                          className="w-24 px-3 py-3 text-xl font-bold border-2 border-blue-300 rounded-xl text-right focus:outline-none focus:ring-2 focus:ring-blue-500"
+                        />
+                        <span className="text-base font-medium text-gray-700">{UNIT_LABEL[price.unit] ?? price.unit}</span>
+                      </div>
+                    )}
                   </div>
                 );
               })}

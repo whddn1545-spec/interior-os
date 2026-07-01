@@ -89,7 +89,7 @@ export default async function SchedulePage() {
               <Link
                 key={sAny.id as string}
                 href={`/schedule/${sAny.id as string}`}
-                className={`block bg-white border rounded-2xl px-4 py-4 ${
+                className={`block bg-white border rounded-2xl px-4 py-4 active:bg-gray-50 ${
                   isActive ? "border-green-300 shadow-sm" : "border-gray-200"
                 }`}
               >

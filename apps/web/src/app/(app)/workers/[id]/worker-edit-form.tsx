@@ -3,6 +3,7 @@
 import { useState, useTransition } from "react";
 import { useRouter } from "next/navigation";
 import { updateWorker, deactivateWorker } from "./actions";
+import { formatPhone } from "@/lib/utils";
 
 const ALL_TRADES = [
   { code: "wallpaper", label: "도배" },
@@ -36,6 +37,7 @@ export function WorkerEditForm({ worker }: { worker: Worker }) {
   const [showDeactivateConfirm, setShowDeactivateConfirm] = useState(false);
   const [error, setError] = useState<string | null>(null);
   const [rating, setRating] = useState(worker.rating ?? 0);
+  const [phone, setPhone] = useState(worker.phone);
 
   function handleSubmit(e: React.FormEvent<HTMLFormElement>) {
     e.preventDefault();
@@ -82,8 +84,11 @@ export function WorkerEditForm({ worker }: { worker: Worker }) {
         <input
           name="phone"
           type="tel"
+          inputMode="numeric"
           required
-          defaultValue={worker.phone}
+          value={phone}
+          onChange={(e) => setPhone(formatPhone(e.target.value))}
+          placeholder="010-0000-0000"
           className="w-full border border-gray-300 rounded-xl px-4 py-3 text-base"
         />
       </div>
@@ -106,7 +111,7 @@ export function WorkerEditForm({ worker }: { worker: Worker }) {
               key={v}
               type="button"
               onClick={() => setRating(v)}
-              className={`flex-1 py-2 rounded-xl text-base font-bold transition-colors ${
+              className={`flex-1 py-3 rounded-xl text-base font-bold transition-colors active:opacity-70 ${
                 rating === v ? "bg-amber-400 text-white" : "bg-gray-100 text-gray-600"
               }`}
             >

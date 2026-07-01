@@ -124,10 +124,10 @@ export default async function QuotesPage({
             const customerName = site?.customers?.name ?? null;
             const isDraft = (q.status as string) === "draft";
             return (
-              <li key={q.id} className="bg-white border border-gray-200 rounded-2xl px-4 py-4">
+              <li key={q.id} className="bg-white border border-gray-200 rounded-2xl overflow-hidden">
                 <Link
                   href={`/quotes/${q.id}?from=/quotes`}
-                  className="block hover:opacity-80"
+                  className="block px-4 py-4 active:bg-gray-50"
                 >
                   <div className="flex items-start justify-between gap-3">
                     <div className="flex-1 min-w-0">

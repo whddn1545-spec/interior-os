@@ -3,6 +3,7 @@
 import { useState, useTransition } from "react";
 import { XIcon, PencilIcon, CheckIcon } from "lucide-react";
 import { updateCustomer } from "./actions";
+import { formatPhone } from "@/lib/utils";
 
 const SOURCE_OPTIONS = [
   { value: "referral", label: "소개" },
@@ -31,12 +32,6 @@ export function CustomerEditForm({ customerId, initial }: Props) {
   const [memo, setMemo] = useState(initial.memo);
   const [error, setError] = useState<string | null>(null);
 
-  function formatPhone(raw: string) {
-    const digits = raw.replace(/\D/g, "").slice(0, 11);
-    if (digits.length <= 3) return digits;
-    if (digits.length <= 7) return `${digits.slice(0, 3)}-${digits.slice(3)}`;
-    return `${digits.slice(0, 3)}-${digits.slice(3, 7)}-${digits.slice(7)}`;
-  }
   const [isPending, startTransition] = useTransition();
 
   function handleSave() {
@@ -57,7 +52,7 @@ export function CustomerEditForm({ customerId, initial }: Props) {
     <>
       <button
         onClick={() => setOpen(true)}
-        className="flex items-center gap-1 bg-gray-100 text-gray-700 px-3 py-2 rounded-xl text-sm font-medium"
+        className="flex items-center gap-1 bg-gray-100 text-gray-700 px-3 py-2.5 rounded-xl text-base font-semibold"
       >
         <PencilIcon size={15} />
         수정
@@ -68,7 +63,7 @@ export function CustomerEditForm({ customerId, initial }: Props) {
           <div className="bg-white w-full rounded-t-3xl p-6 pb-10 max-h-[90vh] overflow-y-auto">
             <div className="flex items-center justify-between mb-6">
               <h2 className="text-xl font-bold text-gray-900">고객 정보 수정</h2>
-              <button onClick={() => setOpen(false)} className="p-2 text-gray-400">
+              <button onClick={() => setOpen(false)} className="p-3 text-gray-400 active:bg-gray-100 rounded-xl">
                 <XIcon size={24} />
               </button>
             </div>

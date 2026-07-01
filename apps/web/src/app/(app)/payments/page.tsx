@@ -72,7 +72,7 @@ export default async function PaymentsPage({
               className={`flex h-14 min-w-[80px] flex-1 items-center justify-center rounded-xl px-4 text-base font-bold transition-colors ${
                 isActive
                   ? "bg-blue-700 text-white"
-                  : "bg-gray-100 text-gray-700 hover:bg-gray-200"
+                  : "bg-gray-100 text-gray-700 active:bg-gray-200"
               }`}
             >
               {f.label}
@@ -99,7 +99,7 @@ export default async function PaymentsPage({
           </p>
           <a
             href="/quotes"
-            className="mt-4 inline-flex min-h-[56px] items-center justify-center rounded-xl bg-blue-700 px-6 py-4 text-base font-bold text-white hover:bg-blue-800"
+            className="mt-4 inline-flex min-h-[56px] items-center justify-center rounded-xl bg-blue-700 px-6 py-4 text-base font-bold text-white active:bg-blue-800"
           >
             견적 보기 →
           </a>

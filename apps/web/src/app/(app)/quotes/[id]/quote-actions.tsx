@@ -432,28 +432,66 @@ export function QuoteActions({ quoteId, status, siteId, customerId, totalAmount 
             <p className="text-base text-gray-500 mb-6">대금 지급 조건을 설정해주세요</p>
 
             <div className="space-y-4 mb-6">
+              {/* 빠른 선택 프리셋 */}
               <div>
-                <label className="block text-lg font-medium text-gray-700 mb-2">
-                  계약금 <span className="text-blue-600">{depositRate}%</span>
-                  <span className="text-gray-500 text-base ml-2">{formatKRW(totalAmount * depositRate / 100)}</span>
-                </label>
-                <input
-                  type="range" min={0} max={80} step={5} value={depositRate}
-                  onChange={(e) => setDepositRate(Number(e.target.value))}
-                  className="w-full"
-                />
+                <p className="text-sm font-medium text-gray-500 mb-2">자주 쓰는 비율 (계약금/중도금/잔금)</p>
+                <div className="grid grid-cols-2 gap-2">
+                  {[
+                    { d: 30, i: 40, label: "30 / 40 / 30" },
+                    { d: 30, i: 30, label: "30 / 30 / 40" },
+                    { d: 40, i: 30, label: "40 / 30 / 30" },
+                    { d: 50, i: 30, label: "50 / 30 / 20" },
+                  ].map(({ d, i, label }) => {
+                    const isActive = depositRate === d && interimRate === i;
+                    return (
+                      <button
+                        key={label}
+                        type="button"
+                        onClick={() => { setDepositRate(d); setInterimRate(i); }}
+                        className={`py-3 rounded-xl border-2 text-base font-semibold transition-colors ${
+                          isActive ? "border-blue-500 bg-blue-50 text-blue-700" : "border-gray-200 bg-white text-gray-700"
+                        }`}
+                      >
+                        {label}
+                      </button>
+                    );
+                  })}
+                </div>
               </div>
+
+              {/* 직접 조정 */}
               <div>
-                <label className="block text-lg font-medium text-gray-700 mb-2">
-                  중도금 <span className="text-blue-600">{interimRate}%</span>
-                  <span className="text-gray-500 text-base ml-2">{formatKRW(totalAmount * interimRate / 100)}</span>
-                </label>
-                <input
-                  type="range" min={0} max={80} step={5} value={interimRate}
-                  onChange={(e) => setInterimRate(Number(e.target.value))}
-                  className="w-full"
-                />
+                <label className="block text-lg font-medium text-gray-700 mb-3">직접 조정</label>
+                <div className="space-y-3">
+                  {[
+                    { label: "계약금", value: depositRate, set: setDepositRate },
+                    { label: "중도금", value: interimRate, set: setInterimRate },
+                  ].map(({ label, value, set }) => (
+                    <div key={label} className="flex items-center justify-between bg-gray-50 rounded-xl px-4 py-3">
+                      <span className="text-base font-medium text-gray-700 w-16">{label}</span>
+                      <div className="flex items-center gap-3">
+                        <button
+                          type="button"
+                          onClick={() => set(Math.max(0, value - 5))}
+                          className="w-10 h-10 rounded-xl bg-white border border-gray-300 text-xl font-bold text-gray-700 flex items-center justify-center active:bg-gray-100"
+                        >
+                          −
+                        </button>
+                        <span className="text-xl font-black text-blue-700 w-16 text-center">{value}%</span>
+                        <button
+                          type="button"
+                          onClick={() => set(Math.min(80, value + 5))}
+                          className="w-10 h-10 rounded-xl bg-white border border-gray-300 text-xl font-bold text-gray-700 flex items-center justify-center active:bg-gray-100"
+                        >
+                          +
+                        </button>
+                        <span className="text-sm text-gray-500 w-20 text-right">{formatKRW(totalAmount * value / 100)}</span>
+                      </div>
+                    </div>
+                  ))}
+                </div>
               </div>
+
               <div className="bg-gray-50 rounded-xl p-3">
                 <div className="flex justify-between text-base">
                   <span className="text-gray-600">잔금 ({Math.max(0, finalRate)}%)</span>

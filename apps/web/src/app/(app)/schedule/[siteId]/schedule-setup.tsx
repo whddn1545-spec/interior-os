@@ -42,7 +42,7 @@ export function ScheduleSetup({ siteId, confirmedQuoteId }: Props) {
         </p>
         <a
           href="/quotes/new"
-          className="inline-block bg-blue-600 text-white rounded-2xl px-8 py-4 text-lg font-semibold"
+          className="inline-block bg-blue-600 text-white rounded-2xl px-8 py-4 text-lg font-semibold active:bg-blue-700"
         >
           새 견적 만들기
         </a>
@@ -83,7 +83,7 @@ export function ScheduleSetup({ siteId, confirmedQuoteId }: Props) {
       <button
         onClick={handleGenerate}
         disabled={isPending}
-        className="w-full bg-blue-600 text-white rounded-2xl py-5 text-xl font-bold disabled:opacity-50"
+        className="w-full bg-blue-600 text-white rounded-2xl py-5 text-xl font-bold disabled:opacity-50 active:bg-blue-700"
       >
         {isPending ? "일정 생성 중..." : "🚀 일정 자동 생성"}
       </button>

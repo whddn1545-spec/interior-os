@@ -75,14 +75,14 @@ export function PhotoUploader({ siteId }: PhotoUploaderProps) {
         <div className="grid grid-cols-2 gap-3">
           <button
             onClick={() => cameraInputRef.current?.click()}
-            className="flex flex-col items-center gap-2 bg-blue-50 border-2 border-dashed border-blue-300 rounded-2xl py-6 text-blue-600 font-semibold"
+            className="flex flex-col items-center gap-2 bg-blue-50 border-2 border-dashed border-blue-300 rounded-2xl py-6 text-blue-600 font-semibold active:bg-blue-100"
           >
             <CameraIcon size={28} />
             <span className="text-base">카메라 촬영</span>
           </button>
           <button
             onClick={() => galleryInputRef.current?.click()}
-            className="flex flex-col items-center gap-2 bg-gray-50 border-2 border-dashed border-gray-300 rounded-2xl py-6 text-gray-600 font-semibold"
+            className="flex flex-col items-center gap-2 bg-gray-50 border-2 border-dashed border-gray-300 rounded-2xl py-6 text-gray-600 font-semibold active:bg-gray-100"
           >
             <ImageIcon size={28} />
             <span className="text-base">사진첩 선택</span>

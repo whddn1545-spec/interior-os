@@ -70,7 +70,7 @@ export function FactorsEditor({ zones }: { zones: Zone[] }) {
           </div>
           <button
             onClick={() => setAdding(true)}
-            className="text-sm font-medium text-blue-600 px-3 py-2 rounded-xl hover:bg-blue-50"
+            className="text-sm font-medium text-blue-600 px-3 py-2 rounded-xl active:bg-blue-50"
           >
             + 구역 추가
           </button>
@@ -85,13 +85,14 @@ export function FactorsEditor({ zones }: { zones: Zone[] }) {
                 value={newName}
                 onChange={(e) => setNewName(e.target.value)}
                 placeholder="예: 가까운 곳 (30분 이내)"
-                className="flex-1 border border-gray-300 rounded-xl px-3 py-2 text-sm focus:outline-none focus:border-blue-400"
+                className="flex-1 border border-gray-300 rounded-xl px-3 py-3 text-base focus:outline-none focus:border-blue-400"
               />
             </div>
             <div className="flex gap-2 items-center">
               <span className="text-sm text-gray-600">계수:</span>
               <input
                 type="number"
+                inputMode="decimal"
                 value={newFactor}
                 onChange={(e) => setNewFactor(e.target.value)}
                 step="0.05"
@@ -102,7 +103,7 @@ export function FactorsEditor({ zones }: { zones: Zone[] }) {
               <button
                 onClick={addZone}
                 disabled={isPending}
-                className="bg-blue-600 text-white px-4 py-2 rounded-xl text-sm font-medium disabled:opacity-50"
+                className="bg-blue-600 text-white px-4 py-3 rounded-xl text-base font-semibold disabled:opacity-50 active:bg-blue-700"
               >
                 추가
               </button>
@@ -126,6 +127,7 @@ export function FactorsEditor({ zones }: { zones: Zone[] }) {
                     <div className="flex items-center gap-2">
                       <input
                         type="number"
+                        inputMode="decimal"
                         value={editFactor}
                         onChange={(e) => setEditFactor(e.target.value)}
                         step="0.01"
@@ -136,13 +138,13 @@ export function FactorsEditor({ zones }: { zones: Zone[] }) {
                       <button
                         onClick={() => saveZone(zone.id, zone.name)}
                         disabled={isPending}
-                        className="bg-blue-600 text-white px-4 py-2 rounded-xl text-sm font-medium disabled:opacity-50"
+                        className="bg-blue-600 text-white px-4 py-3 rounded-xl text-base font-semibold disabled:opacity-50 active:bg-blue-700"
                       >
                         저장
                       </button>
                       <button
                         onClick={() => setEditing(null)}
-                        className="text-gray-500 px-3 py-2 rounded-xl text-sm"
+                        className="text-gray-500 px-3 py-3 rounded-xl text-base active:bg-gray-100"
                       >
                         취소
                       </button>
@@ -156,7 +158,7 @@ export function FactorsEditor({ zones }: { zones: Zone[] }) {
                     </div>
                     <button
                       onClick={() => startEdit(zone)}
-                      className="text-blue-600 text-sm font-medium px-3 py-2 rounded-xl hover:bg-blue-50"
+                      className="text-blue-600 text-sm font-medium px-3 py-2 rounded-xl active:bg-blue-50"
                     >
                       수정
                     </button>

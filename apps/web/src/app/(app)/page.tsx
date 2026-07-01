@@ -215,7 +215,7 @@ export default async function HomePage() {
                     target="_blank"
                     rel="noopener noreferrer"
                     onClick={(e) => e.stopPropagation()}
-                    className="shrink-0 ml-3 bg-gray-100 text-gray-700 text-base font-semibold rounded-xl px-3 py-2"
+                    className="shrink-0 ml-3 bg-gray-100 text-gray-700 text-base font-semibold rounded-xl px-3 py-2.5 active:bg-gray-200"
                   >
                     지도 보기
                   </a>
@@ -241,18 +241,19 @@ export default async function HomePage() {
                   <p className="text-2xl font-bold text-gray-900">{site?.name ?? "현장"}</p>
                   <p className="text-base text-gray-500 mb-3">{task.title}</p>
                   {worker && (
-                    <a
-                      href={worker.phone ? `tel:${worker.phone}` : undefined}
-                      className="flex items-center gap-2 text-lg text-gray-700 mb-3"
-                    >
+                    <div className="flex items-center gap-2 mb-3">
                       <span className="text-2xl">👷</span>
-                      <span className="font-semibold">{worker.name}</span>
+                      <span className="text-lg font-semibold text-gray-800">{worker.name}</span>
                       {worker.phone && (
-                        <span className="text-blue-600 font-semibold underline">
-                          {worker.phone}
-                        </span>
+                        <a
+                          href={`tel:${worker.phone}`}
+                          onClick={(e) => e.stopPropagation()}
+                          className="ml-auto flex items-center gap-1 bg-green-100 text-green-700 px-3 py-1.5 rounded-xl text-base font-semibold shrink-0"
+                        >
+                          📞 전화
+                        </a>
                       )}
-                    </a>
+                    </div>
                   )}
                   <a
                     href={mapHref(site?.address, site?.name ?? task.title)}

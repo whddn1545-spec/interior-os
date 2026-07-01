@@ -29,7 +29,7 @@ export default async function WorkerAttendancePage() {
   return (
     <div className="min-h-screen bg-gray-50 pb-24">
       <header className="sticky top-0 bg-white border-b border-gray-100 z-10 px-4 py-3 flex items-center gap-3">
-        <Link href="/workers" className="p-2 -ml-2 text-gray-600">
+        <Link href="/workers" className="p-3 -ml-3 text-gray-600">
           <ArrowLeftIcon size={24} />
         </Link>
         <div className="flex-1 min-w-0">
@@ -56,7 +56,7 @@ export default async function WorkerAttendancePage() {
           <p className="text-base">작업자를 추가하면 출역을 기록할 수 있어요</p>
           <Link
             href="/workers/new"
-            className="mt-4 inline-flex min-h-[56px] items-center justify-center rounded-xl bg-orange-600 px-6 py-4 text-base font-bold text-white hover:bg-orange-700"
+            className="mt-4 inline-flex min-h-[56px] items-center justify-center rounded-xl bg-orange-600 px-6 py-4 text-base font-bold text-white active:bg-orange-700"
           >
             작업자 추가하기 →
           </Link>

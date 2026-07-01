@@ -29,7 +29,7 @@ export function BottomNav() {
             <li key={href} className="flex-1">
               <Link
                 href={href}
-                className={`relative flex flex-col items-center gap-1 py-3 transition-colors ${
+                className={`relative flex flex-col items-center gap-1 py-3 transition-colors active:opacity-70 ${
                   active ? "text-blue-600" : "text-gray-400"
                 }`}
               >

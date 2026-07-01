@@ -188,7 +188,7 @@ export function PriceDocumentUploader({ trades }: { trades: Trade[] }) {
       <div className="bg-indigo-50 border border-indigo-200 rounded-2xl p-4 mb-4">
         <div className="flex items-center justify-between mb-1">
           <h3 className="text-lg font-bold text-indigo-900">AI 추출 결과</h3>
-          <button onClick={reset} className="p-1.5 text-gray-500">
+          <button onClick={reset} className="p-2 text-gray-500 active:bg-gray-100 rounded-lg">
             <XIcon size={20} />
           </button>
         </div>
@@ -241,7 +241,7 @@ export function PriceDocumentUploader({ trades }: { trades: Trade[] }) {
                   <select
                     value={item.tradeId}
                     onChange={(e) => updateItem(idx, "tradeId", e.target.value)}
-                    className="w-full text-sm font-semibold text-gray-800 bg-gray-50 border border-gray-200 rounded-lg px-3 py-2 appearance-none pr-8"
+                    className="w-full text-base font-semibold text-gray-800 bg-gray-50 border border-gray-200 rounded-xl px-3 py-3 appearance-none pr-8"
                   >
                     {trades.map((t) => (
                       <option key={t.id} value={t.id}>{t.name_ko}</option>
@@ -260,7 +260,7 @@ export function PriceDocumentUploader({ trades }: { trades: Trade[] }) {
                     inputMode="numeric"
                     value={item.materialUnitPrice}
                     onChange={(e) => updateItem(idx, "materialUnitPrice", Number(e.target.value))}
-                    className="w-full text-sm border border-gray-200 rounded-lg px-2 py-2 bg-white focus:outline-none focus:border-indigo-400"
+                    className="w-full text-base border border-gray-200 rounded-xl px-2 py-3 bg-white focus:outline-none focus:border-indigo-400"
                   />
                 </div>
                 <div>
@@ -270,7 +270,7 @@ export function PriceDocumentUploader({ trades }: { trades: Trade[] }) {
                     inputMode="numeric"
                     value={item.laborDayRate}
                     onChange={(e) => updateItem(idx, "laborDayRate", Number(e.target.value))}
-                    className="w-full text-sm border border-gray-200 rounded-lg px-2 py-2 bg-white focus:outline-none focus:border-indigo-400"
+                    className="w-full text-base border border-gray-200 rounded-xl px-2 py-3 bg-white focus:outline-none focus:border-indigo-400"
                   />
                 </div>
                 <div>
@@ -281,7 +281,7 @@ export function PriceDocumentUploader({ trades }: { trades: Trade[] }) {
                     inputMode="decimal"
                     value={item.defaultDaysPerUnit}
                     onChange={(e) => updateItem(idx, "defaultDaysPerUnit", Number(e.target.value))}
-                    className="w-full text-sm border border-gray-200 rounded-lg px-2 py-2 bg-white focus:outline-none focus:border-indigo-400"
+                    className="w-full text-base border border-gray-200 rounded-xl px-2 py-3 bg-white focus:outline-none focus:border-indigo-400"
                   />
                 </div>
               </div>

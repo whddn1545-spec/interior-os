@@ -82,14 +82,14 @@ export function WorkerCard({
       }`}
     >
       {/* 이름 / 전화 */}
-      <div className="flex items-baseline justify-between">
+      <div className="flex items-center justify-between gap-2">
         <p className="text-xl font-bold text-gray-900">{worker.name}</p>
         {worker.phone && (
           <a
             href={`tel:${worker.phone}`}
-            className="text-sm font-medium text-blue-600"
+            className="flex items-center gap-1 bg-green-100 text-green-700 px-3 py-1.5 rounded-xl text-sm font-semibold shrink-0"
           >
-            {worker.phone}
+            📞 전화
           </a>
         )}
       </div>
@@ -160,8 +160,8 @@ export function WorkerCard({
             잔액 {worker.balance.toLocaleString("ko-KR")}원이 정산 완료돼요.
           </p>
           <div className="flex gap-2">
-            <button onClick={() => setShowConfirm(false)} className="flex-1 py-3 rounded-xl border border-gray-300 text-gray-700 text-base font-medium">아니요</button>
-            <button onClick={confirmMarkPaid} disabled={isPending} className="flex-1 py-3 rounded-xl bg-green-600 text-white text-base font-bold disabled:opacity-50">네, 완료</button>
+            <button onClick={() => setShowConfirm(false)} className="flex-1 py-3 rounded-xl border border-gray-300 text-gray-700 text-base font-medium active:bg-gray-100">아니요</button>
+            <button onClick={confirmMarkPaid} disabled={isPending} className="flex-1 py-3 rounded-xl bg-green-600 text-white text-base font-bold disabled:opacity-50 active:bg-green-700">네, 완료</button>
           </div>
         </div>
       )}
@@ -172,14 +172,14 @@ export function WorkerCard({
           type="button"
           onClick={handleMarkPaid}
           disabled={isPending || worker.balance <= 0}
-          className="flex flex-1 items-center justify-center rounded-xl bg-green-600 py-3.5 text-base font-bold text-white disabled:opacity-40"
+          className="flex flex-1 items-center justify-center rounded-xl bg-green-600 py-3.5 text-base font-bold text-white disabled:opacity-40 active:bg-green-700"
         >
           {isPending ? "처리 중..." : "정산 완료"}
         </button>
         <button
           type="button"
           onClick={handleCopyStatement}
-          className="flex flex-1 items-center justify-center rounded-xl bg-blue-600 py-3.5 text-base font-bold text-white"
+          className="flex flex-1 items-center justify-center rounded-xl bg-blue-600 py-3.5 text-base font-bold text-white active:bg-blue-700"
         >
           정산 명세 문자
         </button>

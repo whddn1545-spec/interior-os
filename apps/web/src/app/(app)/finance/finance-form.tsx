@@ -77,7 +77,7 @@ export function FinanceForm({ sites }: { sites: Site[] }) {
     <>
       <button
         onClick={() => setOpen(true)}
-        className="flex items-center gap-1.5 bg-blue-600 text-white px-4 py-2.5 rounded-xl text-base font-semibold"
+        className="flex items-center gap-1.5 bg-blue-600 text-white px-4 py-2.5 rounded-xl text-base font-semibold active:bg-blue-700"
       >
         <PlusIcon size={18} />
         입출금 추가
@@ -209,7 +209,7 @@ export function FinanceForm({ sites }: { sites: Site[] }) {
               <button
                 type="submit"
                 disabled={isPending}
-                className="w-full bg-blue-600 text-white py-4 rounded-xl text-lg font-bold disabled:opacity-50"
+                className="w-full bg-blue-600 text-white py-4 rounded-xl text-lg font-bold disabled:opacity-50 active:bg-blue-700"
               >
                 {isPending ? "저장 중..." : "저장하기"}
               </button>

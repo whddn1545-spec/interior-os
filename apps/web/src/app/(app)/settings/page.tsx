@@ -45,7 +45,7 @@ export default async function SettingsPage() {
           <Link
             key={href}
             href={href}
-            className={`flex items-center gap-4 px-4 py-4 hover:bg-gray-50 ${
+            className={`flex items-center gap-4 px-4 py-4 active:bg-gray-50 ${
               i < MENU.length - 1 ? "border-b border-gray-100" : ""
             }`}
           >
@@ -66,7 +66,7 @@ export default async function SettingsPage() {
         <form action="/api/auth/signout" method="POST">
           <button
             type="submit"
-            className="w-full flex items-center gap-4 px-4 py-4 text-red-600 hover:bg-red-50"
+            className="w-full flex items-center gap-4 px-4 py-4 text-red-600 active:bg-red-50"
           >
             <div className="w-10 h-10 bg-red-50 rounded-xl flex items-center justify-center shrink-0">
               <LogOutIcon size={20} className="text-red-500" />

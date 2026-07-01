@@ -124,9 +124,9 @@ export function PaymentCard({ schedule }: { schedule: PaymentBoardItem }) {
       {/* 고객 / 현장 */}
       <Link
         href={`/sites/${schedule.siteId}?from=/payments`}
-        className="block group"
+        className="block group -mx-1 px-1 py-2 rounded-xl active:bg-blue-50"
       >
-        <p className="text-xl font-bold text-gray-900 group-active:text-blue-700">{schedule.customerName}</p>
+        <p className="text-xl font-bold text-gray-900">{schedule.customerName}</p>
         <p className="text-base text-blue-600 underline decoration-blue-200">{schedule.siteName} →</p>
       </Link>
 

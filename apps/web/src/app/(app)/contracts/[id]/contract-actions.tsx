@@ -92,7 +92,7 @@ export function ContractActions({ contractId, status, siteId }: Props) {
       {status === "draft" && (
         <button
           onClick={() => setShowConfirm(true)}
-          className="flex items-center justify-center gap-2 w-full bg-blue-600 text-white rounded-2xl py-5 text-xl font-bold"
+          className="flex items-center justify-center gap-2 w-full bg-blue-600 text-white rounded-2xl py-5 text-xl font-bold active:bg-blue-700"
         >
           <CheckCircleIcon size={22} />
           계약서 확정하기
@@ -103,7 +103,7 @@ export function ContractActions({ contractId, status, siteId }: Props) {
         <>
           <button
             onClick={() => router.push(`/schedule/${siteId}?from=/contracts/${contractId}`)}
-            className="flex items-center justify-center gap-2 w-full bg-blue-600 text-white rounded-2xl py-5 text-xl font-bold"
+            className="flex items-center justify-center gap-2 w-full bg-blue-600 text-white rounded-2xl py-5 text-xl font-bold active:bg-blue-700"
           >
             <CalendarPlusIcon size={22} />
             공사 일정 만들기
@@ -111,7 +111,7 @@ export function ContractActions({ contractId, status, siteId }: Props) {
           <button
             onClick={handleGeneratePdf}
             disabled={generatingPdf}
-            className="flex items-center justify-center gap-2 w-full bg-white text-blue-700 border-2 border-blue-600 rounded-2xl py-4 text-lg font-semibold disabled:opacity-50"
+            className="flex items-center justify-center gap-2 w-full bg-white text-blue-700 border-2 border-blue-600 rounded-2xl py-4 text-lg font-semibold disabled:opacity-50 active:bg-blue-50"
           >
             <FileTextIcon size={20} />
             {generatingPdf ? "PDF 생성 중..." : "계약서 PDF 보기"}
@@ -119,7 +119,7 @@ export function ContractActions({ contractId, status, siteId }: Props) {
           {pdfUrl && (
             <button
               onClick={handleShare}
-              className="flex items-center justify-center gap-2 w-full bg-blue-50 text-blue-700 border border-blue-200 rounded-2xl py-4 text-lg font-semibold"
+              className="flex items-center justify-center gap-2 w-full bg-blue-50 text-blue-700 border border-blue-200 rounded-2xl py-4 text-lg font-semibold active:bg-blue-100"
             >
               <Share2Icon size={20} />
               PDF 링크 공유하기
@@ -127,7 +127,7 @@ export function ContractActions({ contractId, status, siteId }: Props) {
           )}
           <button
             onClick={() => router.push(`/messages?contractId=${contractId}&siteId=${siteId}`)}
-            className="flex items-center justify-center gap-2 w-full bg-green-600 text-white rounded-2xl py-4 text-lg font-semibold"
+            className="flex items-center justify-center gap-2 w-full bg-green-600 text-white rounded-2xl py-4 text-lg font-semibold active:bg-green-700"
           >
             <MessageSquareIcon size={20} />
             고객에게 문자 보내기
@@ -146,13 +146,13 @@ export function ContractActions({ contractId, status, siteId }: Props) {
               <button
                 onClick={handleConfirm}
                 disabled={isPending}
-                className="w-full bg-blue-600 text-white rounded-2xl py-5 text-xl font-bold disabled:opacity-50"
+                className="w-full bg-blue-600 text-white rounded-2xl py-5 text-xl font-bold disabled:opacity-50 active:bg-blue-700"
               >
                 {isPending ? "처리 중..." : "네, 확정합니다"}
               </button>
               <button
                 onClick={() => setShowConfirm(false)}
-                className="w-full bg-gray-100 text-gray-700 rounded-2xl py-4 text-lg font-medium"
+                className="w-full bg-gray-100 text-gray-700 rounded-2xl py-4 text-lg font-medium active:bg-gray-200"
               >
                 취소
               </button>

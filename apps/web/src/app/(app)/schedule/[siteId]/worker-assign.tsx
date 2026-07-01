@@ -74,9 +74,9 @@ export function WorkerAssign({ siteId, tasks, workers, assignments }: Props) {
     <>
       <button
         onClick={() => setOpen(true)}
-        className="flex items-center gap-1.5 bg-green-600 text-white px-3 py-2 rounded-xl text-sm font-semibold"
+        className="flex items-center gap-1.5 bg-green-600 text-white px-3 py-2.5 rounded-xl text-base font-semibold active:bg-green-700"
       >
-        <UserPlusIcon size={16} />
+        <UserPlusIcon size={18} />
         작업자 배정
       </button>
 
@@ -85,7 +85,7 @@ export function WorkerAssign({ siteId, tasks, workers, assignments }: Props) {
           <div className="bg-white w-full rounded-t-3xl p-6 pb-10 max-h-[90vh] overflow-y-auto">
             <div className="flex items-center justify-between mb-6">
               <h2 className="text-xl font-bold text-gray-900">작업자 배정</h2>
-              <button onClick={() => setOpen(false)} className="p-2 text-gray-400">
+              <button onClick={() => setOpen(false)} className="p-3 text-gray-400 active:bg-gray-100 rounded-xl">
                 <XIcon size={24} />
               </button>
             </div>
@@ -96,21 +96,33 @@ export function WorkerAssign({ siteId, tasks, workers, assignments }: Props) {
                 <h3 className="text-base font-semibold text-gray-700 mb-2">현재 배정</h3>
                 <div className="space-y-2">
                   {assignments.map((a, i) => (
-                    <div key={i} className="flex items-center justify-between bg-green-50 border border-green-200 rounded-xl px-4 py-2.5">
-                      <div>
-                        <p className="text-base font-semibold text-gray-900">{a.workerName}</p>
-                        <p className="text-sm text-gray-500">{a.workerPhone}</p>
+                    <div key={i} className="bg-green-50 border border-green-200 rounded-xl px-4 py-3">
+                      <div className="flex items-center justify-between gap-2">
+                        <div>
+                          <p className="text-base font-semibold text-gray-900">{a.workerName}</p>
+                          <p className="text-sm text-green-700 font-medium">{STATUS_LABEL[a.status] ?? a.status}</p>
+                        </div>
+                        <div className="flex items-center gap-2 shrink-0">
+                          {a.workerPhone && (
+                            <a
+                              href={`tel:${a.workerPhone}`}
+                              className="flex items-center gap-1 bg-white border border-green-300 text-green-700 px-3 py-2.5 rounded-xl text-base font-semibold active:bg-green-50"
+                            >
+                              📞 전화
+                            </a>
+                          )}
+                          <a
+                            href={`/messages?workerId=${a.workerId}`}
+                            className="flex items-center gap-1 bg-green-600 text-white px-3 py-2.5 rounded-xl text-base font-semibold active:bg-green-700"
+                          >
+                            <MessageSquareIcon size={15} />
+                            문자
+                          </a>
+                        </div>
                       </div>
-                      <div className="flex items-center gap-2">
-                        <span className="text-sm font-medium text-green-700">{STATUS_LABEL[a.status] ?? a.status}</span>
-                        <a
-                          href={`/messages?workerId=${a.workerId}`}
-                          className="flex items-center gap-1 bg-green-600 text-white px-2 py-1 rounded-lg text-xs font-medium"
-                        >
-                          <MessageSquareIcon size={14} />
-                          문자
-                        </a>
-                      </div>
+                      {a.workerPhone && (
+                        <p className="text-sm text-gray-500 mt-1">{a.workerPhone}</p>
+                      )}
                     </div>
                   ))}
                 </div>

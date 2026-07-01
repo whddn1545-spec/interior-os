@@ -199,7 +199,7 @@ export default async function CustomersPage({
               <li key={cAny.id as string}>
                 <Link
                   href={`/customers/${cAny.id as string}`}
-                  className="flex items-center gap-3 bg-white border border-gray-200 rounded-2xl px-4 py-4"
+                  className="flex items-center gap-3 bg-white border border-gray-200 rounded-2xl px-4 py-4 active:bg-gray-50"
                 >
                   <div className="w-12 h-12 bg-blue-100 rounded-full flex items-center justify-center text-xl font-bold text-blue-700 shrink-0">
                     {(cAny.name as string).charAt(0)}
@@ -216,7 +216,7 @@ export default async function CustomersPage({
                   <a
                     href={`tel:${cAny.phone as string}`}
                     onClick={(e) => e.stopPropagation()}
-                    className="flex items-center gap-1 bg-green-100 text-green-700 px-3 py-2 rounded-xl text-sm font-medium shrink-0"
+                    className="flex items-center gap-1 bg-green-100 text-green-700 px-3 py-2.5 rounded-xl text-base font-semibold shrink-0"
                   >
                     <PhoneIcon size={16} />
                     전화

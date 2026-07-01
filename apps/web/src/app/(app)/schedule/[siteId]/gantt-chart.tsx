@@ -89,7 +89,7 @@ export function GanttChart({ tasks, siteId, siteName }: Props) {
         <a
           href={`/api/pdf/schedule/${siteId}`}
           target="_blank"
-          className="bg-gray-100 text-gray-700 rounded-xl px-4 py-2 text-sm font-medium"
+          className="bg-gray-100 text-gray-700 rounded-xl px-4 py-2.5 text-base font-semibold active:bg-gray-200"
         >
           📄 PDF
         </a>
@@ -132,15 +132,15 @@ export function GanttChart({ tasks, siteId, siteName }: Props) {
             const isActive = task.status === "active";
 
             return (
-              <div key={task.id} className="flex items-center mb-2">
+              <div key={task.id} className="flex items-center mb-3">
                 {/* 작업명 */}
                 <div className="w-[120px] shrink-0 pr-2">
-                  <p className="text-sm font-medium text-gray-800 truncate">{task.title}</p>
-                  <p className="text-xs text-gray-500">{task.durationDays}일</p>
+                  <p className="text-base font-semibold text-gray-800 truncate">{task.title}</p>
+                  <p className="text-sm text-gray-500">{task.durationDays}일</p>
                 </div>
 
                 {/* 바 */}
-                <div className="relative flex-1" style={{ height: 32 }}>
+                <div className="relative flex-1" style={{ height: 44 }}>
                   {/* 배경 그리드 */}
                   <div className="absolute inset-0 flex">
                     {Array.from({ length: totalDays }).map((_, i) => (
@@ -155,10 +155,10 @@ export function GanttChart({ tasks, siteId, siteName }: Props) {
                   {/* 간트 바 */}
                   <button
                     onClick={() => setSelectedTask(selectedTask?.id === task.id ? null : task)}
-                    className={`absolute top-1 h-6 rounded-md text-white text-xs font-medium flex items-center justify-center shadow-sm ${barColor} ${isDone ? "opacity-60" : ""} ${isActive ? "ring-2 ring-offset-1 ring-blue-400" : ""}`}
+                    className={`absolute top-1 h-9 rounded-lg text-white text-sm font-semibold flex items-center justify-center shadow-sm active:opacity-80 ${barColor} ${isDone ? "opacity-60" : ""} ${isActive ? "ring-2 ring-offset-1 ring-blue-400" : ""}`}
                     style={{
                       left: left * dayWidth,
-                      width: Math.max(width * dayWidth - 2, 20),
+                      width: Math.max(width * dayWidth - 2, 24),
                     }}
                   >
                     {width > 2 ? STATUS_LABEL[task.status] ?? "" : ""}

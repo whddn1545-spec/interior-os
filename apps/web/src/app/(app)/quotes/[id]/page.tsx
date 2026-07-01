@@ -70,7 +70,7 @@ export default async function QuoteDetailPage({ params, searchParams }: { params
   return (
     <div className="min-h-screen bg-gray-50 pb-24">
       <header className="sticky top-0 bg-white border-b border-gray-100 z-10 px-4 py-3 flex items-center gap-3">
-        <Link href={from ?? "/quotes"} className="p-2 -ml-2 text-gray-600">
+        <Link href={from ?? "/quotes"} className="p-3 -ml-3 text-gray-600">
           <ArrowLeftIcon size={24} />
         </Link>
         <div className="flex-1">
@@ -248,7 +248,7 @@ export default async function QuoteDetailPage({ params, searchParams }: { params
                 href={quoteAny.customer_pdf_url as string}
                 target="_blank"
                 rel="noopener noreferrer"
-                className="flex items-center gap-2 w-full bg-blue-600 text-white rounded-xl px-4 py-3 text-base font-semibold"
+                className="flex items-center gap-2 w-full bg-blue-600 text-white rounded-xl px-4 py-3 text-base font-semibold active:bg-blue-700"
               >
                 <FileTextIcon size={20} />
                 고객용 견적서 열기
@@ -258,7 +258,7 @@ export default async function QuoteDetailPage({ params, searchParams }: { params
                   href={quoteAny.internal_pdf_url as string}
                   target="_blank"
                   rel="noopener noreferrer"
-                  className="flex items-center gap-2 w-full bg-gray-100 text-gray-700 rounded-xl px-4 py-3 text-base font-semibold"
+                  className="flex items-center gap-2 w-full bg-gray-100 text-gray-700 rounded-xl px-4 py-3 text-base font-semibold active:bg-gray-200"
                 >
                   <FileTextIcon size={20} />
                   내부용(원가 포함) 열기

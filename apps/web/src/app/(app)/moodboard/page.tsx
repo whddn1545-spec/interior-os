@@ -138,7 +138,7 @@ export default function MoodboardPage() {
         <div className="grid grid-cols-2 gap-1 bg-gray-100 rounded-2xl p-1">
           <button
             onClick={() => setMode("photo")}
-            className={`py-3 rounded-xl text-base font-bold transition-colors ${
+            className={`py-3 rounded-xl text-base font-bold transition-colors active:opacity-70 ${
               mode === "photo" ? "bg-white text-blue-600 shadow-sm" : "text-gray-500"
             }`}
           >
@@ -146,7 +146,7 @@ export default function MoodboardPage() {
           </button>
           <button
             onClick={() => setMode("text")}
-            className={`py-3 rounded-xl text-base font-bold transition-colors ${
+            className={`py-3 rounded-xl text-base font-bold transition-colors active:opacity-70 ${
               mode === "text" ? "bg-white text-blue-600 shadow-sm" : "text-gray-500"
             }`}
           >
@@ -176,9 +176,9 @@ export default function MoodboardPage() {
                   <img src={beforePreview} alt="공사 전" className="w-full max-h-64 object-cover" />
                   <button
                     onClick={clearBeforeImage}
-                    className="absolute top-2 right-2 bg-black/50 text-white rounded-full p-1.5"
+                    className="absolute top-2 right-2 bg-black/50 text-white rounded-full p-2.5 active:bg-black/70"
                   >
-                    <XIcon size={18} />
+                    <XIcon size={20} />
                   </button>
                   <div className="absolute bottom-2 left-2 bg-black/50 text-white text-xs font-semibold px-2 py-1 rounded-full">
                     공사 전
@@ -188,14 +188,14 @@ export default function MoodboardPage() {
                 <div className="grid grid-cols-2 gap-3">
                   <button
                     onClick={() => cameraRef.current?.click()}
-                    className="flex flex-col items-center gap-2 bg-blue-50 border-2 border-dashed border-blue-300 rounded-2xl py-6 text-blue-600 font-semibold"
+                    className="flex flex-col items-center gap-2 bg-blue-50 border-2 border-dashed border-blue-300 rounded-2xl py-6 text-blue-600 font-semibold active:bg-blue-100"
                   >
                     <CameraIcon size={28} />
                     <span className="text-base">현장 촬영</span>
                   </button>
                   <button
                     onClick={() => galleryRef.current?.click()}
-                    className="flex flex-col items-center gap-2 bg-gray-50 border-2 border-dashed border-gray-300 rounded-2xl py-6 text-gray-600 font-semibold"
+                    className="flex flex-col items-center gap-2 bg-gray-50 border-2 border-dashed border-gray-300 rounded-2xl py-6 text-gray-600 font-semibold active:bg-gray-100"
                   >
                     <ImageIcon size={28} />
                     <span className="text-base">앨범 / 도면</span>
@@ -210,7 +210,7 @@ export default function MoodboardPage() {
               <div className="grid grid-cols-3 gap-2">
                 {SPACE_TYPES.map(({ value, label }) => (
                   <button key={value} onClick={() => setSpaceType(value)}
-                    className={`py-4 rounded-xl text-base font-semibold transition-colors ${spaceType === value ? "bg-blue-600 text-white" : "bg-white border border-gray-300 text-gray-700"}`}>
+                    className={`py-4 rounded-xl text-base font-semibold transition-colors active:opacity-80 ${spaceType === value ? "bg-blue-600 text-white" : "bg-white border border-gray-300 text-gray-700"}`}>
                     {label}
                   </button>
                 ))}
@@ -248,7 +248,7 @@ export default function MoodboardPage() {
               <div className="grid grid-cols-3 gap-2">
                 {STYLES.map(({ value, label }) => (
                   <button key={value} onClick={() => setStyle(value)}
-                    className={`py-4 rounded-xl text-base font-semibold transition-colors ${style === value ? "bg-blue-600 text-white" : "bg-white border border-gray-300 text-gray-700"}`}>
+                    className={`py-4 rounded-xl text-base font-semibold transition-colors active:opacity-80 ${style === value ? "bg-blue-600 text-white" : "bg-white border border-gray-300 text-gray-700"}`}>
                     {label}
                   </button>
                 ))}
@@ -263,7 +263,7 @@ export default function MoodboardPage() {
               <div className="grid grid-cols-2 gap-2">
                 {COLOR_OPTIONS.map(({ value, label }) => (
                   <button key={value} onClick={() => toggleColor(value)}
-                    className={`py-4 rounded-xl text-base font-semibold transition-colors ${selectedColors.includes(value) ? "bg-blue-600 text-white" : "bg-white border border-gray-300 text-gray-700"}`}>
+                    className={`py-4 rounded-xl text-base font-semibold transition-colors active:opacity-80 ${selectedColors.includes(value) ? "bg-blue-600 text-white" : "bg-white border border-gray-300 text-gray-700"}`}>
                     {label}
                   </button>
                 ))}
@@ -321,7 +321,7 @@ export default function MoodboardPage() {
               <div className="grid grid-cols-3 gap-2">
                 {SPACE_TYPES.map(({ value, label }) => (
                   <button key={value} onClick={() => setSpaceType(value)}
-                    className={`py-3 rounded-xl text-base font-semibold transition-colors ${spaceType === value ? "bg-purple-600 text-white" : "bg-white border border-gray-300 text-gray-700"}`}>
+                    className={`py-3 rounded-xl text-base font-semibold transition-colors active:opacity-80 ${spaceType === value ? "bg-purple-600 text-white" : "bg-white border border-gray-300 text-gray-700"}`}>
                     {label}
                   </button>
                 ))}
@@ -333,7 +333,7 @@ export default function MoodboardPage() {
               <div className="grid grid-cols-3 gap-2">
                 {STYLES.map(({ value, label }) => (
                   <button key={value} onClick={() => setStyle(value)}
-                    className={`py-4 rounded-xl text-base font-semibold transition-colors ${style === value ? "bg-purple-600 text-white" : "bg-white border border-gray-300 text-gray-700"}`}>
+                    className={`py-4 rounded-xl text-base font-semibold transition-colors active:opacity-80 ${style === value ? "bg-purple-600 text-white" : "bg-white border border-gray-300 text-gray-700"}`}>
                     {label}
                   </button>
                 ))}
@@ -347,7 +347,7 @@ export default function MoodboardPage() {
               <div className="grid grid-cols-2 gap-2">
                 {COLOR_OPTIONS.map(({ value, label }) => (
                   <button key={value} onClick={() => toggleColor(value)}
-                    className={`py-4 rounded-xl text-base font-semibold transition-colors ${selectedColors.includes(value) ? "bg-purple-600 text-white" : "bg-white border border-gray-300 text-gray-700"}`}>
+                    className={`py-4 rounded-xl text-base font-semibold transition-colors active:opacity-80 ${selectedColors.includes(value) ? "bg-purple-600 text-white" : "bg-white border border-gray-300 text-gray-700"}`}>
                     {label}
                   </button>
                 ))}
@@ -359,7 +359,7 @@ export default function MoodboardPage() {
               <div className="grid grid-cols-4 gap-2">
                 {AREA_OPTIONS.map(({ value, label }) => (
                   <button key={value} onClick={() => setArea(value)}
-                    className={`py-3 rounded-xl text-base font-semibold transition-colors ${area === value ? "bg-purple-600 text-white" : "bg-white border border-gray-300 text-gray-700"}`}>
+                    className={`py-3 rounded-xl text-base font-semibold transition-colors active:opacity-80 ${area === value ? "bg-purple-600 text-white" : "bg-white border border-gray-300 text-gray-700"}`}>
                     {label}
                   </button>
                 ))}

@@ -1,6 +1,6 @@
 import { notFound } from "next/navigation";
 import Link from "next/link";
-import { ArrowLeftIcon, ChevronRightIcon, MessageSquareIcon, FileTextIcon } from "lucide-react";
+import { ArrowLeftIcon, ChevronRightIcon, MessageSquareIcon, FileTextIcon, PhoneIcon } from "lucide-react";
 import { createClient } from "@/lib/supabase/server";
 import { CustomerEditForm } from "./customer-edit-form";
 
@@ -32,11 +32,18 @@ export default async function CustomerDetailPage({ params }: { params: Promise<{
   return (
     <div className="min-h-screen bg-gray-50 pb-24">
       <header className="sticky top-0 bg-white border-b border-gray-100 z-10 px-4 py-3 flex items-center gap-3">
-        <Link href="/customers" className="p-2 -ml-2 text-gray-600">
+        <Link href="/customers" className="p-3 -ml-3 text-gray-600">
           <ArrowLeftIcon size={24} />
         </Link>
         <h1 className="text-xl font-bold text-gray-900 flex-1">{c.name as string}</h1>
         <div className="flex items-center gap-2">
+          <a
+            href={`tel:${c.phone as string}`}
+            className="flex items-center gap-1 bg-green-100 text-green-700 px-3 py-2.5 rounded-xl text-base font-semibold shrink-0"
+          >
+            <PhoneIcon size={16} />
+            전화
+          </a>
           <CustomerEditForm
             customerId={id}
             initial={{
@@ -49,17 +56,10 @@ export default async function CustomerDetailPage({ params }: { params: Promise<{
           />
           <Link
             href={`/quotes/new?customerId=${id}`}
-            className="flex items-center gap-1 bg-blue-100 text-blue-700 px-3 py-2 rounded-xl text-sm font-medium"
+            className="flex items-center gap-1 bg-blue-100 text-blue-700 px-3 py-2.5 rounded-xl text-base font-semibold"
           >
             <FileTextIcon size={16} />
             새 견적
-          </Link>
-          <Link
-            href={`/messages?customerId=${id}`}
-            className="flex items-center gap-1 bg-green-100 text-green-700 px-3 py-2 rounded-xl text-sm font-medium"
-          >
-            <MessageSquareIcon size={16} />
-            문자
           </Link>
         </div>
       </header>
@@ -124,7 +124,7 @@ export default async function CustomerDetailPage({ params }: { params: Promise<{
                   <Link
                     key={sAny.id as string}
                     href={`/sites/${sAny.id as string}?from=/customers/${id}`}
-                    className="flex items-center gap-3 bg-white border border-gray-200 rounded-2xl px-4 py-4"
+                    className="flex items-center gap-3 bg-white border border-gray-200 rounded-2xl px-4 py-4 active:bg-gray-50"
                   >
                     <div className="flex-1 min-w-0">
                       <p className="text-base font-semibold text-gray-900 truncate">{sAny.name as string}</p>
