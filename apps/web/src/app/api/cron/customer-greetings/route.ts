@@ -1,5 +1,5 @@
 import { NextRequest, NextResponse } from "next/server";
-import { createClient } from "@/lib/supabase/server";
+import { createAdminClient } from "@/lib/supabase/admin";
 import { sendSms } from "@/lib/sms/nhn";
 
 const SEASON_MESSAGES: Record<string, string> = {
@@ -30,7 +30,7 @@ export async function GET(req: NextRequest) {
     return NextResponse.json({ skipped: true, reason: "not a greeting day", date: todayKey });
   }
 
-  const supabase = await createClient();
+  const supabase = createAdminClient();
   const { data: tenants } = await supabase.from("tenants").select("id, business_name");
   if (!tenants || tenants.length === 0) return NextResponse.json({ sent: 0 });
 
