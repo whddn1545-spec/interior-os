@@ -11,13 +11,24 @@ const geistMono = Geist_Mono({
 });
 
 export const metadata: Metadata = {
-  title: "InteriorOS",
-  description: "인테리어 자영업 AI 업무 자동화",
+  metadataBase: new URL(process.env.NEXT_PUBLIC_SITE_URL || "https://interior-os.vercel.app"),
+  title: {
+    template: "%s | InteriorOS",
+    default: "InteriorOS - 인테리어 자영업 AI 업무 자동화",
+  },
+  description: "견적서 작성부터 시공 관리, 고객 문자 발송까지. 인테리어 사장님을 위한 AI 비서",
   manifest: "/manifest.webmanifest",
   appleWebApp: {
     capable: true,
     statusBarStyle: "default",
     title: "InteriorOS",
+  },
+  openGraph: {
+    title: "InteriorOS",
+    description: "인테리어 자영업 AI 업무 자동화",
+    siteName: "InteriorOS",
+    locale: "ko_KR",
+    type: "website",
   },
 };
 
