@@ -16,6 +16,7 @@ import {
 } from "lucide-react";
 import { createClient } from "@/lib/supabase/server";
 import { formatKRW } from "@interior-os/core/pricing";
+import { SiteEditForm } from "./site-edit-form";
 
 export const dynamic = "force-dynamic";
 
@@ -162,21 +163,32 @@ export default async function SiteHubPage({
   return (
     <div className="min-h-screen bg-gray-50 pb-24">
       {/* 헤더 */}
-      <header className="sticky top-0 bg-white border-b border-gray-100 z-10 px-4 py-3 flex items-center gap-3">
-        <Link href={from ?? "/customers"} className="p-3 -ml-3 text-gray-600" aria-label="뒤로 가기">
+      <header className="sticky top-0 bg-card/95 backdrop-blur border-b border-border z-10 px-4 py-3 flex items-center gap-2">
+        <Link href={from ?? "/sites"} className="p-3 -ml-3 text-muted-foreground" aria-label="뒤로 가기">
           <ArrowLeftIcon size={24} />
         </Link>
         <div className="flex-1 min-w-0">
-          <h1 className="text-xl font-bold text-gray-900 truncate">{siteAny.name}</h1>
-          <p className="text-base text-gray-500 truncate">
+          <h1 className="text-xl font-bold text-foreground truncate">{siteAny.name}</h1>
+          <p className="text-base text-muted-foreground truncate">
             {customer?.name ? `${customer.name} · ` : ""}
             {SITE_STATUS_LABEL[siteAny.status] ?? siteAny.status}
           </p>
         </div>
+        <SiteEditForm
+          siteId={id}
+          initial={{
+            name: siteAny.name,
+            address: siteAny.address ?? "",
+            status: siteAny.status as "lead" | "quoting" | "contracted" | "in_progress" | "done" | "canceled",
+            start_date: siteAny.start_date,
+            end_date: siteAny.end_date,
+            area_pyeong: null,
+          }}
+        />
         {customer?.phone && (
           <a
             href={`tel:${customer.phone}`}
-            className="flex items-center gap-1 bg-green-100 text-profit px-3 py-2.5 rounded-xl text-base font-semibold shrink-0"
+            className="flex items-center gap-1 bg-profit/12 text-profit px-3 py-2.5 rounded-xl text-base font-semibold shrink-0"
             aria-label="고객 전화"
           >
             <PhoneIcon size={16} />
