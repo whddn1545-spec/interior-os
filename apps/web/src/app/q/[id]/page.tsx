@@ -44,9 +44,16 @@ export async function generateMetadata({ params }: { params: Promise<{ id: strin
   const q = quote as unknown as { sites: { name: string; customers: { name: string } | null } | null } | null;
   const siteName = q?.sites?.name ?? "견적서";
   const customerName = q?.sites?.customers?.name ?? "";
+  const title = `${siteName} 견적서${customerName ? ` — ${customerName}님` : ""}`;
+  const description = "인테리어 리모델링 견적서를 확인해주세요";
   return {
-    title: `${siteName} 견적서${customerName ? ` — ${customerName}님` : ""}`,
-    description: "인테리어 리모델링 견적서를 확인해주세요",
+    title,
+    description,
+    openGraph: {
+      title,
+      description,
+      type: "website",
+    },
   };
 }
 

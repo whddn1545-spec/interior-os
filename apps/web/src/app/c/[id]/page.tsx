@@ -50,9 +50,16 @@ export async function generateMetadata({ params }: { params: Promise<{ id: strin
   const d = data as unknown as { quotes: { sites: { name: string; customers: { name: string } | null } | null } | null } | null;
   const siteName = d?.quotes?.sites?.name ?? "계약서";
   const customerName = d?.quotes?.sites?.customers?.name ?? "";
+  const title = `${siteName} 계약서${customerName ? ` — ${customerName}님` : ""}`;
+  const description = "인테리어 공사 계약서를 확인하고 서명해주세요";
   return {
-    title: `${siteName} 계약서${customerName ? ` — ${customerName}님` : ""}`,
-    description: "인테리어 공사 계약서를 확인하고 서명해주세요",
+    title,
+    description,
+    openGraph: {
+      title,
+      description,
+      type: "website",
+    },
   };
 }
 
