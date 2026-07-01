@@ -29,7 +29,10 @@ export function PwaInstallBanner() {
     if (localStorage.getItem(DISMISSED_KEY)) return;
     const p = detectPlatform();
     if (!p) return;
+    
+    // eslint-disable-next-line react-hooks/set-state-in-effect
     setPlatform(p);
+    
     setDismissed(false);
 
     // Android: beforeinstallprompt 이벤트 저장

@@ -3,7 +3,7 @@
 import { useState, useTransition, useEffect } from "react";
 import { getTradePrices } from "../actions";
 import type { QuoteItemDraft } from "../actions";
-import { calcQuote, formatKRW, DISTANCE_FACTORS, DIFFICULTY_FACTORS } from "@interior-os/core/pricing";
+import { calcQuote, formatKRW } from "@interior-os/core/pricing";
 
 interface TradePrice {
   tradeId: string;

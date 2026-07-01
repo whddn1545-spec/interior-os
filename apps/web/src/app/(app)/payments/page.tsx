@@ -1,5 +1,5 @@
 import Link from "next/link";
-import { ArrowLeftIcon, ShieldAlertIcon, CheckCircleIcon } from "lucide-react";
+import { ArrowLeftIcon } from "lucide-react";
 import { getPaymentBoard, getQuotesMissingSchedule } from "./actions";
 import { PaymentCard } from "./payment-card";
 import { MissingScheduleBanner } from "./missing-schedule-banner";

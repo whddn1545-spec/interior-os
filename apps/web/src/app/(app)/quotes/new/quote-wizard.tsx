@@ -86,13 +86,7 @@ export function QuoteWizard({ initialCustomer }: QuoteWizardProps) {
     setHydrated(true);
   }, [initialCustomer]);
 
-  function updateState(patch: Partial<WizardState>) {
-    setState((prev) => {
-      const next = { ...prev, ...patch };
-      saveDraft(step, next);
-      return next;
-    });
-  }
+
 
   function goToStep(next: Step, patch?: Partial<WizardState>) {
     setState((prev) => {

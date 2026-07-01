@@ -123,7 +123,6 @@ export default function MoodboardPage() {
     });
   }
 
-  const resultUrl = mode === "text" ? textImageUrl : visualUrl;
 
   return (
     <div className="min-h-screen bg-muted pb-24">

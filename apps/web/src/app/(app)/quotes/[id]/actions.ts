@@ -286,7 +286,6 @@ export async function generateQuotePdf(
 
   if (!quote) return { ok: false, error: "견적을 찾을 수 없습니다" };
   const quoteAny = quote as unknown as Record<string, unknown>;
-  const site = quoteAny.sites as { name: string; address: string; customers: { name: string } | null } | null;
 
   // 현재는 PDF URL placeholder (AI 생성기 연동 후 실제 PDF 반환)
   const pdfColumn = audience === "customer" ? "customer_pdf_url" : "internal_pdf_url";
@@ -296,7 +295,7 @@ export async function generateQuotePdf(
   // PDF 생성 Route Handler 내부 호출 (쿠키 포워딩으로 인증 유지)
   const cookieStore = await cookies();
   const cookieHeader = cookieStore.getAll().map(c => `${c.name}=${c.value}`).join("; ");
-  const appUrl = process.env.NEXT_PUBLIC_APP_URL ?? `http://localhost:${process.env.PORT ?? 3000}`;
+  const appUrl = process.env.NEXT_PUBLIC_SITE_URL ?? process.env.NEXT_PUBLIC_APP_URL ?? `http://localhost:${process.env.PORT ?? 3000}`;
   const response = await fetch(`${appUrl}/api/pdf/quote`, {
     method: "POST",
     headers: {

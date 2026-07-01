@@ -1,5 +1,5 @@
 import Link from "next/link";
-import { PlusIcon, UploadIcon, ChevronRightIcon, SearchIcon, ArrowLeftIcon, PhoneIcon } from "lucide-react";
+import { PlusIcon, UploadIcon, SearchIcon, ArrowLeftIcon, PhoneIcon } from "lucide-react";
 import { Fab } from "@/components/fab";
 import { createClient } from "@/lib/supabase/server";
 import { GradeClassifier } from "./grade-classifier";

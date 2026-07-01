@@ -1,7 +1,7 @@
 "use server";
 
 import { createClient } from "@/lib/supabase/server";
-import { getTenantId } from "@/lib/supabase/get-tenant";
+import { getTenantId } from "@/lib/supabase/get-tenant"; // eslint-disable-line @typescript-eslint/no-unused-vars
 import { revalidatePath } from "next/cache";
 
 type CustomerGrade = "vip" | "gold" | "normal" | "dormant";
@@ -21,7 +21,6 @@ export async function aiClassifyGrades(): Promise<{
   const { data: { user } } = await supabase.auth.getUser();
   if (!user) return { ok: false, error: "로그인이 필요합니다" };
 
-  const tenantId = await getTenantId(supabase, user);
 
   // 고객 + 공사 이력 조회
   const { data: customers } = await supabase

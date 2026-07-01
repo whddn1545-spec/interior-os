@@ -25,10 +25,7 @@ const STATUS_DOT: Record<string, string> = {
   done:        "bg-primary/50",
   canceled:    "bg-loss",
 };
-const STATUS_LABEL: Record<string, string> = {
-  lead: "상담중", quoting: "견적중", contracted: "계약",
-  in_progress: "공사중", done: "완료", canceled: "취소",
-};
+
 
 function formatDateShort(s: string | null): string {
   if (!s) return "";

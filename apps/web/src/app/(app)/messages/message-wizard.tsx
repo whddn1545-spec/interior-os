@@ -82,14 +82,12 @@ export function MessageWizard({ workers, sites, customers }: Props) {
       setSelectedWorkerId(workerId);
       setMessageType("worker_notify");
     } else if (customerId) {
-      // eslint-disable-next-line react-hooks/set-state-in-effect
       setTargetType("customer");
       setSelectedCustomerId(customerId);
       setMessageType("customer_progress");
     }
 
     if (siteId) {
-      // eslint-disable-next-line react-hooks/set-state-in-effect
       setSelectedSiteId(siteId);
       // 대상까지 정해졌다면 바로 현장 단계로 진입
       if (workerId || customerId) setStep("site");

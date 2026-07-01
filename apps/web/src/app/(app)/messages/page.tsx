@@ -1,7 +1,7 @@
 import { Suspense } from "react";
 import { createClient } from "@/lib/supabase/server";
 import Link from "next/link";
-import { MessageSquareIcon, ChevronRightIcon, ArrowLeftIcon } from "lucide-react";
+import { MessageSquareIcon, ArrowLeftIcon } from "lucide-react";
 import { MessageWizard } from "./message-wizard";
 import { getWorkers, getActiveSites, getCustomers } from "./actions";
 

@@ -2,7 +2,7 @@
 
 import { useState, useRef, useTransition } from "react";
 import Link from "next/link";
-import { ArrowLeftIcon, UploadIcon, CheckCircleIcon, AlertCircleIcon } from "lucide-react";
+import { ArrowLeftIcon, UploadIcon, CheckCircleIcon } from "lucide-react";
 import { previewCsvImport, importCustomers, type ImportPreview, type ImportRow } from "./actions";
 import { useRouter } from "next/navigation";
 
@@ -42,7 +42,7 @@ export default function CustomerImportPage() {
 
     const rows: ImportRow[] = preview.rows
       .filter((r) => !(skipDuplicates && r.isDuplicate))
-      .map(({ isDuplicate: _, ...row }) => row);
+      .map((row) => { const r = { ...row }; delete r.isDuplicate; return r; });
 
     startTransition(async () => {
       setError(null);
