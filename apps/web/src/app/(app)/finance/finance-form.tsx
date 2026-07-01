@@ -1,9 +1,11 @@
 "use client";
 
 import { useState, useTransition } from "react";
-import { PlusIcon, XIcon } from "lucide-react";
+import { PlusIcon, XIcon, WifiOffIcon } from "lucide-react";
 import { toast } from "sonner";
 import { addFinanceEntry } from "./actions";
+import { enqueue } from "@/lib/offline/outbox";
+import { useOutbox } from "@/lib/offline/use-outbox";
 
 interface Site { id: string; name: string }
 
@@ -20,6 +22,7 @@ export function FinanceForm({ sites }: { sites: Site[] }) {
   const [addedCount, setAddedCount] = useState(0);
   const [category, setCategory] = useState("customer_payment");
   const [direction, setDirection] = useState<"in" | "out">("in");
+  const { isOnline, refreshCount } = useOutbox();
 
   const today = new Date().toISOString().split("T")[0];
 
@@ -48,13 +51,33 @@ export function FinanceForm({ sites }: { sites: Site[] }) {
 
     startTransition(async () => {
       setError(null);
+
+      // 오프라인이면 아웃박스에 저장 (낙관적 UI)
+      if (!isOnline) {
+        await enqueue("addFinanceEntry", {
+          direction: formData.get("direction") as string,
+          category: formData.get("category") as string,
+          amount: Number(formData.get("amount")),
+          paidAt: formData.get("paid_at") as string,
+          memo: formData.get("memo") as string | null,
+          siteId: formData.get("site_id") as string | null,
+        });
+        await refreshCount();
+        setAddedCount((c) => c + 1);
+        toast("오프라인 저장됨 — 연결 시 자동 동기화돼요", { icon: "📥" });
+        form.reset();
+        setCategory("customer_payment");
+        setDirection("in");
+        const dateInput = form.elements.namedItem("paid_at") as HTMLInputElement | null;
+        if (dateInput) dateInput.value = today;
+        return;
+      }
+
       const result = await addFinanceEntry(formData);
       if (result.ok) {
-        // 자동으로 닫지 않고 토스트로 알린 뒤 연속 입력 유도
         setAddedCount((c) => c + 1);
         toast.success("저장됐어요! 이어서 입력할 수 있어요.");
         form.reset();
-        // 폼 초기화 후 항목/종류 기본값도 함께 되돌린다.
         setCategory("customer_payment");
         setDirection("in");
         const dateInput = form.elements.namedItem("paid_at") as HTMLInputElement | null;
@@ -209,9 +232,18 @@ export function FinanceForm({ sites }: { sites: Site[] }) {
               <button
                 type="submit"
                 disabled={isPending}
-                className="w-full bg-primary text-white py-4 rounded-xl text-lg font-bold disabled:opacity-50 active:bg-primary/90"
+                className={`w-full py-4 rounded-xl text-lg font-bold disabled:opacity-50 active:opacity-80 flex items-center justify-center gap-2 ${
+                  isOnline
+                    ? "bg-primary text-primary-foreground"
+                    : "bg-foreground text-background"
+                }`}
               >
-                {isPending ? "저장 중..." : "저장하기"}
+                {isPending ? "저장 중..." : isOnline ? "저장하기" : (
+                  <>
+                    <WifiOffIcon size={18} />
+                    오프라인 저장
+                  </>
+                )}
               </button>
             </form>
           </div>
