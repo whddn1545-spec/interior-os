@@ -11,6 +11,7 @@ import {
   UserIcon,
   WalletIcon,
   PhoneIcon,
+  SparklesIcon,
 } from "lucide-react";
 import { createClient } from "@/lib/supabase/server";
 import { formatKRW } from "@interior-os/core/pricing";
@@ -422,6 +423,21 @@ export default async function SiteHubPage({
                   </p>
                 </div>
                 <ChevronRightIcon size={20} className="text-gray-300 shrink-0" />
+              </Link>
+            )}
+
+            {/* 완공 리포트 — 공사 완료 시 표시 */}
+            {siteAny.status === "done" && (
+              <Link
+                href={`/sites/${id}/report`}
+                className="flex items-center gap-3 bg-gradient-to-r from-primary/10 to-primary/5 rounded-2xl p-4 border border-primary/25 active:opacity-80"
+              >
+                <SparklesIcon size={24} className="text-primary shrink-0" />
+                <div className="flex-1">
+                  <p className="text-base font-bold text-primary">완공 리포트 생성</p>
+                  <p className="text-sm text-muted-foreground">AI가 완공 보고서를 자동으로 작성해드려요</p>
+                </div>
+                <ChevronRightIcon size={20} className="text-primary/40 shrink-0" />
               </Link>
             )}
           </>
