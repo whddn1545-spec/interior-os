@@ -49,8 +49,8 @@ export function PhotoCard({ photo, siteId, trades, signedUrl }: PhotoCardProps) 
 
   return (
     <>
-      <div className="bg-white border border-gray-200 rounded-2xl overflow-hidden">
-        <div className="aspect-square bg-gray-100 relative">
+      <div className="bg-card border border-border rounded-2xl overflow-hidden">
+        <div className="aspect-square bg-muted relative">
           {signedUrl && (
             <>
               {/* eslint-disable-next-line @next/next/no-img-element */}
@@ -68,7 +68,7 @@ export function PhotoCard({ photo, siteId, trades, signedUrl }: PhotoCardProps) 
           )}
           <button
             onClick={() => setOpen(true)}
-            className="absolute bottom-2 right-2 bg-white/90 text-gray-700 p-2.5 rounded-xl shadow active:bg-gray-100"
+            className="absolute bottom-2 right-2 bg-card/90 text-foreground/90 p-2.5 rounded-xl shadow active:bg-muted"
           >
             <PencilIcon size={18} />
           </button>
@@ -78,10 +78,10 @@ export function PhotoCard({ photo, siteId, trades, signedUrl }: PhotoCardProps) 
             <p className="text-xs font-medium text-primary/90">{PHASE_LABEL[photo.phase] ?? photo.phase}</p>
           )}
           {photo.tradeName && (
-            <p className="text-xs text-gray-600">{photo.tradeName}</p>
+            <p className="text-xs text-muted-foreground">{photo.tradeName}</p>
           )}
           {photo.captionHint && (
-            <p className="text-xs text-gray-500 truncate">{photo.captionHint}</p>
+            <p className="text-xs text-muted-foreground truncate">{photo.captionHint}</p>
           )}
           {photo.qualityScore !== null && (
             <p className="text-xs text-amber-500">품질 {Math.round(photo.qualityScore)}%</p>
@@ -91,23 +91,23 @@ export function PhotoCard({ photo, siteId, trades, signedUrl }: PhotoCardProps) 
 
       {open && (
         <div className="fixed inset-0 bg-black/50 z-50 flex items-end">
-          <div className="bg-white w-full rounded-t-3xl p-6 pb-10">
+          <div className="bg-card w-full rounded-t-3xl p-6 pb-10">
             <div className="flex items-center justify-between mb-5">
-              <h2 className="text-xl font-bold text-gray-900">사진 분류 수정</h2>
-              <button onClick={() => setOpen(false)} className="p-3 text-gray-400 active:bg-gray-100 rounded-xl">
+              <h2 className="text-xl font-bold text-foreground">사진 분류 수정</h2>
+              <button onClick={() => setOpen(false)} className="p-3 text-muted-foreground/70 active:bg-muted rounded-xl">
                 <XIcon size={24} />
               </button>
             </div>
 
             <div className="mb-5">
-              <label className="block text-base font-semibold text-gray-700 mb-2">시공 단계</label>
+              <label className="block text-base font-semibold text-foreground/90 mb-2">시공 단계</label>
               <div className="grid grid-cols-3 gap-2">
                 {PHASES.map((p) => (
                   <button
                     key={p}
                     onClick={() => setPhase(p)}
                     className={`py-3 rounded-xl border-2 text-sm font-medium transition-colors ${
-                      phase === p ? "border-blue-500 bg-primary/10 text-primary/90" : "border-gray-200 text-gray-600"
+                      phase === p ? "border-blue-500 bg-primary/10 text-primary/90" : "border-border text-muted-foreground"
                     }`}
                   >
                     {PHASE_LABEL[p]}
@@ -117,12 +117,12 @@ export function PhotoCard({ photo, siteId, trades, signedUrl }: PhotoCardProps) 
             </div>
 
             <div className="mb-6">
-              <label className="block text-base font-semibold text-gray-700 mb-2">공종</label>
+              <label className="block text-base font-semibold text-foreground/90 mb-2">공종</label>
               <div className="grid grid-cols-3 gap-2">
                 <button
                   onClick={() => setTradeId("")}
                   className={`py-3 rounded-xl border-2 text-sm font-medium transition-colors ${
-                    tradeId === "" ? "border-blue-500 bg-primary/10 text-primary/90" : "border-gray-200 text-gray-600"
+                    tradeId === "" ? "border-blue-500 bg-primary/10 text-primary/90" : "border-border text-muted-foreground"
                   }`}
                 >
                   선택 안 함
@@ -132,7 +132,7 @@ export function PhotoCard({ photo, siteId, trades, signedUrl }: PhotoCardProps) 
                     key={t.id}
                     onClick={() => setTradeId(t.id)}
                     className={`py-3 rounded-xl border-2 text-sm font-medium transition-colors ${
-                      tradeId === t.id ? "border-blue-500 bg-primary/10 text-primary/90" : "border-gray-200 text-gray-600"
+                      tradeId === t.id ? "border-blue-500 bg-primary/10 text-primary/90" : "border-border text-muted-foreground"
                     }`}
                   >
                     {t.nameKo}

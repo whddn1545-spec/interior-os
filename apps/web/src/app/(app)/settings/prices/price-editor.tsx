@@ -134,10 +134,10 @@ export function PriceEditor({ trades, prices, showSeedButton }: Props) {
           const unit = UNIT_LABEL[trade.unit] ?? trade.unit;
 
           return (
-            <div key={trade.id} className="bg-white rounded-2xl border border-gray-200 overflow-hidden">
-              <div className="flex items-center justify-between px-4 py-3 bg-gray-50 border-b border-gray-100">
-                <span className="text-lg font-bold text-gray-900">{trade.name_ko}</span>
-                <span className="text-sm text-gray-500">단위: {unit}</span>
+            <div key={trade.id} className="bg-card rounded-2xl border border-border overflow-hidden">
+              <div className="flex items-center justify-between px-4 py-3 bg-muted border-b border-border">
+                <span className="text-lg font-bold text-foreground">{trade.name_ko}</span>
+                <span className="text-sm text-muted-foreground">단위: {unit}</span>
               </div>
 
               <div className="p-4">
@@ -156,8 +156,8 @@ export function PriceEditor({ trades, prices, showSeedButton }: Props) {
                     ) : (
                       <div className="flex items-start justify-between mb-3">
                         <div className="flex-1">
-                          <p className="text-base font-semibold text-gray-900">{price.item_name}</p>
-                          <p className="text-sm text-gray-500">
+                          <p className="text-base font-semibold text-foreground">{price.item_name}</p>
+                          <p className="text-sm text-muted-foreground">
                             자재 {price.material_unit_price.toLocaleString("ko-KR")}원/{unit} ·
                             일당 {price.labor_day_rate.toLocaleString("ko-KR")}원 ·
                             {unit}당 {price.default_days_per_unit}일
@@ -166,7 +166,7 @@ export function PriceEditor({ trades, prices, showSeedButton }: Props) {
                         <div className="flex gap-2 shrink-0">
                           <button
                             onClick={() => startEdit(price)}
-                            className="px-4 py-3 bg-gray-100 text-gray-700 rounded-xl text-base font-medium active:bg-gray-200"
+                            className="px-4 py-3 bg-muted text-foreground/90 rounded-xl text-base font-medium active:bg-muted"
                           >
                             수정
                           </button>
@@ -254,42 +254,42 @@ function PriceForm({
   return (
     <div className="bg-primary/10 rounded-xl p-3 mb-3 space-y-3">
       <div>
-        <label className="text-base font-semibold text-gray-700 mb-1 block">자재명</label>
-        <p className="text-sm text-gray-500 mb-1.5">어떤 자재인지 적어주세요. 예) 강마루, 실크벽지</p>
+        <label className="text-base font-semibold text-foreground/90 mb-1 block">자재명</label>
+        <p className="text-sm text-muted-foreground mb-1.5">어떤 자재인지 적어주세요. 예) 강마루, 실크벽지</p>
         <input
           type="text"
           placeholder="예: 강마루"
           value={form.itemName}
           onChange={(e) => setForm({ ...form, itemName: e.target.value })}
-          className="w-full border border-gray-200 rounded-lg px-3 py-3 text-base bg-white focus:outline-none focus:border-blue-400"
+          className="w-full border border-border rounded-lg px-3 py-3 text-base bg-card focus:outline-none focus:border-primary"
         />
       </div>
       <div className="grid grid-cols-2 gap-2">
         <div>
-          <label className="text-base font-semibold text-gray-700 mb-1 block">자재 단가 (원/{unit})</label>
-          <p className="text-sm text-gray-500 mb-1.5">{unit} 1개당 자재값이에요. 예) 30,000원</p>
+          <label className="text-base font-semibold text-foreground/90 mb-1 block">자재 단가 (원/{unit})</label>
+          <p className="text-sm text-muted-foreground mb-1.5">{unit} 1개당 자재값이에요. 예) 30,000원</p>
           <input
             type="number"
             inputMode="numeric"
             placeholder="30000"
             value={form.materialUnitPrice}
             onChange={(e) => setForm({ ...form, materialUnitPrice: e.target.value })}
-            className="w-full border border-gray-200 rounded-lg px-3 py-3 text-base bg-white focus:outline-none focus:border-blue-400"
+            className="w-full border border-border rounded-lg px-3 py-3 text-base bg-card focus:outline-none focus:border-primary"
           />
           {materialWarning && (
             <p className="text-sm text-amber-700 mt-1.5 leading-snug">⚠️ {materialWarning}</p>
           )}
         </div>
         <div>
-          <label className="text-base font-semibold text-gray-700 mb-1 block">일당 (원/일)</label>
-          <p className="text-sm text-gray-500 mb-1.5">하루 인건비예요. 예) 250,000원</p>
+          <label className="text-base font-semibold text-foreground/90 mb-1 block">일당 (원/일)</label>
+          <p className="text-sm text-muted-foreground mb-1.5">하루 인건비예요. 예) 250,000원</p>
           <input
             type="number"
             inputMode="numeric"
             placeholder="250000"
             value={form.laborDayRate}
             onChange={(e) => setForm({ ...form, laborDayRate: e.target.value })}
-            className="w-full border border-gray-200 rounded-lg px-3 py-3 text-base bg-white focus:outline-none focus:border-blue-400"
+            className="w-full border border-border rounded-lg px-3 py-3 text-base bg-card focus:outline-none focus:border-primary"
           />
           {laborWarning && (
             <p className="text-sm text-amber-700 mt-1.5 leading-snug">⚠️ {laborWarning}</p>
@@ -297,8 +297,8 @@ function PriceForm({
         </div>
       </div>
       <div>
-        <label className="text-base font-semibold text-gray-700 mb-1 block">{unit}당 작업일수</label>
-        <p className="text-sm text-gray-500 mb-1.5">
+        <label className="text-base font-semibold text-foreground/90 mb-1 block">{unit}당 작업일수</label>
+        <p className="text-sm text-muted-foreground mb-1.5">
           {unit} 1개를 작업하는 데 걸리는 날수예요. 예) 0.12 (약 10개에 하루)
         </p>
         <input
@@ -308,7 +308,7 @@ function PriceForm({
           placeholder="0.12"
           value={form.defaultDaysPerUnit}
           onChange={(e) => setForm({ ...form, defaultDaysPerUnit: e.target.value })}
-          className="w-full border border-gray-200 rounded-lg px-3 py-3 text-base bg-white focus:outline-none focus:border-blue-400"
+          className="w-full border border-border rounded-lg px-3 py-3 text-base bg-card focus:outline-none focus:border-primary"
         />
         {daysWarning && (
           <p className="text-sm text-amber-700 mt-1.5 leading-snug">⚠️ {daysWarning}</p>
@@ -324,7 +324,7 @@ function PriceForm({
         </button>
         <button
           onClick={onCancel}
-          className="flex-1 bg-white text-gray-700 rounded-lg py-4 text-base font-medium border border-gray-200"
+          className="flex-1 bg-card text-foreground/90 rounded-lg py-4 text-base font-medium border border-border"
         >
           취소
         </button>

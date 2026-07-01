@@ -33,12 +33,12 @@ export default async function WorkerDetailPage({ params }: { params: Promise<{ i
   };
 
   return (
-    <div className="min-h-screen bg-gray-50 pb-24">
-      <header className="sticky top-0 bg-white border-b border-gray-100 z-10 px-4 py-3 flex items-center gap-3">
-        <Link href="/workers" className="p-3 -ml-3 text-gray-600">
+    <div className="min-h-screen bg-muted pb-24">
+      <header className="sticky top-0 bg-card border-b border-border z-10 px-4 py-3 flex items-center gap-3">
+        <Link href="/workers" className="p-3 -ml-3 text-muted-foreground">
           <ArrowLeftIcon size={24} />
         </Link>
-        <h1 className="text-xl font-bold text-gray-900 flex-1">{w.name as string}</h1>
+        <h1 className="text-xl font-bold text-foreground flex-1">{w.name as string}</h1>
         <a
           href={`tel:${w.phone as string}`}
           className="flex items-center gap-1 bg-green-100 text-profit px-3 py-2.5 rounded-xl text-base font-semibold"
@@ -50,7 +50,7 @@ export default async function WorkerDetailPage({ params }: { params: Promise<{ i
 
       <div className="max-w-lg mx-auto px-4 pt-6 space-y-6">
         {/* 편집 폼 */}
-        <div className="bg-white rounded-2xl p-4 border border-gray-100">
+        <div className="bg-card rounded-2xl p-4 border border-border">
           <WorkerEditForm
             worker={{
               id: w.id as string,
@@ -66,7 +66,7 @@ export default async function WorkerDetailPage({ params }: { params: Promise<{ i
 
         {/* 배정 이력 */}
         <div>
-          <h2 className="text-xl font-semibold text-gray-800 mb-3">현장 배정 이력</h2>
+          <h2 className="text-xl font-semibold text-foreground mb-3">현장 배정 이력</h2>
           {assignments && assignments.length > 0 ? (
             <div className="space-y-2">
               {(assignments as unknown as Record<string, unknown>[]).map((a) => {
@@ -76,16 +76,16 @@ export default async function WorkerDetailPage({ params }: { params: Promise<{ i
                   <Link
                     key={a.id as string}
                     href={site ? `/sites/${site.id}?from=/workers/${id}` : `/workers/${id}`}
-                    className="flex items-center justify-between bg-white border border-gray-200 rounded-2xl px-4 py-3 active:bg-gray-50"
+                    className="flex items-center justify-between bg-card border border-border rounded-2xl px-4 py-3 active:bg-muted"
                   >
                     <div>
-                      <p className="text-base font-semibold text-gray-900">{site?.name ?? "-"}</p>
-                      <p className="text-sm text-gray-500">
+                      <p className="text-base font-semibold text-foreground">{site?.name ?? "-"}</p>
+                      <p className="text-sm text-muted-foreground">
                         {trade?.name_ko ?? ""} · {a.start_date as string}
                         {a.end_date ? ` ~ ${a.end_date as string}` : ""}
                       </p>
                     </div>
-                    <span className="text-sm font-medium text-gray-500">
+                    <span className="text-sm font-medium text-muted-foreground">
                       {STATUS_LABEL[a.status as string] ?? a.status as string}
                     </span>
                   </Link>
@@ -93,14 +93,14 @@ export default async function WorkerDetailPage({ params }: { params: Promise<{ i
               })}
             </div>
           ) : (
-            <div className="bg-white border border-gray-200 rounded-2xl px-4 py-6 text-center">
-              <p className="text-base text-gray-700">아직 배정된 현장이 없어요.</p>
-              <p className="text-base text-gray-500 mt-1">
+            <div className="bg-card border border-border rounded-2xl px-4 py-6 text-center">
+              <p className="text-base text-foreground/90">아직 배정된 현장이 없어요.</p>
+              <p className="text-base text-muted-foreground mt-1">
                 일정 화면에서 이 작업자를 현장에 배정해보세요.
               </p>
               <Link
                 href="/schedule"
-                className="inline-flex items-center justify-center mt-4 bg-gray-900 text-white px-5 py-4 rounded-xl text-base font-medium"
+                className="inline-flex items-center justify-center mt-4 bg-foreground text-background px-5 py-4 rounded-xl text-base font-medium"
               >
                 일정으로 가기
               </Link>

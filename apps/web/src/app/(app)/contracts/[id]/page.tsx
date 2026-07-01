@@ -34,7 +34,7 @@ export default async function ContractDetailPage({ params, searchParams }: { par
   const total = quoteAny?.total_amount ?? paymentTerms?.totalAmount ?? 0;
 
   const statusConfig: Record<string, { label: string; color: string }> = {
-    draft: { label: "임시저장", color: "bg-gray-100 text-gray-600" },
+    draft: { label: "임시저장", color: "bg-muted text-muted-foreground" },
     confirmed: { label: "확정됨", color: "bg-blue-100 text-primary/90" },
     signed: { label: "서명완료", color: "bg-green-100 text-profit" },
   };
@@ -42,14 +42,14 @@ export default async function ContractDetailPage({ params, searchParams }: { par
   const cfg = statusConfig[status] ?? statusConfig.draft;
 
   return (
-    <div className="min-h-screen bg-gray-50 pb-24">
-      <header className="sticky top-0 bg-white border-b border-gray-100 z-10 px-4 py-3 flex items-center gap-3">
-        <Link href={from ?? "/quotes"} className="p-3 -ml-3 text-gray-600">
+    <div className="min-h-screen bg-muted pb-24">
+      <header className="sticky top-0 bg-card border-b border-border z-10 px-4 py-3 flex items-center gap-3">
+        <Link href={from ?? "/quotes"} className="p-3 -ml-3 text-muted-foreground">
           <ArrowLeftIcon size={24} />
         </Link>
         <div className="flex-1">
-          <h1 className="text-xl font-bold text-gray-900">계약서</h1>
-          <p className="text-sm text-gray-500">{quoteAny?.sites?.name ?? ""}</p>
+          <h1 className="text-xl font-bold text-foreground">계약서</h1>
+          <p className="text-sm text-muted-foreground">{quoteAny?.sites?.name ?? ""}</p>
         </div>
         <span className={`text-sm px-3 py-1.5 rounded-full font-medium ${cfg.color}`}>
           {cfg.label}
@@ -58,27 +58,27 @@ export default async function ContractDetailPage({ params, searchParams }: { par
 
       <div className="max-w-lg mx-auto px-4 pt-6 space-y-4">
         {/* 현장/고객 정보 */}
-        <div className="bg-white rounded-2xl p-4 border border-gray-100">
-          <h2 className="text-lg font-semibold text-gray-800 mb-3">계약 당사자</h2>
+        <div className="bg-card rounded-2xl p-4 border border-border">
+          <h2 className="text-lg font-semibold text-foreground mb-3">계약 당사자</h2>
           <div className="space-y-2 text-base">
             {quoteAny?.sites?.customers && (
               <>
                 <div className="flex justify-between">
-                  <span className="text-gray-500">고객명</span>
+                  <span className="text-muted-foreground">고객명</span>
                   <span className="font-medium">{quoteAny.sites.customers.name}</span>
                 </div>
                 <div className="flex justify-between">
-                  <span className="text-gray-500">연락처</span>
+                  <span className="text-muted-foreground">연락처</span>
                   <a href={`tel:${quoteAny.sites.customers.phone}`} className="font-medium text-primary">{quoteAny.sites.customers.phone}</a>
                 </div>
               </>
             )}
             <div className="flex justify-between">
-              <span className="text-gray-500">현장</span>
+              <span className="text-muted-foreground">현장</span>
               <span className="font-medium text-right">{quoteAny?.sites?.name ?? "—"}</span>
             </div>
             <div className="flex justify-between">
-              <span className="text-gray-500">주소</span>
+              <span className="text-muted-foreground">주소</span>
               <span className="font-medium text-right max-w-[220px]">{quoteAny?.sites?.address ?? "—"}</span>
             </div>
           </div>
@@ -86,23 +86,23 @@ export default async function ContractDetailPage({ params, searchParams }: { par
 
         {/* 계약금 분할 */}
         {paymentTerms && (
-          <div className="bg-white rounded-2xl p-4 border border-gray-100">
-            <h2 className="text-lg font-semibold text-gray-800 mb-3">대금 지급 일정</h2>
+          <div className="bg-card rounded-2xl p-4 border border-border">
+            <h2 className="text-lg font-semibold text-foreground mb-3">대금 지급 일정</h2>
             <div className="space-y-2 text-base">
               <div className="flex justify-between">
-                <span className="text-gray-600">계약금 ({((paymentTerms.deposit ?? 0) * 100).toFixed(0)}%)</span>
-                <span className="font-semibold text-gray-900">{formatKRW(total * (paymentTerms.deposit ?? 0))}</span>
+                <span className="text-muted-foreground">계약금 ({((paymentTerms.deposit ?? 0) * 100).toFixed(0)}%)</span>
+                <span className="font-semibold text-foreground">{formatKRW(total * (paymentTerms.deposit ?? 0))}</span>
               </div>
               <div className="flex justify-between">
-                <span className="text-gray-600">중도금 ({((paymentTerms.interim ?? 0) * 100).toFixed(0)}%)</span>
-                <span className="font-semibold text-gray-900">{formatKRW(total * (paymentTerms.interim ?? 0))}</span>
+                <span className="text-muted-foreground">중도금 ({((paymentTerms.interim ?? 0) * 100).toFixed(0)}%)</span>
+                <span className="font-semibold text-foreground">{formatKRW(total * (paymentTerms.interim ?? 0))}</span>
               </div>
               <div className="flex justify-between">
-                <span className="text-gray-600">잔금 ({((paymentTerms.final ?? 0) * 100).toFixed(0)}%)</span>
-                <span className="font-semibold text-gray-900">{formatKRW(total * (paymentTerms.final ?? 0))}</span>
+                <span className="text-muted-foreground">잔금 ({((paymentTerms.final ?? 0) * 100).toFixed(0)}%)</span>
+                <span className="font-semibold text-foreground">{formatKRW(total * (paymentTerms.final ?? 0))}</span>
               </div>
-              <hr className="border-gray-200" />
-              <div className="flex justify-between text-xl font-bold text-gray-900">
+              <hr className="border-border" />
+              <div className="flex justify-between text-xl font-bold text-foreground">
                 <span>총 계약금액</span>
                 <span className="text-primary/90">{formatKRW(total)}</span>
               </div>
@@ -114,22 +114,22 @@ export default async function ContractDetailPage({ params, searchParams }: { par
         {(c.quote_id as string | null) && (
           <Link
             href={`/quotes/${c.quote_id}`}
-            className="bg-white rounded-2xl p-4 border border-gray-100 flex items-center gap-3 min-h-[56px] active:bg-gray-50"
+            className="bg-card rounded-2xl p-4 border border-border flex items-center gap-3 min-h-[56px] active:bg-muted"
           >
             <FileTextIcon size={24} className="text-primary shrink-0" />
             <div className="flex-1">
-              <p className="text-base font-semibold text-gray-900">이 계약의 원본 견적 보기</p>
-              <p className="text-sm text-gray-500">금액 근거가 된 견적서를 확인할 수 있어요</p>
+              <p className="text-base font-semibold text-foreground">이 계약의 원본 견적 보기</p>
+              <p className="text-sm text-muted-foreground">금액 근거가 된 견적서를 확인할 수 있어요</p>
             </div>
-            <ChevronRightIcon size={22} className="text-gray-400 shrink-0" />
+            <ChevronRightIcon size={22} className="text-muted-foreground/70 shrink-0" />
           </Link>
         )}
 
         {/* 특약사항 */}
         {(c.special_terms as string | null) && (
-          <div className="bg-white rounded-2xl p-4 border border-gray-100">
-            <h2 className="text-lg font-semibold text-gray-800 mb-2">특약사항</h2>
-            <p className="text-base text-gray-700 whitespace-pre-line">{c.special_terms as string}</p>
+          <div className="bg-card rounded-2xl p-4 border border-border">
+            <h2 className="text-lg font-semibold text-foreground mb-2">특약사항</h2>
+            <p className="text-base text-foreground/90 whitespace-pre-line">{c.special_terms as string}</p>
           </div>
         )}
 

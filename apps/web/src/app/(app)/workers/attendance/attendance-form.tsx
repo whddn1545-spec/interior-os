@@ -72,8 +72,8 @@ export function AttendanceForm({
   }
 
   return (
-    <div className="mt-1 w-full rounded-xl bg-gray-50 p-4">
-      <p className="mb-3 text-sm font-bold text-gray-700">{workerName} 출역 기록</p>
+    <div className="mt-1 w-full rounded-xl bg-muted p-4">
+      <p className="mb-3 text-sm font-bold text-foreground/90">{workerName} 출역 기록</p>
 
       {done ? (
         <p className="rounded-lg bg-green-100 px-3 py-3 text-center text-base font-bold text-profit">
@@ -81,7 +81,7 @@ export function AttendanceForm({
         </p>
       ) : (
         <>
-          <label className="mb-1 block text-sm font-bold text-gray-600">현장</label>
+          <label className="mb-1 block text-sm font-bold text-muted-foreground">현장</label>
           {sites.length === 0 ? (
             <p className="mb-3 rounded-lg bg-amber-50 px-3 py-2 text-sm text-amber-700">
               진행 중인 현장이 없습니다
@@ -90,7 +90,7 @@ export function AttendanceForm({
             <select
               value={siteId}
               onChange={(e) => setSiteId(e.target.value)}
-              className="mb-3 h-14 w-full rounded-xl border border-gray-300 bg-white px-4 text-base font-medium"
+              className="mb-3 h-14 w-full rounded-xl border border-border bg-card px-4 text-base font-medium"
             >
               {sites.map((s) => (
                 <option key={s.id} value={s.id}>
@@ -100,22 +100,22 @@ export function AttendanceForm({
             </select>
           )}
 
-          <label className="mb-1 block text-sm font-bold text-gray-600">날짜</label>
+          <label className="mb-1 block text-sm font-bold text-muted-foreground">날짜</label>
           <input
             type="date"
             value={workDate}
             onChange={(e) => setWorkDate(e.target.value)}
-            className="mb-3 h-14 w-full rounded-xl border border-gray-300 bg-white px-4 text-base font-medium"
+            className="mb-3 h-14 w-full rounded-xl border border-border bg-card px-4 text-base font-medium"
           />
 
-          <label className="mb-1 block text-sm font-bold text-gray-600">일당</label>
+          <label className="mb-1 block text-sm font-bold text-muted-foreground">일당</label>
           <input
             type="number"
             inputMode="numeric"
             value={dayRate}
             onChange={(e) => setDayRate(e.target.value)}
             placeholder="일당 (원)"
-            className="mb-3 h-14 w-full rounded-xl border border-gray-300 bg-white px-4 text-lg font-bold"
+            className="mb-3 h-14 w-full rounded-xl border border-border bg-card px-4 text-lg font-bold"
           />
 
           {feedback && (
@@ -139,7 +139,7 @@ export function AttendanceForm({
                 setOpen(false);
                 setFeedback(null);
               }}
-              className="flex h-14 flex-1 items-center justify-center rounded-xl bg-gray-200 text-lg font-bold text-gray-700 active:bg-gray-300"
+              className="flex h-14 flex-1 items-center justify-center rounded-xl bg-muted text-lg font-bold text-foreground/90 active:bg-muted/60"
             >
               취소
             </button>

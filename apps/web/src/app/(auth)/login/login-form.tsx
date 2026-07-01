@@ -52,8 +52,8 @@ export function LoginForm() {
       <div className="min-h-screen flex flex-col items-center justify-center px-6 bg-gradient-to-b from-blue-50 to-white">
         <div className="text-center">
           <div className="text-6xl mb-6">📧</div>
-          <h1 className="text-3xl font-black text-gray-900 mb-3">이메일을 확인해주세요</h1>
-          <p className="text-lg text-gray-500">
+          <h1 className="text-3xl font-black text-foreground mb-3">이메일을 확인해주세요</h1>
+          <p className="text-lg text-muted-foreground">
             {email}로 인증 링크를 보냈어요.<br />
             링크를 클릭하면 바로 시작할 수 있어요!
           </p>
@@ -67,14 +67,14 @@ export function LoginForm() {
       <div className="max-w-md mx-auto w-full">
         <div className="text-center mb-10">
           <p className="text-5xl font-black text-blue-600 mb-2">InteriorOS</p>
-          <p className="text-lg text-gray-500">인테리어 업무 자동화</p>
+          <p className="text-lg text-muted-foreground">인테리어 업무 자동화</p>
         </div>
 
-        <div className="flex bg-gray-100 rounded-2xl p-1 mb-6">
+        <div className="flex bg-muted rounded-2xl p-1 mb-6">
           <button
             onClick={() => setMode("login")}
             className={`flex-1 py-3 rounded-xl text-base font-semibold transition-colors ${
-              mode === "login" ? "bg-white text-gray-900 shadow-sm" : "text-gray-500"
+              mode === "login" ? "bg-card text-foreground shadow-sm" : "text-muted-foreground"
             }`}
           >
             로그인
@@ -82,7 +82,7 @@ export function LoginForm() {
           <button
             onClick={() => setMode("signup")}
             className={`flex-1 py-3 rounded-xl text-base font-semibold transition-colors ${
-              mode === "signup" ? "bg-white text-gray-900 shadow-sm" : "text-gray-500"
+              mode === "signup" ? "bg-card text-foreground shadow-sm" : "text-muted-foreground"
             }`}
           >
             회원가입
@@ -91,26 +91,26 @@ export function LoginForm() {
 
         <div className="space-y-4">
           <div>
-            <label className="block text-base font-semibold text-gray-700 mb-2">이메일</label>
+            <label className="block text-base font-semibold text-foreground mb-2">이메일</label>
             <input
               type="email"
               value={email}
               onChange={(e) => setEmail(e.target.value)}
               placeholder="example@email.com"
               autoComplete="email"
-              className="w-full border border-gray-200 rounded-2xl px-4 py-4 text-lg focus:outline-none focus:border-blue-400"
+              className="w-full border border-border rounded-2xl px-4 py-4 text-lg focus:outline-none focus:border-primary"
               onKeyDown={(e) => e.key === "Enter" && handleSubmit()}
             />
           </div>
           <div>
-            <label className="block text-base font-semibold text-gray-700 mb-2">비밀번호</label>
+            <label className="block text-base font-semibold text-foreground mb-2">비밀번호</label>
             <input
               type="password"
               value={password}
               onChange={(e) => setPassword(e.target.value)}
               placeholder="비밀번호 입력"
               autoComplete={mode === "login" ? "current-password" : "new-password"}
-              className="w-full border border-gray-200 rounded-2xl px-4 py-4 text-lg focus:outline-none focus:border-blue-400"
+              className="w-full border border-border rounded-2xl px-4 py-4 text-lg focus:outline-none focus:border-primary"
               onKeyDown={(e) => e.key === "Enter" && handleSubmit()}
             />
           </div>
@@ -130,7 +130,7 @@ export function LoginForm() {
           </button>
         </div>
 
-        <p className="mt-8 text-center text-sm text-gray-400">
+        <p className="mt-8 text-center text-sm text-muted-foreground">
           인테리어 자영업자를 위한 AI 업무 도구
         </p>
       </div>

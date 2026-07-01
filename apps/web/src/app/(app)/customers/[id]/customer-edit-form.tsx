@@ -52,7 +52,7 @@ export function CustomerEditForm({ customerId, initial }: Props) {
     <>
       <button
         onClick={() => setOpen(true)}
-        className="flex items-center gap-1 bg-gray-100 text-gray-700 px-3 py-2.5 rounded-xl text-base font-semibold"
+        className="flex items-center gap-1 bg-muted text-foreground/90 px-3 py-2.5 rounded-xl text-base font-semibold"
       >
         <PencilIcon size={15} />
         수정
@@ -60,44 +60,44 @@ export function CustomerEditForm({ customerId, initial }: Props) {
 
       {open && (
         <div className="fixed inset-0 bg-black/50 z-50 flex items-end">
-          <div className="bg-white w-full rounded-t-3xl p-6 pb-10 max-h-[90vh] overflow-y-auto">
+          <div className="bg-card w-full rounded-t-3xl p-6 pb-10 max-h-[90vh] overflow-y-auto">
             <div className="flex items-center justify-between mb-6">
-              <h2 className="text-xl font-bold text-gray-900">고객 정보 수정</h2>
-              <button onClick={() => setOpen(false)} className="p-3 text-gray-400 active:bg-gray-100 rounded-xl">
+              <h2 className="text-xl font-bold text-foreground">고객 정보 수정</h2>
+              <button onClick={() => setOpen(false)} className="p-3 text-muted-foreground/70 active:bg-muted rounded-xl">
                 <XIcon size={24} />
               </button>
             </div>
 
             <div className="space-y-5">
               <div>
-                <label className="block text-base font-semibold text-gray-700 mb-2">이름 *</label>
+                <label className="block text-base font-semibold text-foreground/90 mb-2">이름 *</label>
                 <input
                   type="text"
                   value={name}
                   onChange={(e) => setName(e.target.value)}
-                  className="w-full border border-gray-200 rounded-2xl px-4 py-4 text-lg focus:outline-none focus:border-blue-400"
+                  className="w-full border border-border rounded-2xl px-4 py-4 text-lg focus:outline-none focus:border-primary"
                 />
               </div>
               <div>
-                <label className="block text-base font-semibold text-gray-700 mb-2">연락처 *</label>
+                <label className="block text-base font-semibold text-foreground/90 mb-2">연락처 *</label>
                 <input
                   type="tel"
                   value={phone}
                   onChange={(e) => setPhone(formatPhone(e.target.value))}
-                  className="w-full border border-gray-200 rounded-2xl px-4 py-4 text-lg focus:outline-none focus:border-blue-400"
+                  className="w-full border border-border rounded-2xl px-4 py-4 text-lg focus:outline-none focus:border-primary"
                 />
               </div>
               <div>
-                <label className="block text-base font-semibold text-gray-700 mb-2">주소</label>
+                <label className="block text-base font-semibold text-foreground/90 mb-2">주소</label>
                 <input
                   type="text"
                   value={address}
                   onChange={(e) => setAddress(e.target.value)}
-                  className="w-full border border-gray-200 rounded-2xl px-4 py-4 text-lg focus:outline-none focus:border-blue-400"
+                  className="w-full border border-border rounded-2xl px-4 py-4 text-lg focus:outline-none focus:border-primary"
                 />
               </div>
               <div>
-                <label className="block text-base font-semibold text-gray-700 mb-3">유입 경로</label>
+                <label className="block text-base font-semibold text-foreground/90 mb-3">유입 경로</label>
                 <div className="grid grid-cols-2 gap-2">
                   {SOURCE_OPTIONS.map((opt) => (
                     <button
@@ -106,7 +106,7 @@ export function CustomerEditForm({ customerId, initial }: Props) {
                       className={`py-3 rounded-2xl border-2 text-base font-medium transition-colors ${
                         source === opt.value
                           ? "border-blue-600 bg-primary text-white"
-                          : "border-gray-200 bg-white text-gray-700"
+                          : "border-border bg-card text-foreground/90"
                       }`}
                     >
                       {opt.label}
@@ -115,12 +115,12 @@ export function CustomerEditForm({ customerId, initial }: Props) {
                 </div>
               </div>
               <div>
-                <label className="block text-base font-semibold text-gray-700 mb-2">메모</label>
+                <label className="block text-base font-semibold text-foreground/90 mb-2">메모</label>
                 <textarea
                   value={memo}
                   onChange={(e) => setMemo(e.target.value)}
                   rows={3}
-                  className="w-full border border-gray-200 rounded-2xl px-4 py-4 text-lg focus:outline-none focus:border-blue-400 resize-none"
+                  className="w-full border border-border rounded-2xl px-4 py-4 text-lg focus:outline-none focus:border-primary resize-none"
                 />
               </div>
 

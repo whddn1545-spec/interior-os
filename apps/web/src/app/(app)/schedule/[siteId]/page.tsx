@@ -139,14 +139,14 @@ export default async function SchedulePage({ params, searchParams }: { params: P
   });
 
   return (
-    <div className="min-h-screen bg-gray-50 pb-24">
-      <header className="sticky top-0 bg-white border-b border-gray-100 z-10 px-4 py-3 flex items-center gap-3">
-        <Link href={from ?? "/schedule"} className="p-3 -ml-3 text-gray-600" aria-label="뒤로 가기">
+    <div className="min-h-screen bg-muted pb-24">
+      <header className="sticky top-0 bg-card border-b border-border z-10 px-4 py-3 flex items-center gap-3">
+        <Link href={from ?? "/schedule"} className="p-3 -ml-3 text-muted-foreground" aria-label="뒤로 가기">
           <ArrowLeftIcon size={24} />
         </Link>
         <div className="flex-1 min-w-0">
-          <h1 className="text-xl font-bold text-gray-900 truncate">{siteAny.name as string}</h1>
-          <p className="text-base text-gray-500">
+          <h1 className="text-xl font-bold text-foreground truncate">{siteAny.name as string}</h1>
+          <p className="text-base text-muted-foreground">
             {customer?.name ? `${customer.name} · ` : ""}
             {hasTasks ? "공사 일정" : "공사 일정 만들기"}
           </p>
@@ -166,9 +166,9 @@ export default async function SchedulePage({ params, searchParams }: { params: P
 
       {/* 현장 요약 — 현장 단위 네비게이션 허브 */}
       <div className="px-4 pt-6">
-        <div className="max-w-2xl mx-auto bg-white rounded-2xl border border-gray-100 p-4 space-y-3">
+        <div className="max-w-2xl mx-auto bg-card rounded-2xl border border-border p-4 space-y-3">
           <div className="flex items-center justify-between gap-3">
-            <h2 className="text-lg font-bold text-gray-900">현장 정보</h2>
+            <h2 className="text-lg font-bold text-foreground">현장 정보</h2>
             <span className="text-base font-semibold text-primary/90 bg-primary/10 px-3 py-1 rounded-full">
               {SITE_STATUS_LABEL[siteStatus] ?? siteStatus}
             </span>
@@ -188,19 +188,19 @@ export default async function SchedulePage({ params, searchParams }: { params: P
             {customer?.name && (
               <Link
                 href={`/customers/${customer.id}`}
-                className="flex items-center gap-3 -mx-1 px-1 py-2 rounded-xl active:bg-gray-50"
+                className="flex items-center gap-3 -mx-1 px-1 py-2 rounded-xl active:bg-muted"
               >
-                <UserIcon size={20} className="text-gray-400 shrink-0" />
-                <span className="text-gray-500 w-16 shrink-0">고객</span>
+                <UserIcon size={20} className="text-muted-foreground/70 shrink-0" />
+                <span className="text-muted-foreground w-16 shrink-0">고객</span>
                 <span className="flex-1 font-medium text-primary truncate">{customer.name}</span>
-                <ChevronRightIcon size={18} className="text-gray-300 shrink-0" />
+                <ChevronRightIcon size={18} className="text-muted-foreground/50 shrink-0" />
               </Link>
             )}
             {siteAddress && (
               <div className="flex items-start gap-3 px-1 py-2">
-                <MapPinIcon size={20} className="text-gray-400 shrink-0 mt-0.5" />
-                <span className="text-gray-500 w-16 shrink-0">주소</span>
-                <span className="flex-1 font-medium text-gray-800">{siteAddress}</span>
+                <MapPinIcon size={20} className="text-muted-foreground/70 shrink-0 mt-0.5" />
+                <span className="text-muted-foreground w-16 shrink-0">주소</span>
+                <span className="flex-1 font-medium text-foreground">{siteAddress}</span>
               </div>
             )}
           </div>
@@ -215,31 +215,31 @@ export default async function SchedulePage({ params, searchParams }: { params: P
                     ? `/quotes/new?customerId=${customer.id}`
                     : "/quotes/new"
               }
-              className="flex flex-col items-center justify-center gap-1 bg-gray-50 rounded-2xl py-4 active:bg-gray-100"
+              className="flex flex-col items-center justify-center gap-1 bg-muted rounded-2xl py-4 active:bg-muted"
             >
               <FileTextIcon size={22} className="text-primary" />
-              <span className="text-base font-semibold text-gray-800">견적</span>
-              <span className="text-sm text-gray-500">
+              <span className="text-base font-semibold text-foreground">견적</span>
+              <span className="text-sm text-muted-foreground">
                 {quoteList.length > 0 ? `${quoteList.length}건` : "만들기"}
               </span>
             </Link>
             <Link
               href={contract ? `/contracts/${contract.id}?from=/schedule/${siteId}` : `/quotes/${latestQuote?.id ?? ""}`}
-              className={`flex flex-col items-center justify-center gap-1 bg-gray-50 rounded-2xl py-4 active:bg-gray-100 ${
+              className={`flex flex-col items-center justify-center gap-1 bg-muted rounded-2xl py-4 active:bg-muted ${
                 !contract && !latestQuote ? "pointer-events-none opacity-50" : ""
               }`}
             >
               <FileSignatureIcon size={22} className="text-profit" />
-              <span className="text-base font-semibold text-gray-800">계약</span>
-              <span className="text-sm text-gray-500">{contract ? "보기" : "없음"}</span>
+              <span className="text-base font-semibold text-foreground">계약</span>
+              <span className="text-sm text-muted-foreground">{contract ? "보기" : "없음"}</span>
             </Link>
             <Link
               href={`/photos/${siteId}?from=/schedule/${siteId}`}
-              className="flex flex-col items-center justify-center gap-1 bg-gray-50 rounded-2xl py-4 active:bg-gray-100"
+              className="flex flex-col items-center justify-center gap-1 bg-muted rounded-2xl py-4 active:bg-muted"
             >
               <ImageIcon size={22} className="text-purple-600" />
-              <span className="text-base font-semibold text-gray-800">사진</span>
-              <span className="text-sm text-gray-500">
+              <span className="text-base font-semibold text-foreground">사진</span>
+              <span className="text-sm text-muted-foreground">
                 {photoTotal > 0 ? `${photoTotal}장` : "올리기"}
               </span>
             </Link>
@@ -280,10 +280,10 @@ export default async function SchedulePage({ params, searchParams }: { params: P
       {/* 모든 작업이 끝난 진행 중 현장: 크고 명확한 공사 완료 버튼으로 발견성 향상 */}
       {showCompletePrompt && (
         <div className="px-4 pt-6">
-          <div className="max-w-2xl mx-auto bg-white rounded-2xl border border-gray-100 p-5 space-y-3">
+          <div className="max-w-2xl mx-auto bg-card rounded-2xl border border-border p-5 space-y-3">
             <div>
-              <h2 className="text-lg font-bold text-gray-900">모든 작업 일정이 끝났어요</h2>
-              <p className="text-base text-gray-500 mt-1">
+              <h2 className="text-lg font-bold text-foreground">모든 작업 일정이 끝났어요</h2>
+              <p className="text-base text-muted-foreground mt-1">
                 공사가 다 끝났다면 아래 버튼으로 이 현장을 공사 완료로 바꿔주세요.
               </p>
             </div>

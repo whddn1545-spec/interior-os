@@ -27,17 +27,17 @@ export default async function WorkerAttendancePage() {
   const totalDue = workers.reduce((sum, w) => sum + w.balance, 0);
 
   return (
-    <div className="min-h-screen bg-gray-50 pb-24">
-      <header className="sticky top-0 bg-white border-b border-gray-100 z-10 px-4 py-3 flex items-center gap-3">
-        <Link href="/workers" className="p-3 -ml-3 text-gray-600">
+    <div className="min-h-screen bg-muted pb-24">
+      <header className="sticky top-0 bg-card border-b border-border z-10 px-4 py-3 flex items-center gap-3">
+        <Link href="/workers" className="p-3 -ml-3 text-muted-foreground">
           <ArrowLeftIcon size={24} />
         </Link>
         <div className="flex-1 min-w-0">
-          <h1 className="text-xl font-bold text-gray-900">작업자 장부</h1>
-          <p className="text-sm text-gray-500">{monthLabel}</p>
+          <h1 className="text-xl font-bold text-foreground">작업자 장부</h1>
+          <p className="text-sm text-muted-foreground">{monthLabel}</p>
         </div>
         <div className="text-right">
-          <p className="text-xs text-gray-400">이번달 지급예정</p>
+          <p className="text-xs text-muted-foreground/70">이번달 지급예정</p>
           <p className="text-lg font-black text-orange-600">{totalDue.toLocaleString("ko-KR")}원</p>
         </div>
       </header>
@@ -51,7 +51,7 @@ export default async function WorkerAttendancePage() {
       )}
 
       {workers.length === 0 ? (
-        <div className="px-4 py-16 text-center text-gray-400">
+        <div className="px-4 py-16 text-center text-muted-foreground/70">
           <p className="mb-2 text-xl">등록된 작업자가 없어요</p>
           <p className="text-base">작업자를 추가하면 출역을 기록할 수 있어요</p>
           <Link

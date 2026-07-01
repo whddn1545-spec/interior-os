@@ -62,33 +62,33 @@ export function BusinessInfoCard({ businessName, ownerName, plan }: Props) {
 
       {open && (
         <div className="fixed inset-0 bg-black/50 z-50 flex items-end">
-          <div className="bg-white w-full rounded-t-3xl p-6 pb-10 max-h-[90vh] overflow-y-auto">
+          <div className="bg-card w-full rounded-t-3xl p-6 pb-10 max-h-[90vh] overflow-y-auto">
             {saved ? (
               <div className="flex flex-col items-center justify-center py-12">
                 <CheckCircleIcon size={72} className="text-green-500 mb-4" />
-                <p className="text-2xl font-bold text-gray-900">저장됐어요!</p>
+                <p className="text-2xl font-bold text-foreground">저장됐어요!</p>
               </div>
             ) : (
               <>
                 <div className="flex items-center justify-between mb-6">
-                  <h2 className="text-xl font-bold text-gray-900">사업자 정보 수정</h2>
+                  <h2 className="text-xl font-bold text-foreground">사업자 정보 수정</h2>
                   <button
                     type="button"
                     onClick={() => setOpen(false)}
-                    className="p-3 text-gray-400 active:bg-gray-100 rounded-xl"
+                    className="p-3 text-muted-foreground/70 active:bg-muted rounded-xl"
                     aria-label="닫기"
                   >
                     <XIcon size={24} />
                   </button>
                 </div>
 
-                <p className="text-base text-gray-500 mb-6">
+                <p className="text-base text-muted-foreground mb-6">
                   여기서 고친 상호와 대표자명은 견적서·계약서에 그대로 들어가요.
                 </p>
 
                 <form onSubmit={handleSubmit} className="space-y-5">
                   <div>
-                    <label htmlFor="business_name" className="block text-base font-semibold text-gray-800 mb-2">
+                    <label htmlFor="business_name" className="block text-base font-semibold text-foreground mb-2">
                       상호 (업체명)
                     </label>
                     <input
@@ -98,12 +98,12 @@ export function BusinessInfoCard({ businessName, ownerName, plan }: Props) {
                       defaultValue={businessName}
                       required
                       placeholder="예) 홍길동인테리어"
-                      className="w-full border border-gray-300 rounded-2xl px-4 py-4 text-lg focus:outline-none focus:border-blue-400"
+                      className="w-full border border-border rounded-2xl px-4 py-4 text-lg focus:outline-none focus:border-primary"
                     />
                   </div>
 
                   <div>
-                    <label htmlFor="owner_name" className="block text-base font-semibold text-gray-800 mb-2">
+                    <label htmlFor="owner_name" className="block text-base font-semibold text-foreground mb-2">
                       대표자 이름
                     </label>
                     <input
@@ -113,7 +113,7 @@ export function BusinessInfoCard({ businessName, ownerName, plan }: Props) {
                       defaultValue={ownerName}
                       required
                       placeholder="예) 홍길동"
-                      className="w-full border border-gray-300 rounded-2xl px-4 py-4 text-lg focus:outline-none focus:border-blue-400"
+                      className="w-full border border-border rounded-2xl px-4 py-4 text-lg focus:outline-none focus:border-primary"
                     />
                   </div>
 

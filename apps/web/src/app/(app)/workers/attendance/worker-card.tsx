@@ -77,13 +77,13 @@ export function WorkerCard({
 
   return (
     <div
-      className={`rounded-2xl bg-white p-5 shadow-sm ${
-        unsettled ? "border-2 border-orange-300" : "border border-gray-200"
+      className={`rounded-2xl bg-card p-5 shadow-sm ${
+        unsettled ? "border-2 border-orange-300" : "border border-border"
       }`}
     >
       {/* 이름 / 전화 */}
       <div className="flex items-center justify-between gap-2">
-        <p className="text-xl font-bold text-gray-900">{worker.name}</p>
+        <p className="text-xl font-bold text-foreground">{worker.name}</p>
         {worker.phone && (
           <a
             href={`tel:${worker.phone}`}
@@ -96,10 +96,10 @@ export function WorkerCard({
 
       {/* 출역 / 일당 배지 */}
       <div className="mt-3 flex flex-wrap gap-2">
-        <span className="rounded-md bg-gray-100 px-3 py-1 text-sm font-bold text-gray-700">
+        <span className="rounded-md bg-muted px-3 py-1 text-sm font-bold text-foreground/90">
           {worker.daysWorked}일 출역
         </span>
-        <span className="rounded-md bg-gray-100 px-3 py-1 text-sm font-bold text-gray-700">
+        <span className="rounded-md bg-muted px-3 py-1 text-sm font-bold text-foreground/90">
           일당 {worker.dayRate.toLocaleString("ko-KR")}원
         </span>
       </div>
@@ -107,23 +107,23 @@ export function WorkerCard({
       {/* 금액 요약 */}
       <div className="mt-4 space-y-1">
         <div className="flex items-baseline justify-between">
-          <span className="text-sm text-gray-500">줄 돈</span>
+          <span className="text-sm text-muted-foreground">줄 돈</span>
           <span
             className={`text-2xl font-black ${
-              unsettled ? "text-orange-600" : "text-gray-900"
+              unsettled ? "text-orange-600" : "text-foreground"
             }`}
           >
             {worker.totalEarned.toLocaleString("ko-KR")}원
           </span>
         </div>
         <div className="flex items-baseline justify-between">
-          <span className="text-sm text-gray-500">준 돈</span>
-          <span className="text-base font-bold text-gray-700">
+          <span className="text-sm text-muted-foreground">준 돈</span>
+          <span className="text-base font-bold text-foreground/90">
             {worker.totalPaid.toLocaleString("ko-KR")}원
           </span>
         </div>
-        <div className="flex items-baseline justify-between border-t border-gray-100 pt-1">
-          <span className="text-sm text-gray-500">잔액</span>
+        <div className="flex items-baseline justify-between border-t border-border pt-1">
+          <span className="text-sm text-muted-foreground">잔액</span>
           <span
             className={`text-xl font-black ${
               unsettled ? "text-orange-600" : "text-profit"
@@ -135,7 +135,7 @@ export function WorkerCard({
       </div>
 
       {feedback && (
-        <p className="mt-3 rounded-lg bg-gray-50 px-3 py-2 text-sm font-medium text-gray-700">
+        <p className="mt-3 rounded-lg bg-muted px-3 py-2 text-sm font-medium text-foreground/90">
           {feedback}
         </p>
       )}
@@ -160,7 +160,7 @@ export function WorkerCard({
             잔액 {worker.balance.toLocaleString("ko-KR")}원이 정산 완료돼요.
           </p>
           <div className="flex gap-2">
-            <button onClick={() => setShowConfirm(false)} className="flex-1 py-3 rounded-xl border border-gray-300 text-gray-700 text-base font-medium active:bg-gray-100">아니요</button>
+            <button onClick={() => setShowConfirm(false)} className="flex-1 py-3 rounded-xl border border-border text-foreground/90 text-base font-medium active:bg-muted">아니요</button>
             <button onClick={confirmMarkPaid} disabled={isPending} className="flex-1 py-3 rounded-xl bg-profit text-white text-base font-bold disabled:opacity-50 active:bg-green-700">네, 완료</button>
           </div>
         </div>

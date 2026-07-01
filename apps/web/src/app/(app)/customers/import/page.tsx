@@ -57,12 +57,12 @@ export default function CustomerImportPage() {
   }
 
   return (
-    <div className="min-h-screen bg-gray-50 pb-24">
-      <header className="sticky top-0 bg-white border-b border-gray-100 z-10 px-4 py-3 flex items-center gap-3">
-        <Link href="/customers" className="p-3 -ml-3 text-gray-600">
+    <div className="min-h-screen bg-muted pb-24">
+      <header className="sticky top-0 bg-card border-b border-border z-10 px-4 py-3 flex items-center gap-3">
+        <Link href="/customers" className="p-3 -ml-3 text-muted-foreground">
           <ArrowLeftIcon size={24} />
         </Link>
-        <h1 className="text-xl font-bold text-gray-900">연락처 가져오기</h1>
+        <h1 className="text-xl font-bold text-foreground">연락처 가져오기</h1>
       </header>
 
       <div className="max-w-lg mx-auto px-4 pt-6 space-y-4">
@@ -79,9 +79,9 @@ export default function CustomerImportPage() {
             </div>
 
             {/* 예시 */}
-            <div className="bg-white border border-gray-200 rounded-2xl p-4">
-              <p className="text-sm font-semibold text-gray-700 mb-2">CSV 예시</p>
-              <pre className="text-xs text-gray-500 overflow-x-auto">{`이름,전화번호,주소,메모
+            <div className="bg-card border border-border rounded-2xl p-4">
+              <p className="text-sm font-semibold text-foreground/90 mb-2">CSV 예시</p>
+              <pre className="text-xs text-muted-foreground overflow-x-auto">{`이름,전화번호,주소,메모
 김영희,010-1234-5678,서울 강남구,VIP 고객
 이철수,010-9876-5432,,소개로 연결`}</pre>
             </div>
@@ -115,29 +115,29 @@ export default function CustomerImportPage() {
           <>
             {/* 미리보기 요약 */}
             <div className="grid grid-cols-3 gap-3">
-              <div className="bg-white border border-gray-200 rounded-2xl p-3 text-center">
-                <p className="text-2xl font-black text-gray-900">{preview.total}</p>
-                <p className="text-sm text-gray-500">전체</p>
+              <div className="bg-card border border-border rounded-2xl p-3 text-center">
+                <p className="text-2xl font-black text-foreground">{preview.total}</p>
+                <p className="text-sm text-muted-foreground">전체</p>
               </div>
               <div className="bg-profit/10 border border-profit/20 rounded-2xl p-3 text-center">
                 <p className="text-2xl font-black text-profit">{preview.total - preview.duplicates}</p>
-                <p className="text-sm text-gray-500">신규</p>
+                <p className="text-sm text-muted-foreground">신규</p>
               </div>
               <div className="bg-amber-50 border border-amber-200 rounded-2xl p-3 text-center">
                 <p className="text-2xl font-black text-amber-700">{preview.duplicates}</p>
-                <p className="text-sm text-gray-500">중복</p>
+                <p className="text-sm text-muted-foreground">중복</p>
               </div>
             </div>
 
             {preview.duplicates > 0 && (
-              <label className="flex items-center gap-3 bg-white border border-gray-200 rounded-2xl px-4 py-3 cursor-pointer">
+              <label className="flex items-center gap-3 bg-card border border-border rounded-2xl px-4 py-3 cursor-pointer">
                 <input
                   type="checkbox"
                   checked={skipDuplicates}
                   onChange={(e) => setSkipDuplicates(e.target.checked)}
                   className="w-5 h-5"
                 />
-                <span className="text-base text-gray-700">중복 연락처 건너뛰기</span>
+                <span className="text-base text-foreground/90">중복 연락처 건너뛰기</span>
               </label>
             )}
 
@@ -149,12 +149,12 @@ export default function CustomerImportPage() {
                   className={`flex items-center gap-3 rounded-2xl px-4 py-3 border ${
                     row.isDuplicate
                       ? "bg-amber-50 border-amber-200 opacity-60"
-                      : "bg-white border-gray-200"
+                      : "bg-card border-border"
                   }`}
                 >
                   <div className="flex-1 min-w-0">
-                    <p className="text-base font-semibold text-gray-900">{row.name}</p>
-                    <p className="text-sm text-gray-500">{row.phone}</p>
+                    <p className="text-base font-semibold text-foreground">{row.name}</p>
+                    <p className="text-sm text-muted-foreground">{row.phone}</p>
                   </div>
                   {row.isDuplicate && (
                     <span className="text-xs text-amber-600 font-medium shrink-0">중복</span>
@@ -172,7 +172,7 @@ export default function CustomerImportPage() {
             <div className="flex gap-3">
               <button
                 onClick={() => { setStep("upload"); setPreview(null); if (fileInputRef.current) fileInputRef.current.value = ""; }}
-                className="flex-1 py-4 border-2 border-gray-300 rounded-xl text-base font-semibold text-gray-700"
+                className="flex-1 py-4 border-2 border-border rounded-xl text-base font-semibold text-foreground/90"
               >
                 다시 선택
               </button>
@@ -190,8 +190,8 @@ export default function CustomerImportPage() {
         {step === "done" && (
           <div className="text-center py-12">
             <CheckCircleIcon size={64} className="mx-auto text-green-500 mb-4" />
-            <p className="text-2xl font-bold text-gray-900 mb-2">가져오기 완료!</p>
-            <p className="text-lg text-gray-600 mb-8">{importedCount}명의 고객이 등록되었어요</p>
+            <p className="text-2xl font-bold text-foreground mb-2">가져오기 완료!</p>
+            <p className="text-lg text-muted-foreground mb-8">{importedCount}명의 고객이 등록되었어요</p>
             <button
               onClick={() => router.push("/customers")}
               className="w-full bg-primary text-white py-4 rounded-xl text-lg font-bold"

@@ -62,11 +62,11 @@ export function FactorsEditor({ zones }: { zones: Zone[] }) {
   return (
     <div className="space-y-6">
       {/* 거리 계수 */}
-      <div className="bg-white rounded-2xl border border-gray-200 overflow-hidden">
-        <div className="px-4 py-4 border-b border-gray-100 flex items-center justify-between">
+      <div className="bg-card rounded-2xl border border-border overflow-hidden">
+        <div className="px-4 py-4 border-b border-border flex items-center justify-between">
           <div>
-            <h2 className="text-lg font-bold text-gray-900">거리 계수</h2>
-            <p className="text-sm text-gray-500">현장까지 거리에 따라 견적 금액에 곱해지는 계수</p>
+            <h2 className="text-lg font-bold text-foreground">거리 계수</h2>
+            <p className="text-sm text-muted-foreground">현장까지 거리에 따라 견적 금액에 곱해지는 계수</p>
           </div>
           <button
             onClick={() => setAdding(true)}
@@ -77,19 +77,19 @@ export function FactorsEditor({ zones }: { zones: Zone[] }) {
         </div>
 
         {adding && (
-          <div className="px-4 py-4 border-b border-gray-100 bg-primary/10">
-            <p className="text-sm font-semibold text-gray-700 mb-3">새 거리 구역</p>
+          <div className="px-4 py-4 border-b border-border bg-primary/10">
+            <p className="text-sm font-semibold text-foreground/90 mb-3">새 거리 구역</p>
             <div className="flex gap-2 mb-2">
               <input
                 type="text"
                 value={newName}
                 onChange={(e) => setNewName(e.target.value)}
                 placeholder="예: 가까운 곳 (30분 이내)"
-                className="flex-1 border border-gray-300 rounded-xl px-3 py-3 text-base focus:outline-none focus:border-blue-400"
+                className="flex-1 border border-border rounded-xl px-3 py-3 text-base focus:outline-none focus:border-primary"
               />
             </div>
             <div className="flex gap-2 items-center">
-              <span className="text-sm text-gray-600">계수:</span>
+              <span className="text-sm text-muted-foreground">계수:</span>
               <input
                 type="number"
                 inputMode="decimal"
@@ -98,7 +98,7 @@ export function FactorsEditor({ zones }: { zones: Zone[] }) {
                 step="0.05"
                 min="1"
                 max="3"
-                className="w-24 border border-gray-300 rounded-xl px-3 py-2 text-sm focus:outline-none focus:border-blue-400"
+                className="w-24 border border-border rounded-xl px-3 py-2 text-sm focus:outline-none focus:border-primary"
               />
               <button
                 onClick={addZone}
@@ -107,13 +107,13 @@ export function FactorsEditor({ zones }: { zones: Zone[] }) {
               >
                 추가
               </button>
-              <button onClick={() => setAdding(false)} className="text-gray-500 text-sm px-2">취소</button>
+              <button onClick={() => setAdding(false)} className="text-muted-foreground text-sm px-2">취소</button>
             </div>
           </div>
         )}
 
         {zones.length === 0 && !adding ? (
-          <div className="px-4 py-6 text-center text-gray-400">
+          <div className="px-4 py-6 text-center text-muted-foreground/70">
             <p className="mb-2">거리 구역이 없어요</p>
             <button onClick={() => setAdding(true)} className="text-primary text-sm font-medium">+ 구역 추가하기</button>
           </div>
@@ -123,7 +123,7 @@ export function FactorsEditor({ zones }: { zones: Zone[] }) {
               <li key={zone.id} className="px-4 py-4">
                 {editing === zone.id ? (
                   <div className="flex items-center gap-3">
-                    <span className="flex-1 text-base font-medium text-gray-800">{zone.name}</span>
+                    <span className="flex-1 text-base font-medium text-foreground">{zone.name}</span>
                     <div className="flex items-center gap-2">
                       <input
                         type="number"
@@ -133,7 +133,7 @@ export function FactorsEditor({ zones }: { zones: Zone[] }) {
                         step="0.01"
                         min="1"
                         max="3"
-                        className="w-24 border border-gray-300 rounded-xl px-3 py-2 text-lg text-center focus:outline-none focus:border-blue-400"
+                        className="w-24 border border-border rounded-xl px-3 py-2 text-lg text-center focus:outline-none focus:border-primary"
                       />
                       <button
                         onClick={() => saveZone(zone.id, zone.name)}
@@ -144,7 +144,7 @@ export function FactorsEditor({ zones }: { zones: Zone[] }) {
                       </button>
                       <button
                         onClick={() => setEditing(null)}
-                        className="text-gray-500 px-3 py-3 rounded-xl text-base active:bg-gray-100"
+                        className="text-muted-foreground px-3 py-3 rounded-xl text-base active:bg-muted"
                       >
                         취소
                       </button>
@@ -153,8 +153,8 @@ export function FactorsEditor({ zones }: { zones: Zone[] }) {
                 ) : (
                   <div className="flex items-center justify-between">
                     <div>
-                      <p className="text-base font-medium text-gray-800">{zone.name}</p>
-                      <p className="text-sm text-gray-500">× {zone.distance_factor.toFixed(2)}</p>
+                      <p className="text-base font-medium text-foreground">{zone.name}</p>
+                      <p className="text-sm text-muted-foreground">× {zone.distance_factor.toFixed(2)}</p>
                     </div>
                     <button
                       onClick={() => startEdit(zone)}
@@ -171,36 +171,36 @@ export function FactorsEditor({ zones }: { zones: Zone[] }) {
       </div>
 
       {/* 난이도 계수 — 코어 패키지 고정값 안내 */}
-      <div className="bg-white rounded-2xl border border-gray-200 overflow-hidden">
-        <div className="px-4 py-4 border-b border-gray-100">
-          <h2 className="text-lg font-bold text-gray-900">난이도 계수</h2>
-          <p className="text-sm text-gray-500">견적 마법사에서 현장 난이도 선택 시 자동 적용</p>
+      <div className="bg-card rounded-2xl border border-border overflow-hidden">
+        <div className="px-4 py-4 border-b border-border">
+          <h2 className="text-lg font-bold text-foreground">난이도 계수</h2>
+          <p className="text-sm text-muted-foreground">견적 마법사에서 현장 난이도 선택 시 자동 적용</p>
         </div>
         <ul className="divide-y divide-gray-100">
           {DIFFICULTY_INFO.map((d) => (
             <li key={d.key} className="px-4 py-4 flex items-center justify-between">
               <div>
-                <p className="text-base font-medium text-gray-800">{d.label}</p>
-                <p className="text-sm text-gray-500">{d.desc}</p>
+                <p className="text-base font-medium text-foreground">{d.label}</p>
+                <p className="text-sm text-muted-foreground">{d.desc}</p>
               </div>
-              <span className="text-lg font-bold text-gray-700">× {d.factor.toFixed(2)}</span>
+              <span className="text-lg font-bold text-foreground/90">× {d.factor.toFixed(2)}</span>
             </li>
           ))}
         </ul>
       </div>
 
       {/* 예비·비상율 */}
-      <div className="bg-white rounded-2xl border border-gray-200 overflow-hidden">
-        <div className="px-4 py-4 border-b border-gray-100">
-          <h2 className="text-lg font-bold text-gray-900">예비·비상율</h2>
-          <p className="text-sm text-gray-500">견적 합계에 자동으로 더해지는 가산율</p>
+      <div className="bg-card rounded-2xl border border-border overflow-hidden">
+        <div className="px-4 py-4 border-b border-border">
+          <h2 className="text-lg font-bold text-foreground">예비·비상율</h2>
+          <p className="text-sm text-muted-foreground">견적 합계에 자동으로 더해지는 가산율</p>
         </div>
         <ul className="divide-y divide-gray-100">
           {RATE_INFO.map((r) => (
             <li key={r.key} className="px-4 py-4 flex items-center justify-between">
               <div>
-                <p className="text-base font-medium text-gray-800">{r.label}</p>
-                <p className="text-sm text-gray-500">{r.desc}</p>
+                <p className="text-base font-medium text-foreground">{r.label}</p>
+                <p className="text-sm text-muted-foreground">{r.desc}</p>
               </div>
               <span className="text-lg font-bold text-primary">+{r.defaultVal}%</span>
             </li>
@@ -212,7 +212,7 @@ export function FactorsEditor({ zones }: { zones: Zone[] }) {
       </div>
 
       {success && (
-        <div className="fixed bottom-24 left-1/2 -translate-x-1/2 bg-gray-900 text-white px-6 py-3 rounded-full text-sm font-medium shadow-lg">
+        <div className="fixed bottom-24 left-1/2 -translate-x-1/2 bg-foreground text-background px-6 py-3 rounded-full text-sm font-medium shadow-lg">
           {success}
         </div>
       )}

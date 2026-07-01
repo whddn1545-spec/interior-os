@@ -18,16 +18,16 @@ export function HelpModal({ tutorialKey, onClose }: Props) {
       onClick={onClose}
     >
       <div
-        className="bg-white rounded-t-3xl max-h-[90vh] overflow-y-auto animate-help-slide-up"
+        className="bg-card rounded-t-3xl max-h-[90vh] overflow-y-auto animate-help-slide-up"
         onClick={(e) => e.stopPropagation()}
       >
         {/* 상단 X 버튼 */}
-        <div className="sticky top-0 bg-white flex justify-end px-4 pt-4">
+        <div className="sticky top-0 bg-card flex justify-end px-4 pt-4">
           <button
             type="button"
             onClick={onClose}
             aria-label="닫기"
-            className="w-12 h-12 flex items-center justify-center rounded-full bg-gray-100 text-2xl text-gray-600 active:bg-gray-200"
+            className="w-12 h-12 flex items-center justify-center rounded-full bg-muted text-2xl text-foreground active:bg-accent"
           >
             ✕
           </button>
@@ -36,7 +36,7 @@ export function HelpModal({ tutorialKey, onClose }: Props) {
         {/* 큰 이모지 + 제목 */}
         <div className="px-6 text-center">
           <div className="text-[80px] leading-none">{content.icon}</div>
-          <h2 className="text-[28px] font-bold text-gray-900 mt-2">{content.title}</h2>
+          <h2 className="text-[28px] font-bold text-foreground mt-2">{content.title}</h2>
         </div>
 
         {/* 단계별 카드 리스트 */}
@@ -44,16 +44,16 @@ export function HelpModal({ tutorialKey, onClose }: Props) {
           {content.steps.map((step, i) => (
             <div
               key={i}
-              className="flex items-start gap-4 bg-gray-50 rounded-2xl px-4 py-4"
+              className="flex items-start gap-4 bg-muted rounded-2xl px-4 py-4"
             >
               <span className="text-3xl leading-none shrink-0">{step.icon}</span>
-              <p className="text-lg text-gray-800 leading-snug">{step.text}</p>
+              <p className="text-lg text-foreground leading-snug">{step.text}</p>
             </div>
           ))}
         </div>
 
         {/* 하단 버튼 */}
-        <div className="px-6 py-6 pb-8 sticky bottom-0 bg-white">
+        <div className="px-6 py-6 pb-8 sticky bottom-0 bg-card">
           <button
             type="button"
             onClick={onClose}

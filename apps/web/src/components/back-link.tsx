@@ -20,7 +20,7 @@ function BackLinkInner({ fallbackHref }: { fallbackHref: string }) {
     <Link
       href={href}
       aria-label="뒤로 가기"
-      className="flex h-14 w-14 -ml-2 items-center justify-center text-gray-600 active:bg-gray-100 rounded-xl"
+      className="flex h-14 w-14 -ml-2 items-center justify-center text-muted-foreground active:bg-muted rounded-xl"
     >
       <ArrowLeftIcon size={26} />
     </Link>
@@ -35,7 +35,7 @@ export function BackLink({ fallbackHref = "/" }: { fallbackHref?: string }) {
         <Link
           href={fallbackHref}
           aria-label="뒤로 가기"
-          className="flex h-14 w-14 -ml-2 items-center justify-center text-gray-600 active:bg-gray-100 rounded-xl"
+          className="flex h-14 w-14 -ml-2 items-center justify-center text-muted-foreground active:bg-muted rounded-xl"
         >
           <ArrowLeftIcon size={26} />
         </Link>

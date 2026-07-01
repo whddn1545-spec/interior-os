@@ -42,15 +42,15 @@ export default async function PaymentsPage({
     <div className="mx-auto w-full max-w-2xl px-4 py-6 pb-24">
       <Link
         href="/"
-        className="mb-3 -ml-2 inline-flex h-14 items-center gap-2 rounded-xl px-2 text-base font-semibold text-gray-600 active:bg-gray-100"
+        className="mb-3 -ml-2 inline-flex h-14 items-center gap-2 rounded-xl px-2 text-base font-semibold text-muted-foreground active:bg-muted"
       >
         <ArrowLeftIcon size={24} />
         홈으로
       </Link>
       {/* 상단 헤더 */}
       <header className="mb-6">
-        <h1 className="text-2xl font-black text-gray-900">💰 받을 돈</h1>
-        <p className="mt-2 text-sm text-gray-500">총 미수금</p>
+        <h1 className="text-2xl font-black text-foreground">💰 받을 돈</h1>
+        <p className="mt-2 text-sm text-muted-foreground">총 미수금</p>
         <p className="text-4xl font-black text-primary/90">
           {totalOutstanding.toLocaleString("ko-KR")}원
         </p>
@@ -72,7 +72,7 @@ export default async function PaymentsPage({
               className={`flex h-14 min-w-[80px] flex-1 items-center justify-center rounded-xl px-4 text-base font-bold transition-colors ${
                 isActive
                   ? "bg-primary/90 text-white"
-                  : "bg-gray-100 text-gray-700 active:bg-gray-200"
+                  : "bg-muted text-foreground/90 active:bg-muted"
               }`}
             >
               {f.label}
@@ -92,9 +92,9 @@ export default async function PaymentsPage({
 
       {/* 카드 리스트 */}
       {filtered.length === 0 ? (
-        <div className="rounded-2xl border border-gray-200 bg-white px-4 py-16 text-center">
-          <p className="text-lg font-bold text-gray-400">받을 돈이 없습니다 🎉</p>
-          <p className="mt-3 text-base text-gray-500">
+        <div className="rounded-2xl border border-border bg-card px-4 py-16 text-center">
+          <p className="text-lg font-bold text-muted-foreground/70">받을 돈이 없습니다 🎉</p>
+          <p className="mt-3 text-base text-muted-foreground">
             확정된 견적이 있는데 안 보이나요?
           </p>
           <Link

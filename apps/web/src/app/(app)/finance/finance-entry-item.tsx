@@ -28,19 +28,19 @@ export function FinanceEntryItem({ id, direction, amount, paidAt, siteName, memo
   }
 
   return (
-    <div className="bg-white border border-gray-200 rounded-2xl px-4 py-3">
+    <div className="bg-card border border-border rounded-2xl px-4 py-3">
       <div className="flex items-center justify-between gap-2">
         <div className="flex-1 min-w-0">
           <div className="flex items-center gap-2">
             <span className={`text-xs px-2 py-0.5 rounded-full font-medium ${isIn ? "bg-green-100 text-profit" : "bg-red-100 text-loss"}`}>
               {isIn ? "수입" : "지출"}
             </span>
-            <p className="text-base font-semibold text-gray-900 truncate">{categoryLabel}</p>
+            <p className="text-base font-semibold text-foreground truncate">{categoryLabel}</p>
           </div>
-          <p className="text-sm text-gray-500 mt-0.5">
+          <p className="text-sm text-muted-foreground mt-0.5">
             {paidAt}{siteName ? ` · ${siteName}` : ""}
           </p>
-          {memo && <p className="text-sm text-gray-400">{memo}</p>}
+          {memo && <p className="text-sm text-muted-foreground/70">{memo}</p>}
         </div>
         <div className="flex items-center gap-2 shrink-0">
           <p className={`text-xl font-bold ${isIn ? "text-profit" : "text-red-500"}`}>
@@ -48,7 +48,7 @@ export function FinanceEntryItem({ id, direction, amount, paidAt, siteName, memo
           </p>
           <button
             onClick={() => setConfirmDelete(true)}
-            className="p-3 -mr-1 text-gray-300 active:text-red-400"
+            className="p-3 -mr-1 text-muted-foreground/50 active:text-red-400"
             aria-label="삭제"
           >
             <Trash2Icon size={20} />
@@ -69,7 +69,7 @@ export function FinanceEntryItem({ id, direction, amount, paidAt, siteName, memo
             </button>
             <button
               onClick={() => setConfirmDelete(false)}
-              className="flex-1 border border-gray-300 text-gray-700 py-2.5 rounded-xl text-base font-semibold active:bg-gray-100"
+              className="flex-1 border border-border text-foreground/90 py-2.5 rounded-xl text-base font-semibold active:bg-muted"
             >
               취소
             </button>

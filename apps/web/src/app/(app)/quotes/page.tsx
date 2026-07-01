@@ -55,7 +55,7 @@ export default async function QuotesPage({
   };
 
   const statusColor: Record<string, string> = {
-    draft: "bg-gray-100 text-gray-600",
+    draft: "bg-muted text-muted-foreground",
     confirmed: "bg-blue-100 text-primary/90",
     sent: "bg-green-100 text-profit",
     accepted: "bg-purple-100 text-purple-700",
@@ -71,11 +71,11 @@ export default async function QuotesPage({
       <div className="grid grid-cols-2 gap-3 mb-6">
         <div className="bg-primary/10 border border-blue-100 rounded-2xl p-4 text-center">
           <p className="text-2xl font-black text-primary/90">{monthConfirmed.length}건</p>
-          <p className="text-sm text-gray-500">이번달 확정 견적</p>
+          <p className="text-sm text-muted-foreground">이번달 확정 견적</p>
         </div>
         <div className="bg-profit/10 border border-green-100 rounded-2xl p-4 text-center">
           <p className="text-lg font-black text-profit">{monthTotal.toLocaleString("ko-KR")}원</p>
-          <p className="text-sm text-gray-500">이번달 견적 총액</p>
+          <p className="text-sm text-muted-foreground">이번달 견적 총액</p>
         </div>
       </div>
 
@@ -90,7 +90,7 @@ export default async function QuotesPage({
               className={`flex h-14 min-w-[88px] flex-1 items-center justify-center rounded-xl px-4 text-base font-bold transition-colors ${
                 isActive
                   ? "bg-primary/90 text-white"
-                  : "bg-gray-100 text-gray-700 active:bg-gray-200"
+                  : "bg-muted text-foreground/90 active:bg-muted"
               }`}
             >
               {f.label}
@@ -100,12 +100,12 @@ export default async function QuotesPage({
       </nav>
 
       {allQuotes.length === 0 ? (
-        <div className="text-center py-16 text-gray-400">
+        <div className="text-center py-16 text-muted-foreground/70">
           <p className="text-xl mb-2">아직 견적이 없어요</p>
           <p className="text-base">위의 &quot;새 견적&quot; 버튼을 눌러 시작하세요</p>
         </div>
       ) : visibleQuotes.length === 0 ? (
-        <div className="text-center py-16 text-gray-400">
+        <div className="text-center py-16 text-muted-foreground/70">
           <p className="text-xl mb-2">해당 상태의 견적이 없어요</p>
           <p className="text-base">다른 탭을 눌러보세요</p>
         </div>
@@ -116,28 +116,28 @@ export default async function QuotesPage({
             const customerName = site?.customers?.name ?? null;
             const isDraft = (q.status as string) === "draft";
             return (
-              <li key={q.id} className="bg-white border border-gray-200 rounded-2xl overflow-hidden">
+              <li key={q.id} className="bg-card border border-border rounded-2xl overflow-hidden">
                 <Link
                   href={`/quotes/${q.id}?from=/quotes`}
-                  className="block px-4 py-4 active:bg-gray-50"
+                  className="block px-4 py-4 active:bg-muted"
                 >
                   <div className="flex items-start justify-between gap-3">
                     <div className="flex-1 min-w-0">
-                      <p className="text-lg font-semibold text-gray-900 truncate">
+                      <p className="text-lg font-semibold text-foreground truncate">
                         {site?.name ?? "현장 정보 없음"}
                       </p>
-                      <p className="text-base text-gray-500 mt-0.5">
+                      <p className="text-base text-muted-foreground mt-0.5">
                         {customerName ? `${customerName} · ` : ""}v{q.version} ·{" "}
                         {new Date(q.created_at).toLocaleDateString("ko-KR")}
                       </p>
                     </div>
                     <div className="text-right shrink-0">
-                      <p className="text-lg font-bold text-gray-900">
+                      <p className="text-lg font-bold text-foreground">
                         {q.total_amount.toLocaleString("ko-KR")}원
                       </p>
                       <span
                         className={`inline-block text-sm px-2 py-0.5 rounded-full mt-1 font-medium ${
-                          statusColor[q.status] ?? "bg-gray-100 text-gray-600"
+                          statusColor[q.status] ?? "bg-muted text-muted-foreground"
                         }`}
                       >
                         {statusLabel[q.status] ?? q.status}

@@ -35,7 +35,7 @@ export default async function WorkersPage({
       {/* 홈으로 돌아가기 (더보기 메뉴로 진입 시 길 잃지 않도록) */}
       <Link
         href="/"
-        className="mb-3 -ml-2 inline-flex h-14 items-center gap-2 rounded-xl px-2 text-base font-semibold text-gray-600 active:bg-gray-100"
+        className="mb-3 -ml-2 inline-flex h-14 items-center gap-2 rounded-xl px-2 text-base font-semibold text-muted-foreground active:bg-muted"
       >
         <ArrowLeftIcon size={24} />
         홈으로
@@ -72,14 +72,14 @@ export default async function WorkersPage({
           <div className="relative flex-1">
             <SearchIcon
               size={22}
-              className="absolute left-4 top-1/2 -translate-y-1/2 text-gray-400 pointer-events-none"
+              className="absolute left-4 top-1/2 -translate-y-1/2 text-muted-foreground/70 pointer-events-none"
             />
             <input
               type="text"
               name="q"
               defaultValue={query}
               placeholder="이름·전화·업체 검색"
-              className="w-full rounded-xl border border-gray-300 bg-white py-4 pl-12 pr-4 text-base text-gray-900 placeholder:text-gray-400 focus:border-blue-500 focus:outline-none"
+              className="w-full rounded-xl border border-border bg-card py-4 pl-12 pr-4 text-base text-foreground placeholder:text-muted-foreground/70 focus:border-primary focus:outline-none"
             />
           </div>
           <button
@@ -101,7 +101,7 @@ export default async function WorkersPage({
       )}
 
       {!workers || workers.length === 0 ? (
-        <div className="text-center py-16 text-gray-400">
+        <div className="text-center py-16 text-muted-foreground/70">
           <p className="text-xl mb-2">
             {query ? "조건에 맞는 작업자가 없어요" : "등록된 작업자가 없어요"}
           </p>
@@ -129,20 +129,20 @@ export default async function WorkersPage({
               <li key={wAny.id as string}>
                 <Link
                   href={`/workers/${wAny.id as string}`}
-                  className="flex items-center gap-3 bg-white border border-gray-200 rounded-2xl px-4 py-4 active:bg-gray-50">
-                  <div className="w-12 h-12 bg-gray-100 rounded-full flex items-center justify-center text-xl font-bold text-gray-600 shrink-0">
+                  className="flex items-center gap-3 bg-card border border-border rounded-2xl px-4 py-4 active:bg-muted">
+                  <div className="w-12 h-12 bg-muted rounded-full flex items-center justify-center text-xl font-bold text-muted-foreground shrink-0">
                     {(wAny.name as string).charAt(0)}
                   </div>
                   <div className="flex-1 min-w-0">
                     <div className="flex items-center gap-2">
-                      <p className="text-lg font-semibold text-gray-900">{wAny.name as string}</p>
+                      <p className="text-lg font-semibold text-foreground">{wAny.name as string}</p>
                       {rating !== null && (
                         <span className="text-sm text-amber-500">{"★".repeat(Math.round(rating))}</span>
                       )}
                     </div>
-                    <p className="text-base text-gray-500 truncate">{tradeNames || "다능"}</p>
+                    <p className="text-base text-muted-foreground truncate">{tradeNames || "다능"}</p>
                     {(wAny.company as string | null) && (
-                      <p className="text-sm text-gray-400">{wAny.company as string}</p>
+                      <p className="text-sm text-muted-foreground/70">{wAny.company as string}</p>
                     )}
                   </div>
                   <a

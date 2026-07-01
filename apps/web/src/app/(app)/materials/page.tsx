@@ -78,10 +78,10 @@ export default function MaterialsPage() {
   const selectedLabel = MATERIAL_FORMULAS.find((f) => f.trade === selectedTrade)?.label ?? "";
 
   return (
-    <div className="min-h-screen bg-gray-50 pb-24">
-      <header className="sticky top-0 bg-white border-b border-gray-100 z-10 px-4 py-3 flex items-center gap-3">
+    <div className="min-h-screen bg-muted pb-24">
+      <header className="sticky top-0 bg-card border-b border-border z-10 px-4 py-3 flex items-center gap-3">
         <BackLink fallbackHref="/" />
-        <h1 className="text-xl font-bold text-gray-900">자재 수량 산출</h1>
+        <h1 className="text-xl font-bold text-foreground">자재 수량 산출</h1>
       </header>
 
       <div className="max-w-lg mx-auto px-4 pt-6 space-y-5">
@@ -91,7 +91,7 @@ export default function MaterialsPage() {
 
         {/* 공종 선택 */}
         <div>
-          <label className="block text-base font-semibold text-gray-700 mb-2">공종</label>
+          <label className="block text-base font-semibold text-foreground/90 mb-2">공종</label>
           <div className="grid grid-cols-3 gap-2">
             {MATERIAL_FORMULAS.map(({ trade, label }) => (
               <button
@@ -100,7 +100,7 @@ export default function MaterialsPage() {
                 className={`py-4 rounded-xl text-base font-semibold transition-colors ${
                   selectedTrade === trade
                     ? "bg-primary text-white"
-                    : "bg-white border border-gray-300 text-gray-700"
+                    : "bg-card border border-border text-foreground/90"
                 }`}
               >
                 {label}
@@ -111,7 +111,7 @@ export default function MaterialsPage() {
 
         {/* 면적 입력 */}
         <div>
-          <label className="block text-base font-semibold text-gray-700 mb-2">면적 (평)</label>
+          <label className="block text-base font-semibold text-foreground/90 mb-2">면적 (평)</label>
           <div className="flex gap-3 items-center">
             <input
               type="number"
@@ -120,12 +120,12 @@ export default function MaterialsPage() {
               max={200}
               value={areaPyeong}
               onChange={(e) => { setAreaPyeong(e.target.value ? Number(e.target.value) : ""); setCalculated(false); }}
-              className="flex-1 border border-gray-300 rounded-xl px-4 py-3 text-xl font-bold text-center"
+              className="flex-1 border border-border rounded-xl px-4 py-3 text-xl font-bold text-center"
             />
-            <span className="text-lg text-gray-500 font-medium">평</span>
+            <span className="text-lg text-muted-foreground font-medium">평</span>
           </div>
           {areaPyeong ? (
-            <p className="text-sm text-gray-500 mt-1 text-center">
+            <p className="text-sm text-muted-foreground mt-1 text-center">
               약 {((areaPyeong as number) * 3.305).toFixed(1)}㎡
             </p>
           ) : null}
@@ -143,20 +143,20 @@ export default function MaterialsPage() {
 
         {/* 결과 */}
         {calculated && results.length > 0 && (
-          <div className="bg-white border border-gray-200 rounded-2xl p-4">
-            <h2 className="text-xl font-bold text-gray-900 mb-4">
+          <div className="bg-card border border-border rounded-2xl p-4">
+            <h2 className="text-xl font-bold text-foreground mb-4">
               {selectedLabel} {areaPyeong}평 필요 자재
             </h2>
             <div className="space-y-3">
               {results.map((r, i) => (
-                <div key={i} className="flex items-center justify-between py-2 border-b border-gray-100 last:border-0">
+                <div key={i} className="flex items-center justify-between py-2 border-b border-border last:border-0">
                   <div>
-                    <p className="text-base font-semibold text-gray-900">{r.name}</p>
-                    <p className="text-sm text-gray-500">{r.formulaText}</p>
+                    <p className="text-base font-semibold text-foreground">{r.name}</p>
+                    <p className="text-sm text-muted-foreground">{r.formulaText}</p>
                   </div>
                   <div className="text-right">
                     <p className="text-2xl font-black text-primary/90">{r.qty}</p>
-                    <p className="text-sm text-gray-500">{r.unit}</p>
+                    <p className="text-sm text-muted-foreground">{r.unit}</p>
                   </div>
                 </div>
               ))}

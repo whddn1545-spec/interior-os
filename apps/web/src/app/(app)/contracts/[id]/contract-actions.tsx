@@ -111,7 +111,7 @@ export function ContractActions({ contractId, status, siteId }: Props) {
           <button
             onClick={handleGeneratePdf}
             disabled={generatingPdf}
-            className="flex items-center justify-center gap-2 w-full bg-white text-primary/90 border-2 border-blue-600 rounded-2xl py-4 text-lg font-semibold disabled:opacity-50 active:bg-primary/10"
+            className="flex items-center justify-center gap-2 w-full bg-card text-primary/90 border-2 border-blue-600 rounded-2xl py-4 text-lg font-semibold disabled:opacity-50 active:bg-primary/10"
           >
             <FileTextIcon size={20} />
             {generatingPdf ? "PDF 생성 중..." : "계약서 PDF 보기"}
@@ -137,9 +137,9 @@ export function ContractActions({ contractId, status, siteId }: Props) {
 
       {showConfirm && (
         <div className="fixed inset-0 bg-black/50 z-50 flex items-end">
-          <div className="bg-white w-full rounded-t-3xl p-6 pb-8">
-            <h3 className="text-2xl font-bold text-gray-900 mb-2 text-center">계약서를 확정할까요?</h3>
-            <p className="text-base text-gray-500 text-center mb-6">
+          <div className="bg-card w-full rounded-t-3xl p-6 pb-8">
+            <h3 className="text-2xl font-bold text-foreground mb-2 text-center">계약서를 확정할까요?</h3>
+            <p className="text-base text-muted-foreground text-center mb-6">
               확정 후에는 PDF를 생성하고 고객에게 보낼 수 있어요
             </p>
             <div className="space-y-3">
@@ -152,7 +152,7 @@ export function ContractActions({ contractId, status, siteId }: Props) {
               </button>
               <button
                 onClick={() => setShowConfirm(false)}
-                className="w-full bg-gray-100 text-gray-700 rounded-2xl py-4 text-lg font-medium active:bg-gray-200"
+                className="w-full bg-muted text-foreground/90 rounded-2xl py-4 text-lg font-medium active:bg-muted"
               >
                 취소
               </button>

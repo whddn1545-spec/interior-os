@@ -17,8 +17,8 @@ export default function AppError({
   return (
     <div className="px-4 pt-16 pb-24 flex flex-col items-center text-center">
       <AlertCircleIcon size={56} className="text-red-400 mb-4" />
-      <h2 className="text-2xl font-bold text-gray-900 mb-2">문제가 생겼어요</h2>
-      <p className="text-lg text-gray-500 mb-8">
+      <h2 className="text-2xl font-bold text-foreground mb-2">문제가 생겼어요</h2>
+      <p className="text-lg text-muted-foreground mb-8">
         잠깐 오류가 발생했어요.
         <br />
         아래 버튼을 눌러 다시 시도해보세요.

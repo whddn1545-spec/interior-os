@@ -70,17 +70,17 @@ export function WorkerEditForm({ worker }: { worker: Worker }) {
   return (
     <form onSubmit={handleSubmit} className="space-y-5">
       <div>
-        <label className="block text-base font-semibold text-gray-700 mb-2">이름 *</label>
+        <label className="block text-base font-semibold text-foreground/90 mb-2">이름 *</label>
         <input
           name="name"
           required
           defaultValue={worker.name}
-          className="w-full border border-gray-300 rounded-xl px-4 py-3 text-base"
+          className="w-full border border-border rounded-xl px-4 py-3 text-base"
         />
       </div>
 
       <div>
-        <label className="block text-base font-semibold text-gray-700 mb-2">전화번호 *</label>
+        <label className="block text-base font-semibold text-foreground/90 mb-2">전화번호 *</label>
         <input
           name="phone"
           type="tel"
@@ -89,22 +89,22 @@ export function WorkerEditForm({ worker }: { worker: Worker }) {
           value={phone}
           onChange={(e) => setPhone(formatPhone(e.target.value))}
           placeholder="010-0000-0000"
-          className="w-full border border-gray-300 rounded-xl px-4 py-3 text-base"
+          className="w-full border border-border rounded-xl px-4 py-3 text-base"
         />
       </div>
 
       <div>
-        <label className="block text-base font-semibold text-gray-700 mb-2">업체명 (선택)</label>
+        <label className="block text-base font-semibold text-foreground/90 mb-2">업체명 (선택)</label>
         <input
           name="company"
           defaultValue={worker.company ?? ""}
-          className="w-full border border-gray-300 rounded-xl px-4 py-3 text-base"
+          className="w-full border border-border rounded-xl px-4 py-3 text-base"
         />
       </div>
 
       {/* 평점 */}
       <div>
-        <label className="block text-base font-semibold text-gray-700 mb-2">평점</label>
+        <label className="block text-base font-semibold text-foreground/90 mb-2">평점</label>
         <div className="flex gap-2">
           {[0, 1, 2, 3, 4, 5].map((v) => (
             <button
@@ -112,7 +112,7 @@ export function WorkerEditForm({ worker }: { worker: Worker }) {
               type="button"
               onClick={() => setRating(v)}
               className={`flex-1 py-3 rounded-xl text-base font-bold transition-colors active:opacity-70 ${
-                rating === v ? "bg-amber-400 text-white" : "bg-gray-100 text-gray-600"
+                rating === v ? "bg-amber-400 text-white" : "bg-muted text-muted-foreground"
               }`}
             >
               {v === 0 ? "없음" : "★".repeat(v)}
@@ -123,7 +123,7 @@ export function WorkerEditForm({ worker }: { worker: Worker }) {
 
       {/* 담당 공종 */}
       <div>
-        <label className="block text-base font-semibold text-gray-700 mb-2">담당 공종</label>
+        <label className="block text-base font-semibold text-foreground/90 mb-2">담당 공종</label>
         <div className="grid grid-cols-3 gap-2">
           {ALL_TRADES.map(({ code, label }) => {
             const checked = worker.tradeCodes.includes(code);
@@ -136,7 +136,7 @@ export function WorkerEditForm({ worker }: { worker: Worker }) {
                   defaultChecked={checked}
                   className="w-5 h-5 accent-blue-600"
                 />
-                <span className="text-base text-gray-700">{label}</span>
+                <span className="text-base text-foreground/90">{label}</span>
               </label>
             );
           })}
@@ -145,13 +145,13 @@ export function WorkerEditForm({ worker }: { worker: Worker }) {
 
       {/* 메모 */}
       <div>
-        <label className="block text-base font-semibold text-gray-700 mb-2">메모 / 이력</label>
+        <label className="block text-base font-semibold text-foreground/90 mb-2">메모 / 이력</label>
         <textarea
           name="memo"
           defaultValue={worker.memo ?? ""}
           rows={3}
           placeholder="작업 특이사항, 이력 등"
-          className="w-full border border-gray-300 rounded-xl px-4 py-3 text-base resize-none"
+          className="w-full border border-border rounded-xl px-4 py-3 text-base resize-none"
         />
       </div>
 
@@ -174,7 +174,7 @@ export function WorkerEditForm({ worker }: { worker: Worker }) {
           <p className="text-base font-semibold text-red-900 mb-1">작업자를 숨길까요?</p>
           <p className="text-sm text-loss mb-3">목록에서 사라지며 복구할 수 없어요.</p>
           <div className="flex gap-2">
-            <button type="button" onClick={() => setShowDeactivateConfirm(false)} className="flex-1 py-3 rounded-xl border border-gray-300 text-gray-700 text-base font-medium">아니요</button>
+            <button type="button" onClick={() => setShowDeactivateConfirm(false)} className="flex-1 py-3 rounded-xl border border-border text-foreground/90 text-base font-medium">아니요</button>
             <button type="button" onClick={confirmDeactivate} disabled={isDeactivating} className="flex-1 py-3 rounded-xl bg-loss text-white text-base font-bold disabled:opacity-50">네, 숨기기</button>
           </div>
         </div>

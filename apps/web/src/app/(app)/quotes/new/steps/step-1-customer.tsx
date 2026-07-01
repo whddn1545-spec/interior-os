@@ -86,16 +86,16 @@ export function Step1Customer({ onNext, initialCustomer }: Props) {
   if (selected) {
     return (
       <div className="px-4 pt-6">
-        <h2 className="text-2xl font-bold text-gray-900 mb-2">누구 집인가요?</h2>
-        <p className="text-lg text-gray-500 mb-6">선택된 고객이에요</p>
+        <h2 className="text-2xl font-bold text-foreground mb-2">누구 집인가요?</h2>
+        <p className="text-lg text-muted-foreground mb-6">선택된 고객이에요</p>
 
-        <div className="flex items-center gap-4 bg-white border border-primary/30 rounded-xl px-4 py-4 mb-4">
+        <div className="flex items-center gap-4 bg-card border border-primary/30 rounded-xl px-4 py-4 mb-4">
           <div className="w-12 h-12 bg-blue-100 rounded-full flex items-center justify-center shrink-0">
             <UserIcon size={22} className="text-primary" />
           </div>
           <div className="flex-1 min-w-0">
-            <p className="text-lg font-semibold text-gray-900">{selected.name}</p>
-            <p className="text-base text-gray-500">{selected.phone}</p>
+            <p className="text-lg font-semibold text-foreground">{selected.name}</p>
+            <p className="text-base text-muted-foreground">{selected.phone}</p>
           </div>
           <button
             onClick={() => setSelected(undefined)}
@@ -117,18 +117,18 @@ export function Step1Customer({ onNext, initialCustomer }: Props) {
 
   return (
     <div className="px-4 pt-6">
-      <h2 className="text-2xl font-bold text-gray-900 mb-2">누구 집인가요?</h2>
-      <p className="text-lg text-gray-500 mb-6">고객을 검색하거나 새로 추가하세요</p>
+      <h2 className="text-2xl font-bold text-foreground mb-2">누구 집인가요?</h2>
+      <p className="text-lg text-muted-foreground mb-6">고객을 검색하거나 새로 추가하세요</p>
 
       {/* 검색 */}
       <div className="relative mb-4">
-        <SearchIcon size={22} className="absolute left-4 top-1/2 -translate-y-1/2 text-gray-400" />
+        <SearchIcon size={22} className="absolute left-4 top-1/2 -translate-y-1/2 text-muted-foreground/70" />
         <input
           type="text"
           value={query}
           onChange={(e) => handleSearch(e.target.value)}
           placeholder="이름 또는 전화번호 검색"
-          className="w-full pl-12 pr-4 py-4 text-lg border border-gray-300 rounded-xl focus:outline-none focus:ring-2 focus:ring-blue-500 bg-white"
+          className="w-full pl-12 pr-4 py-4 text-lg border border-border rounded-xl focus:outline-none focus:ring-2 focus:ring-primary/500 bg-card"
         />
       </div>
 
@@ -139,14 +139,14 @@ export function Step1Customer({ onNext, initialCustomer }: Props) {
             <li key={c.id}>
               <button
                 onClick={() => onNext(c)}
-                className="w-full flex items-center gap-4 bg-white border border-gray-200 rounded-xl px-4 py-4 text-left active:border-blue-400 active:bg-primary/10"
+                className="w-full flex items-center gap-4 bg-card border border-border rounded-xl px-4 py-4 text-left active:border-blue-400 active:bg-primary/10"
               >
                 <div className="w-12 h-12 bg-blue-100 rounded-full flex items-center justify-center shrink-0">
                   <UserIcon size={22} className="text-primary" />
                 </div>
                 <div>
-                  <p className="text-lg font-semibold text-gray-900">{c.name}</p>
-                  <p className="text-base text-gray-500">{c.phone}</p>
+                  <p className="text-lg font-semibold text-foreground">{c.name}</p>
+                  <p className="text-base text-muted-foreground">{c.phone}</p>
                 </div>
               </button>
             </li>
@@ -158,7 +158,7 @@ export function Step1Customer({ onNext, initialCustomer }: Props) {
       {!showNewForm && (
         <button
           onClick={() => setShowNewForm(true)}
-          className="w-full flex items-center gap-3 border-2 border-dashed border-gray-300 rounded-xl px-4 py-4 text-lg text-gray-500 active:border-blue-400 active:text-primary"
+          className="w-full flex items-center gap-3 border-2 border-dashed border-border rounded-xl px-4 py-4 text-lg text-muted-foreground active:border-blue-400 active:text-primary"
         >
           <PlusIcon size={24} />
           새 고객 추가
@@ -167,33 +167,33 @@ export function Step1Customer({ onNext, initialCustomer }: Props) {
 
       {/* 새 고객 폼 */}
       {showNewForm && (
-        <div className="bg-white border border-gray-200 rounded-xl p-4 space-y-3">
-          <h3 className="text-lg font-semibold text-gray-800">새 고객 정보</h3>
+        <div className="bg-card border border-border rounded-xl p-4 space-y-3">
+          <h3 className="text-lg font-semibold text-foreground">새 고객 정보</h3>
           <div>
-            <label className="block text-base font-medium text-gray-700 mb-1">이름</label>
+            <label className="block text-base font-medium text-foreground/90 mb-1">이름</label>
             <input
               type="text"
               value={newName}
               onChange={(e) => setNewName(e.target.value)}
               placeholder="홍길동"
-              className="w-full px-4 py-3 text-lg border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500"
+              className="w-full px-4 py-3 text-lg border border-border rounded-lg focus:outline-none focus:ring-2 focus:ring-primary/500"
             />
           </div>
           <div>
-            <label className="block text-base font-medium text-gray-700 mb-1">전화번호</label>
+            <label className="block text-base font-medium text-foreground/90 mb-1">전화번호</label>
             <input
               type="tel"
               value={newPhone}
               onChange={(e) => setNewPhone(formatPhone(e.target.value))}
               placeholder="010-0000-0000"
-              className="w-full px-4 py-3 text-lg border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500"
+              className="w-full px-4 py-3 text-lg border border-border rounded-lg focus:outline-none focus:ring-2 focus:ring-primary/500"
             />
           </div>
           {error && <p className="text-red-500 text-base">{error}</p>}
           <div className="flex gap-3 pt-1">
             <button
               onClick={() => setShowNewForm(false)}
-              className="flex-1 py-3 text-lg border border-gray-300 rounded-xl text-gray-600"
+              className="flex-1 py-3 text-lg border border-border rounded-xl text-muted-foreground"
             >
               취소
             </button>

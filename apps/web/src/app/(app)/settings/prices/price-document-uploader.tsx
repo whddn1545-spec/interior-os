@@ -171,10 +171,10 @@ export function PriceDocumentUploader({ trades }: { trades: Trade[] }) {
             </>
           )}
         </button>
-        <p className="text-sm text-gray-400 text-center mt-2">
+        <p className="text-sm text-muted-foreground/70 text-center mt-2">
           단가표 사진을 찍어 올리면 AI가 자동으로 읽어줘요
         </p>
-        <p className="text-xs text-gray-300 text-center mt-1">
+        <p className="text-xs text-muted-foreground/50 text-center mt-1">
           PDF 지원은 추후 추가 예정
         </p>
       </div>
@@ -188,7 +188,7 @@ export function PriceDocumentUploader({ trades }: { trades: Trade[] }) {
       <div className="bg-indigo-50 border border-indigo-200 rounded-2xl p-4 mb-4">
         <div className="flex items-center justify-between mb-1">
           <h3 className="text-lg font-bold text-indigo-900">AI 추출 결과</h3>
-          <button onClick={reset} className="p-2 text-gray-500 active:bg-gray-100 rounded-lg">
+          <button onClick={reset} className="p-2 text-muted-foreground active:bg-muted rounded-lg">
             <XIcon size={20} />
           </button>
         </div>
@@ -209,10 +209,10 @@ export function PriceDocumentUploader({ trades }: { trades: Trade[] }) {
           return (
             <div
               key={idx}
-              className={`rounded-2xl border-2 overflow-hidden ${item.selected ? "border-indigo-200 bg-white" : "border-gray-100 bg-gray-50 opacity-60"}`}
+              className={`rounded-2xl border-2 overflow-hidden ${item.selected ? "border-indigo-200 bg-card" : "border-border bg-muted opacity-60"}`}
             >
               {/* 헤더 행 */}
-              <div className="flex items-center gap-3 px-4 py-3 border-b border-gray-100">
+              <div className="flex items-center gap-3 px-4 py-3 border-b border-border">
                 <input
                   type="checkbox"
                   checked={item.selected}
@@ -224,10 +224,10 @@ export function PriceDocumentUploader({ trades }: { trades: Trade[] }) {
                     type="text"
                     value={item.itemName}
                     onChange={(e) => updateItem(idx, "itemName", e.target.value)}
-                    className="text-base font-bold text-gray-900 bg-transparent w-full focus:outline-none focus:border-b focus:border-indigo-400"
+                    className="text-base font-bold text-foreground bg-transparent w-full focus:outline-none focus:border-b focus:border-indigo-400"
                     placeholder="자재명"
                   />
-                  <p className="text-xs text-gray-400 truncate">문서 원문: {item.tradeNameFromDoc}</p>
+                  <p className="text-xs text-muted-foreground/70 truncate">문서 원문: {item.tradeNameFromDoc}</p>
                 </div>
                 <span className={`text-xs font-semibold rounded-full px-2 py-0.5 shrink-0 ${conf.cls}`}>
                   {conf.label}
@@ -235,53 +235,53 @@ export function PriceDocumentUploader({ trades }: { trades: Trade[] }) {
               </div>
 
               {/* 공종 선택 */}
-              <div className="px-4 py-2 border-b border-gray-100 flex items-center gap-2">
-                <span className="text-sm text-gray-500 shrink-0">공종</span>
+              <div className="px-4 py-2 border-b border-border flex items-center gap-2">
+                <span className="text-sm text-muted-foreground shrink-0">공종</span>
                 <div className="relative flex-1">
                   <select
                     value={item.tradeId}
                     onChange={(e) => updateItem(idx, "tradeId", e.target.value)}
-                    className="w-full text-base font-semibold text-gray-800 bg-gray-50 border border-gray-200 rounded-xl px-3 py-3 appearance-none pr-8"
+                    className="w-full text-base font-semibold text-foreground bg-muted border border-border rounded-xl px-3 py-3 appearance-none pr-8"
                   >
                     {trades.map((t) => (
                       <option key={t.id} value={t.id}>{t.name_ko}</option>
                     ))}
                   </select>
-                  <ChevronDownIcon size={14} className="absolute right-2 top-2.5 text-gray-400 pointer-events-none" />
+                  <ChevronDownIcon size={14} className="absolute right-2 top-2.5 text-muted-foreground/70 pointer-events-none" />
                 </div>
               </div>
 
               {/* 수치 입력 */}
               <div className="grid grid-cols-3 gap-2 px-4 py-3">
                 <div>
-                  <label className="text-xs text-gray-500 block mb-1">자재단가(원)</label>
+                  <label className="text-xs text-muted-foreground block mb-1">자재단가(원)</label>
                   <input
                     type="number"
                     inputMode="numeric"
                     value={item.materialUnitPrice}
                     onChange={(e) => updateItem(idx, "materialUnitPrice", Number(e.target.value))}
-                    className="w-full text-base border border-gray-200 rounded-xl px-2 py-3 bg-white focus:outline-none focus:border-indigo-400"
+                    className="w-full text-base border border-border rounded-xl px-2 py-3 bg-card focus:outline-none focus:border-indigo-400"
                   />
                 </div>
                 <div>
-                  <label className="text-xs text-gray-500 block mb-1">일당(원)</label>
+                  <label className="text-xs text-muted-foreground block mb-1">일당(원)</label>
                   <input
                     type="number"
                     inputMode="numeric"
                     value={item.laborDayRate}
                     onChange={(e) => updateItem(idx, "laborDayRate", Number(e.target.value))}
-                    className="w-full text-base border border-gray-200 rounded-xl px-2 py-3 bg-white focus:outline-none focus:border-indigo-400"
+                    className="w-full text-base border border-border rounded-xl px-2 py-3 bg-card focus:outline-none focus:border-indigo-400"
                   />
                 </div>
                 <div>
-                  <label className="text-xs text-gray-500 block mb-1">단위당 작업일</label>
+                  <label className="text-xs text-muted-foreground block mb-1">단위당 작업일</label>
                   <input
                     type="number"
                     step="0.01"
                     inputMode="decimal"
                     value={item.defaultDaysPerUnit}
                     onChange={(e) => updateItem(idx, "defaultDaysPerUnit", Number(e.target.value))}
-                    className="w-full text-base border border-gray-200 rounded-xl px-2 py-3 bg-white focus:outline-none focus:border-indigo-400"
+                    className="w-full text-base border border-border rounded-xl px-2 py-3 bg-card focus:outline-none focus:border-indigo-400"
                   />
                 </div>
               </div>
@@ -304,7 +304,7 @@ export function PriceDocumentUploader({ trades }: { trades: Trade[] }) {
         </button>
         <button
           onClick={reset}
-          className="bg-gray-100 text-gray-700 rounded-2xl px-5 py-4 text-base font-semibold"
+          className="bg-muted text-foreground/90 rounded-2xl px-5 py-4 text-base font-semibold"
         >
           취소
         </button>

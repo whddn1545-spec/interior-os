@@ -27,12 +27,12 @@ export default async function PricesPage() {
   const hasAnyPrices = pricesData.length > 0;
 
   return (
-    <div className="min-h-screen bg-gray-50 pb-24">
-      <header className="sticky top-0 bg-white border-b border-gray-100 z-10 px-4 py-3 flex items-center gap-3">
-        <Link href="/settings" className="p-3 -ml-3 text-gray-600">
+    <div className="min-h-screen bg-muted pb-24">
+      <header className="sticky top-0 bg-card border-b border-border z-10 px-4 py-3 flex items-center gap-3">
+        <Link href="/settings" className="p-3 -ml-3 text-muted-foreground">
           <ArrowLeftIcon size={24} />
         </Link>
-        <h1 className="text-xl font-bold text-gray-900 flex-1">단가표 관리</h1>
+        <h1 className="text-xl font-bold text-foreground flex-1">단가표 관리</h1>
       </header>
 
       <div className="max-w-lg mx-auto px-4 pt-6">

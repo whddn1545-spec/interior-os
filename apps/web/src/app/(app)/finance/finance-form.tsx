@@ -85,10 +85,10 @@ export function FinanceForm({ sites }: { sites: Site[] }) {
 
       {open && (
         <div className="fixed inset-0 bg-black/50 z-50 flex items-end">
-          <div className="bg-white w-full rounded-t-3xl p-6 pb-10 max-h-[90vh] overflow-y-auto">
+          <div className="bg-card w-full rounded-t-3xl p-6 pb-10 max-h-[90vh] overflow-y-auto">
             <div className="flex items-center justify-between mb-6">
-              <h2 className="text-xl font-bold text-gray-900">입출금 추가</h2>
-              <button onClick={closeSheet} aria-label="닫기" className="flex items-center justify-center w-14 h-14 -mr-2 text-gray-400">
+              <h2 className="text-xl font-bold text-foreground">입출금 추가</h2>
+              <button onClick={closeSheet} aria-label="닫기" className="flex items-center justify-center w-14 h-14 -mr-2 text-muted-foreground/70">
                 <XIcon size={28} />
               </button>
             </div>
@@ -102,13 +102,13 @@ export function FinanceForm({ sites }: { sites: Site[] }) {
             <form onSubmit={handleSubmit} className="space-y-4">
               {/* 카테고리 — 항목을 먼저 고르면 수입/지출이 자동으로 맞춰진다 */}
               <div>
-                <label className="block text-base font-semibold text-gray-700 mb-2">항목</label>
+                <label className="block text-base font-semibold text-foreground/90 mb-2">항목</label>
                 <select
                   name="category"
                   required
                   value={category}
                   onChange={(e) => handleCategoryChange(e.target.value)}
-                  className="w-full border border-gray-300 rounded-xl px-4 py-3 text-base bg-white"
+                  className="w-full border border-border rounded-xl px-4 py-3 text-base bg-card"
                 >
                   <option value="customer_payment">고객 입금</option>
                   <option value="material">자재비</option>
@@ -120,7 +120,7 @@ export function FinanceForm({ sites }: { sites: Site[] }) {
 
               {/* 수입/지출 — 항목에 맞춰 자동 선택되며, 필요하면 직접 바꿀 수 있다 */}
               <div>
-                <label className="block text-base font-semibold text-gray-700 mb-2">종류</label>
+                <label className="block text-base font-semibold text-foreground/90 mb-2">종류</label>
                 <div className="grid grid-cols-2 gap-3">
                   {[
                     { value: "in", label: "수입", color: "text-profit border-green-400 bg-profit/10" },
@@ -142,12 +142,12 @@ export function FinanceForm({ sites }: { sites: Site[] }) {
                     </label>
                   ))}
                 </div>
-                <p className="mt-1.5 text-base text-gray-500">항목에 맞춰 자동으로 골라드려요. 다르면 직접 바꿀 수 있어요.</p>
+                <p className="mt-1.5 text-base text-muted-foreground">항목에 맞춰 자동으로 골라드려요. 다르면 직접 바꿀 수 있어요.</p>
               </div>
 
               {/* 금액 */}
               <div>
-                <label className="block text-base font-semibold text-gray-700 mb-2">금액 (원)</label>
+                <label className="block text-base font-semibold text-foreground/90 mb-2">금액 (원)</label>
                 <input
                   type="number"
                   name="amount"
@@ -156,31 +156,31 @@ export function FinanceForm({ sites }: { sites: Site[] }) {
                   step={1}
                   inputMode="numeric"
                   placeholder="예) 1500000"
-                  className="w-full border border-gray-300 rounded-xl px-4 py-3 text-base"
+                  className="w-full border border-border rounded-xl px-4 py-3 text-base"
                 />
-                <p className="mt-1.5 text-base text-gray-500">1원 이상, 음수는 입력할 수 없어요</p>
+                <p className="mt-1.5 text-base text-muted-foreground">1원 이상, 음수는 입력할 수 없어요</p>
               </div>
 
               {/* 날짜 */}
               <div>
-                <label className="block text-base font-semibold text-gray-700 mb-2">날짜</label>
+                <label className="block text-base font-semibold text-foreground/90 mb-2">날짜</label>
                 <input
                   type="date"
                   name="paid_at"
                   required
                   max={today}
                   defaultValue={today}
-                  className="w-full border border-gray-300 rounded-xl px-4 py-3 text-base"
+                  className="w-full border border-border rounded-xl px-4 py-3 text-base"
                 />
-                <p className="mt-1.5 text-base text-gray-500">오늘까지만 선택할 수 있어요 (미래 날짜 불가)</p>
+                <p className="mt-1.5 text-base text-muted-foreground">오늘까지만 선택할 수 있어요 (미래 날짜 불가)</p>
               </div>
 
               {/* 현장 */}
               <div>
-                <label className="block text-base font-semibold text-gray-700 mb-2">현장 (선택)</label>
+                <label className="block text-base font-semibold text-foreground/90 mb-2">현장 (선택)</label>
                 <select
                   name="site_id"
-                  className="w-full border border-gray-300 rounded-xl px-4 py-3 text-base bg-white"
+                  className="w-full border border-border rounded-xl px-4 py-3 text-base bg-card"
                 >
                   <option value="">현장 선택 안 함</option>
                   {sites.map((s) => (
@@ -191,12 +191,12 @@ export function FinanceForm({ sites }: { sites: Site[] }) {
 
               {/* 메모 */}
               <div>
-                <label className="block text-base font-semibold text-gray-700 mb-2">메모 (선택)</label>
+                <label className="block text-base font-semibold text-foreground/90 mb-2">메모 (선택)</label>
                 <input
                   type="text"
                   name="memo"
                   placeholder="거래처명, 내용 등"
-                  className="w-full border border-gray-300 rounded-xl px-4 py-3 text-base"
+                  className="w-full border border-border rounded-xl px-4 py-3 text-base"
                 />
               </div>
 

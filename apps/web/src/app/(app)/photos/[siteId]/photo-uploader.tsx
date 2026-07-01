@@ -82,7 +82,7 @@ export function PhotoUploader({ siteId }: PhotoUploaderProps) {
           </button>
           <button
             onClick={() => galleryInputRef.current?.click()}
-            className="flex flex-col items-center gap-2 bg-gray-50 border-2 border-dashed border-gray-300 rounded-2xl py-6 text-gray-600 font-semibold active:bg-gray-100"
+            className="flex flex-col items-center gap-2 bg-muted border-2 border-dashed border-border rounded-2xl py-6 text-muted-foreground font-semibold active:bg-muted"
           >
             <ImageIcon size={28} />
             <span className="text-base">사진첩 선택</span>

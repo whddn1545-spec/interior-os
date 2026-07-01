@@ -8,8 +8,8 @@ const STATUS_LABEL: Record<string, string> = {
 };
 
 const STATUS_COLOR: Record<string, string> = {
-  lead: "text-gray-500", quoting: "text-yellow-600", contracted: "text-primary",
-  in_progress: "text-profit", done: "text-gray-400", canceled: "text-red-400",
+  lead: "text-muted-foreground", quoting: "text-yellow-600", contracted: "text-primary",
+  in_progress: "text-profit", done: "text-muted-foreground/70", canceled: "text-red-400",
 };
 
 export default async function SchedulePage() {
@@ -47,7 +47,7 @@ export default async function SchedulePage() {
   return (
     <div className="px-4 pt-6 pb-24">
       <div className="flex items-center justify-between mb-6">
-        <h1 className="text-2xl font-bold text-gray-900">공사 일정</h1>
+        <h1 className="text-2xl font-bold text-foreground">공사 일정</h1>
       </div>
 
       {/* 오늘 기준 안내 */}
@@ -58,9 +58,9 @@ export default async function SchedulePage() {
 
       {sites.length === 0 ? (
         <div className="text-center py-16">
-          <CalendarIcon size={48} className="mx-auto mb-3 text-gray-300" />
-          <p className="text-xl text-gray-500">진행 중인 현장이 없어요</p>
-          <p className="text-base text-gray-400 mt-1 mb-6">견적을 확정하면 여기에서 일정을 만들 수 있어요</p>
+          <CalendarIcon size={48} className="mx-auto mb-3 text-muted-foreground/50" />
+          <p className="text-xl text-muted-foreground">진행 중인 현장이 없어요</p>
+          <p className="text-base text-muted-foreground/70 mt-1 mb-6">견적을 확정하면 여기에서 일정을 만들 수 있어요</p>
           <Link
             href="/quotes"
             className="inline-flex items-center justify-center gap-2 bg-primary text-white rounded-2xl px-8 py-4 text-lg font-bold"
@@ -89,8 +89,8 @@ export default async function SchedulePage() {
               <Link
                 key={sAny.id as string}
                 href={`/schedule/${sAny.id as string}`}
-                className={`block bg-white border rounded-2xl px-4 py-4 active:bg-gray-50 ${
-                  isActive ? "border-green-300 shadow-sm" : "border-gray-200"
+                className={`block bg-card border rounded-2xl px-4 py-4 active:bg-muted ${
+                  isActive ? "border-green-300 shadow-sm" : "border-border"
                 }`}
               >
                 <div className="flex items-start justify-between mb-3">
@@ -99,18 +99,18 @@ export default async function SchedulePage() {
                       {isActive && (
                         <span className="w-2 h-2 bg-profit/100 rounded-full shrink-0" />
                       )}
-                      <p className="text-lg font-semibold text-gray-900 truncate">{sAny.name as string}</p>
+                      <p className="text-lg font-semibold text-foreground truncate">{sAny.name as string}</p>
                     </div>
-                    <p className={`text-sm font-medium ${STATUS_COLOR[status] ?? "text-gray-500"}`}>
+                    <p className={`text-sm font-medium ${STATUS_COLOR[status] ?? "text-muted-foreground"}`}>
                       {STATUS_LABEL[status] ?? status}
                     </p>
                   </div>
-                  <ChevronRightIcon size={18} className="text-gray-300 shrink-0 mt-1" />
+                  <ChevronRightIcon size={18} className="text-muted-foreground/50 shrink-0 mt-1" />
                 </div>
 
                 {/* 날짜 */}
                 {(startDate ?? endDate) && (
-                  <p className="text-sm text-gray-500 mb-3">
+                  <p className="text-sm text-muted-foreground mb-3">
                     {startDate ? new Date(startDate).toLocaleDateString("ko-KR", { month: "numeric", day: "numeric" }) : "?"}
                     {" ~ "}
                     {endDate ? new Date(endDate).toLocaleDateString("ko-KR", { month: "numeric", day: "numeric" }) : "?"}
@@ -121,10 +121,10 @@ export default async function SchedulePage() {
                 {totalTasks > 0 && (
                   <div>
                     <div className="flex justify-between text-sm mb-1.5">
-                      <span className="text-gray-500">진행률</span>
-                      <span className="font-medium text-gray-700">{doneTasks}/{totalTasks} ({progress}%)</span>
+                      <span className="text-muted-foreground">진행률</span>
+                      <span className="font-medium text-foreground/90">{doneTasks}/{totalTasks} ({progress}%)</span>
                     </div>
-                    <div className="h-2 bg-gray-100 rounded-full overflow-hidden">
+                    <div className="h-2 bg-muted rounded-full overflow-hidden">
                       <div
                         className="h-full bg-primary/100 rounded-full transition-all"
                         style={{ width: `${progress}%` }}

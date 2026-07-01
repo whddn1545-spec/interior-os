@@ -165,15 +165,15 @@ export function GanttChart({ tasks, siteId, siteName }: Props) {
     <div>
       <div className="flex items-center justify-between mb-4">
         <div>
-          <h2 className="text-xl font-bold text-gray-900">{siteName}</h2>
-          <p className="text-base text-gray-500">
+          <h2 className="text-xl font-bold text-foreground">{siteName}</h2>
+          <p className="text-base text-muted-foreground">
             {minDate.toLocaleDateString("ko-KR")} ~ {maxDate.toLocaleDateString("ko-KR")} ({totalDays}일)
           </p>
         </div>
         <a
           href={`/api/pdf/schedule/${siteId}`}
           target="_blank"
-          className="bg-gray-100 text-gray-700 rounded-xl px-4 py-2.5 text-base font-semibold active:bg-gray-200"
+          className="bg-muted text-foreground/90 rounded-xl px-4 py-2.5 text-base font-semibold active:bg-muted"
         >
           📄 PDF
         </a>
@@ -184,7 +184,7 @@ export function GanttChart({ tasks, siteId, siteName }: Props) {
         {Object.entries(KIND_COLOR).map(([kind, color]) => (
           <div key={kind} className="flex items-center gap-1.5">
             <div className={`w-3 h-3 rounded-sm ${color}`} />
-            <span className="text-gray-600">
+            <span className="text-muted-foreground">
               {kind === "work" ? "작업" : kind === "reserve" ? "예비" : "비상"}
             </span>
           </div>
@@ -199,7 +199,7 @@ export function GanttChart({ tasks, siteId, siteName }: Props) {
             {weekHeaders.map((wk) => (
               <div
                 key={wk.startDay}
-                className="text-xs text-gray-500 border-l border-gray-200 pl-1"
+                className="text-xs text-muted-foreground border-l border-border pl-1"
                 style={{ width: wk.width * dayWidth }}
               >
                 {wk.label}
@@ -221,8 +221,8 @@ export function GanttChart({ tasks, siteId, siteName }: Props) {
                 {/* 작업명 */}
                 <div className="w-[120px] shrink-0 pr-2 flex items-center justify-between">
                   <div className="truncate">
-                    <p className="text-base font-semibold text-gray-800 truncate">{task.title}</p>
-                    <p className="text-sm text-gray-500">{task.durationDays}일</p>
+                    <p className="text-base font-semibold text-foreground truncate">{task.title}</p>
+                    <p className="text-sm text-muted-foreground">{task.durationDays}일</p>
                   </div>
                   {hasViolation && (
                     <AlertCircleIcon size={16} className="text-red-500 shrink-0 ml-1" />
@@ -236,7 +236,7 @@ export function GanttChart({ tasks, siteId, siteName }: Props) {
                     {Array.from({ length: totalDays }).map((_, i) => (
                       <div
                         key={i}
-                        className={`border-r ${i % 7 === 6 ? "border-gray-300" : "border-gray-100"}`}
+                        className={`border-r ${i % 7 === 6 ? "border-border" : "border-border"}`}
                         style={{ width: dayWidth }}
                       />
                     ))}
@@ -270,14 +270,14 @@ export function GanttChart({ tasks, siteId, siteName }: Props) {
 
       {/* 작업 상세/수정 패널 */}
       {selectedTask && (
-        <div className="mt-6 bg-white rounded-2xl border border-gray-200 p-4">
-          <h3 className="text-lg font-bold text-gray-900 mb-1">{selectedTask.title}</h3>
-          <p className="text-base text-gray-500 mb-4">
+        <div className="mt-6 bg-card rounded-2xl border border-border p-4">
+          <h3 className="text-lg font-bold text-foreground mb-1">{selectedTask.title}</h3>
+          <p className="text-base text-muted-foreground mb-4">
             {selectedTask.startDate} ~ {selectedTask.endDate} ({selectedTask.durationDays}일)
           </p>
 
           <div>
-            <p className="text-base font-medium text-gray-700 mb-2">작업 상태 변경</p>
+            <p className="text-base font-medium text-foreground/90 mb-2">작업 상태 변경</p>
             <div className="grid grid-cols-2 gap-2">
               {(["planned", "active", "done", "canceled"] as const).map((s) => (
                 <button
@@ -287,7 +287,7 @@ export function GanttChart({ tasks, siteId, siteName }: Props) {
                   className={`py-3 rounded-xl text-base font-medium disabled:opacity-40 ${
                     selectedTask.status === s
                       ? "bg-primary text-white"
-                      : "bg-gray-100 text-gray-700"
+                      : "bg-muted text-foreground/90"
                   }`}
                 >
                   {STATUS_LABEL[s]}
@@ -298,7 +298,7 @@ export function GanttChart({ tasks, siteId, siteName }: Props) {
 
           <button
             onClick={() => setSelectedTask(null)}
-            className="mt-3 w-full bg-gray-100 text-gray-600 rounded-xl py-3 text-base font-medium"
+            className="mt-3 w-full bg-muted text-muted-foreground rounded-xl py-3 text-base font-medium"
           >
             닫기
           </button>
@@ -310,15 +310,15 @@ export function GanttChart({ tasks, siteId, siteName }: Props) {
         {(["planned", "active", "done"] as const).map((s) => {
           const count = tasks.filter((t) => t.status === s && t.kind === "work").length;
           return (
-            <div key={s} className="bg-white rounded-2xl border border-gray-100 p-4 text-center">
-              <p className="text-3xl font-black text-gray-900">{count}</p>
-              <p className="text-base text-gray-500">{STATUS_LABEL[s]} 공종</p>
+            <div key={s} className="bg-card rounded-2xl border border-border p-4 text-center">
+              <p className="text-3xl font-black text-foreground">{count}</p>
+              <p className="text-base text-muted-foreground">{STATUS_LABEL[s]} 공종</p>
             </div>
           );
         })}
-        <div className="bg-white rounded-2xl border border-gray-100 p-4 text-center">
-          <p className="text-3xl font-black text-gray-900">{totalDays}</p>
-          <p className="text-base text-gray-500">총 공사 일수</p>
+        <div className="bg-card rounded-2xl border border-border p-4 text-center">
+          <p className="text-3xl font-black text-foreground">{totalDays}</p>
+          <p className="text-base text-muted-foreground">총 공사 일수</p>
         </div>
       </div>
     </div>

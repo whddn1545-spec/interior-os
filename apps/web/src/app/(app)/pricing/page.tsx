@@ -14,7 +14,7 @@ const PLANS = [
     price: 0,
     priceLabel: "무료",
     desc: "처음 시작하는 사업자",
-    color: "border-gray-200",
+    color: "border-border",
     features: [
       "견적 월 5건",
       "고객 50명",
@@ -133,18 +133,18 @@ function PricingContent() {
   }
 
   return (
-    <div className="min-h-screen bg-gray-50 pb-24">
-      <header className="sticky top-0 bg-white border-b border-gray-100 z-10 px-4 py-3 flex items-center gap-3">
-        <Link href="/settings" className="p-3 -ml-3 text-gray-600">
+    <div className="min-h-screen bg-muted pb-24">
+      <header className="sticky top-0 bg-card border-b border-border z-10 px-4 py-3 flex items-center gap-3">
+        <Link href="/settings" className="p-3 -ml-3 text-muted-foreground">
           <ArrowLeftIcon size={24} />
         </Link>
-        <h1 className="text-xl font-bold text-gray-900">요금제</h1>
+        <h1 className="text-xl font-bold text-foreground">요금제</h1>
       </header>
 
       <div className="max-w-lg mx-auto px-4 pt-6 space-y-4">
         <div className="text-center mb-6">
-          <p className="text-2xl font-bold text-gray-900 mb-1">InteriorOS 요금제</p>
-          <p className="text-base text-gray-500">부가세 포함 · 언제든 해지 가능</p>
+          <p className="text-2xl font-bold text-foreground mb-1">InteriorOS 요금제</p>
+          <p className="text-base text-muted-foreground">부가세 포함 · 언제든 해지 가능</p>
         </div>
 
         {error && (
@@ -156,7 +156,7 @@ function PricingContent() {
         {PLANS.map((plan) => (
           <div
             key={plan.id}
-            className={`bg-white rounded-2xl border-2 p-5 relative ${plan.color}`}
+            className={`bg-card rounded-2xl border-2 p-5 relative ${plan.color}`}
           >
             {plan.badge && (
               <span className="absolute -top-3 left-4 bg-primary text-white text-sm font-bold px-3 py-1 rounded-full">
@@ -165,17 +165,17 @@ function PricingContent() {
             )}
             <div className="flex items-start justify-between mb-4">
               <div>
-                <h3 className="text-xl font-black text-gray-900">{plan.name}</h3>
-                <p className="text-sm text-gray-500">{plan.desc}</p>
+                <h3 className="text-xl font-black text-foreground">{plan.name}</h3>
+                <p className="text-sm text-muted-foreground">{plan.desc}</p>
               </div>
               <div className="text-right">
-                <p className="text-2xl font-black text-gray-900">{plan.priceLabel}</p>
+                <p className="text-2xl font-black text-foreground">{plan.priceLabel}</p>
               </div>
             </div>
 
             <ul className="space-y-2 mb-5">
               {plan.features.map((f, i) => (
-                <li key={i} className="flex items-start gap-2 text-base text-gray-700">
+                <li key={i} className="flex items-start gap-2 text-base text-foreground/90">
                   <CheckIcon size={18} className="text-green-500 shrink-0 mt-0.5" />
                   {f}
                 </li>
@@ -184,7 +184,7 @@ function PricingContent() {
 
             {plan.price === 0 ? (
               <button
-                className="w-full py-3 border-2 border-gray-300 text-gray-600 rounded-xl text-base font-semibold"
+                className="w-full py-3 border-2 border-border text-muted-foreground rounded-xl text-base font-semibold"
                 disabled
               >
                 현재 무료 플랜
@@ -203,7 +203,7 @@ function PricingContent() {
           </div>
         ))}
 
-        <p className="text-center text-base text-gray-400 mt-4">
+        <p className="text-center text-base text-muted-foreground/70 mt-4">
           결제 관련 문의: {SUPPORT_CONTACT}
         </p>
       </div>

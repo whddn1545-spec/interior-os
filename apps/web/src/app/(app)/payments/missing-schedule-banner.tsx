@@ -53,10 +53,10 @@ export function MissingScheduleBanner({ quotes }: { quotes: MissingScheduleQuote
         {quotes.map((q) => (
           <div
             key={q.quoteId}
-            className="rounded-xl border border-amber-200 bg-white p-4"
+            className="rounded-xl border border-amber-200 bg-card p-4"
           >
-            <p className="text-lg font-bold text-gray-900">{q.customerName}</p>
-            <p className="text-base text-gray-600">{q.siteName}</p>
+            <p className="text-lg font-bold text-foreground">{q.customerName}</p>
+            <p className="text-base text-muted-foreground">{q.siteName}</p>
             <p className="mt-1 text-xl font-black text-primary/90">
               {q.totalAmount.toLocaleString("ko-KR")}원
             </p>

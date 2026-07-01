@@ -144,7 +144,7 @@ export default async function ReportPage({ params }: { params: Promise<{ id: str
   const today = new Date().toLocaleDateString("ko-KR", { year: "numeric", month: "long", day: "numeric" });
 
   return (
-    <div className="min-h-screen bg-background print:bg-white">
+    <div className="min-h-screen bg-background print:bg-card">
       {/* 인쇄 시 숨겨지는 헤더 */}
       <header className="sticky top-0 bg-card/95 backdrop-blur border-b border-border z-10 px-4 py-3 flex items-center gap-3 print:hidden">
         <Link href={`/sites/${id}`} className="p-3 -ml-3 text-muted-foreground">
@@ -186,8 +186,8 @@ export default async function ReportPage({ params }: { params: Promise<{ id: str
         </div>
 
         {/* 2. 현장 기본 정보 */}
-        <div className="bg-card rounded-2xl border border-border p-5 print:border-gray-200 print:rounded-none print:p-0">
-          <h3 className="text-lg font-bold text-foreground mb-4 print:border-b print:border-gray-200 print:pb-2">현장 정보</h3>
+        <div className="bg-card rounded-2xl border border-border p-5 print:border-border print:rounded-none print:p-0">
+          <h3 className="text-lg font-bold text-foreground mb-4 print:border-b print:border-border print:pb-2">현장 정보</h3>
           <dl className="grid grid-cols-2 gap-x-6 gap-y-3 text-base">
             {siteAny.customers?.name && (
               <>
@@ -220,21 +220,21 @@ export default async function ReportPage({ params }: { params: Promise<{ id: str
 
         {/* 3. 공사비 요약 */}
         {totalAmount > 0 && (
-          <div className="bg-card rounded-2xl border border-border p-5 print:border-gray-200 print:rounded-none print:p-0">
-            <h3 className="text-lg font-bold text-foreground mb-4 print:border-b print:border-gray-200 print:pb-2">공사비 내역</h3>
+          <div className="bg-card rounded-2xl border border-border p-5 print:border-border print:rounded-none print:p-0">
+            <h3 className="text-lg font-bold text-foreground mb-4 print:border-b print:border-border print:pb-2">공사비 내역</h3>
             <div className="grid grid-cols-3 gap-3">
-              <div className="bg-muted rounded-xl p-3 text-center print:border print:border-gray-200 print:bg-white">
+              <div className="bg-muted rounded-xl p-3 text-center print:border print:border-border print:bg-card">
                 <p className="text-xs text-muted-foreground mb-1">계약 금액</p>
                 <p className="text-lg font-black tabular-nums text-foreground">{formatKRW(totalAmount)}</p>
               </div>
               {totalExpenses > 0 && (
-                <div className="bg-muted rounded-xl p-3 text-center print:border print:border-gray-200 print:bg-white">
+                <div className="bg-muted rounded-xl p-3 text-center print:border print:border-border print:bg-card">
                   <p className="text-xs text-muted-foreground mb-1">실제 지출</p>
                   <p className="text-lg font-black tabular-nums text-foreground">{formatKRW(totalExpenses)}</p>
                 </div>
               )}
               {margin !== null && (
-                <div className="bg-muted rounded-xl p-3 text-center print:border print:border-gray-200 print:bg-white">
+                <div className="bg-muted rounded-xl p-3 text-center print:border print:border-border print:bg-card">
                   <p className="text-xs text-muted-foreground mb-1">
                     {margin >= 0 ? "마진" : "초과"}
                   </p>
@@ -255,7 +255,7 @@ export default async function ReportPage({ params }: { params: Promise<{ id: str
         {/* 4. 사진 갤러리 */}
         {photoUrls.length > 0 && (
           <div>
-            <h3 className="text-lg font-bold text-foreground mb-3 print:border-b print:border-gray-200 print:pb-2">
+            <h3 className="text-lg font-bold text-foreground mb-3 print:border-b print:border-border print:pb-2">
               시공 사진 ({photoUrls.length}장)
             </h3>
             <div className="grid grid-cols-2 gap-2 print:grid-cols-3">
@@ -274,18 +274,18 @@ export default async function ReportPage({ params }: { params: Promise<{ id: str
 
         {/* 5. AI 완공 소감 */}
         {narrative && (
-          <div className="bg-primary/8 rounded-2xl p-5 border border-primary/20 print:border-gray-300 print:bg-gray-50 print:rounded-none">
-            <h3 className="text-lg font-bold text-primary mb-3 print:text-gray-900 print:border-b print:border-gray-200 print:pb-2">
+          <div className="bg-primary/8 rounded-2xl p-5 border border-primary/20 print:border-border print:bg-muted print:rounded-none">
+            <h3 className="text-lg font-bold text-primary mb-3 print:text-foreground print:border-b print:border-border print:pb-2">
               시공 소감
             </h3>
-            <div className="text-base text-foreground leading-relaxed whitespace-pre-line print:text-gray-800">
+            <div className="text-base text-foreground leading-relaxed whitespace-pre-line print:text-foreground">
               {narrative}
             </div>
           </div>
         )}
 
         {/* 6. 푸터 */}
-        <div className="border-t-2 border-border pt-6 text-center print:border-gray-200">
+        <div className="border-t-2 border-border pt-6 text-center print:border-border">
           <p className="text-base font-bold text-foreground mb-1">
             {tenantAny?.business_name ?? ""} {tenantAny?.owner_name ? `· ${tenantAny.owner_name}` : ""}
           </p>

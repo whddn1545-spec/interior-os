@@ -61,13 +61,13 @@ export default async function SitePhotosPage({ params, searchParams }: { params:
 
   return (
     <div className="pb-24">
-      <header className="sticky top-0 bg-white border-b border-gray-100 z-10 px-4 py-3 flex items-center gap-3">
-        <Link href={from ?? "/photos"} className="p-3 -ml-3 text-gray-600">
+      <header className="sticky top-0 bg-card border-b border-border z-10 px-4 py-3 flex items-center gap-3">
+        <Link href={from ?? "/photos"} className="p-3 -ml-3 text-muted-foreground">
           <ArrowLeftIcon size={24} />
         </Link>
         <div className="flex-1 min-w-0">
-          <h1 className="text-xl font-bold text-gray-900 truncate">{s.name as string}</h1>
-          <p className="text-sm text-gray-500">사진 {photoList.length}장</p>
+          <h1 className="text-xl font-bold text-foreground truncate">{s.name as string}</h1>
+          <p className="text-sm text-muted-foreground">사진 {photoList.length}장</p>
         </div>
       </header>
       <div className="px-4 pt-6">
@@ -86,7 +86,7 @@ export default async function SitePhotosPage({ params, searchParams }: { params:
       <PhotoUploader siteId={siteId} />
 
       {photoList.length === 0 ? (
-        <div className="text-center py-12 text-gray-400">
+        <div className="text-center py-12 text-muted-foreground/70">
           <p className="text-lg">사진을 올려주세요</p>
           <p className="text-sm mt-1">날짜별로 정리되고, 분쟁 발생 시 증거로 활용할 수 있어요</p>
         </div>
@@ -94,7 +94,7 @@ export default async function SitePhotosPage({ params, searchParams }: { params:
         <div className="mt-4 space-y-6">
           {Array.from(grouped.entries()).map(([dateKey, datePhotos]) => (
             <div key={dateKey}>
-              <p className="text-sm font-bold text-gray-500 mb-2">
+              <p className="text-sm font-bold text-muted-foreground mb-2">
                 📅 {dateKey === "날짜 미확인" ? dateKey : formatDateKR(dateKey)}
                 <span className="font-normal ml-1">({datePhotos.length}장)</span>
               </p>

@@ -35,15 +35,15 @@ export default function PwaGuidePage() {
     return (
       <div className="px-4 pt-6 pb-24">
         <div className="flex items-center gap-3 mb-6">
-          <Link href="/settings" className="p-3 -ml-3 text-gray-600">
+          <Link href="/settings" className="p-3 -ml-3 text-muted-foreground">
             <ArrowLeftIcon size={24} />
           </Link>
-          <h1 className="text-2xl font-bold text-gray-900">홈 화면에 추가</h1>
+          <h1 className="text-2xl font-bold text-foreground">홈 화면에 추가</h1>
         </div>
         <div className="text-center py-16">
           <div className="text-6xl mb-4">✅</div>
-          <h2 className="text-2xl font-bold text-gray-900 mb-2">이미 설치되어 있어요!</h2>
-          <p className="text-gray-500">홈 화면에서 InteriorOS 아이콘을 탭해서 실행하세요.</p>
+          <h2 className="text-2xl font-bold text-foreground mb-2">이미 설치되어 있어요!</h2>
+          <p className="text-muted-foreground">홈 화면에서 InteriorOS 아이콘을 탭해서 실행하세요.</p>
         </div>
       </div>
     );
@@ -52,10 +52,10 @@ export default function PwaGuidePage() {
   return (
     <div className="px-4 pt-6 pb-24">
       <div className="flex items-center gap-3 mb-6">
-        <Link href="/settings" className="p-3 -ml-3 text-gray-600">
+        <Link href="/settings" className="p-3 -ml-3 text-muted-foreground">
           <ArrowLeftIcon size={24} />
         </Link>
-        <h1 className="text-2xl font-bold text-gray-900">홈 화면에 추가</h1>
+        <h1 className="text-2xl font-bold text-foreground">홈 화면에 추가</h1>
       </div>
 
       <div className="bg-primary/10 border border-blue-100 rounded-2xl px-4 py-4 mb-6">
@@ -68,7 +68,7 @@ export default function PwaGuidePage() {
 
       {(os === "ios") && (
         <div className="space-y-4">
-          <h2 className="text-lg font-bold text-gray-900">iPhone / iPad (Safari)</h2>
+          <h2 className="text-lg font-bold text-foreground">iPhone / iPad (Safari)</h2>
           <ol className="space-y-4">
             {[
               { step: 1, icon: "🌐", text: "Safari 브라우저로 이 페이지를 열어주세요" },
@@ -76,13 +76,13 @@ export default function PwaGuidePage() {
               { step: 3, icon: "➕", text: "'홈 화면에 추가'를 찾아서 탭하세요" },
               { step: 4, icon: "✅", text: "오른쪽 위 '추가'를 누르면 완료!" },
             ].map(({ step, icon, text }) => (
-              <li key={step} className="flex items-start gap-4 bg-white border border-gray-200 rounded-2xl px-4 py-4">
+              <li key={step} className="flex items-start gap-4 bg-card border border-border rounded-2xl px-4 py-4">
                 <span className="w-8 h-8 bg-primary text-white rounded-full flex items-center justify-center text-base font-bold shrink-0">
                   {step}
                 </span>
                 <div>
                   <span className="text-2xl mr-2">{icon}</span>
-                  <span className="text-base text-gray-800">{text}</span>
+                  <span className="text-base text-foreground">{text}</span>
                 </div>
               </li>
             ))}
@@ -98,7 +98,7 @@ export default function PwaGuidePage() {
 
       {(os === "android") && (
         <div className="space-y-4">
-          <h2 className="text-lg font-bold text-gray-900">Android (Chrome)</h2>
+          <h2 className="text-lg font-bold text-foreground">Android (Chrome)</h2>
           <ol className="space-y-4">
             {[
               { step: 1, icon: "🌐", text: "Chrome 브라우저로 이 페이지를 열어주세요" },
@@ -106,13 +106,13 @@ export default function PwaGuidePage() {
               { step: 3, icon: "📱", text: "'홈 화면에 추가' 또는 '앱 설치'를 누르세요" },
               { step: 4, icon: "✅", text: "'추가' 또는 '설치'를 눌러 완료!" },
             ].map(({ step, icon, text }) => (
-              <li key={step} className="flex items-start gap-4 bg-white border border-gray-200 rounded-2xl px-4 py-4">
+              <li key={step} className="flex items-start gap-4 bg-card border border-border rounded-2xl px-4 py-4">
                 <span className="w-8 h-8 bg-primary text-white rounded-full flex items-center justify-center text-base font-bold shrink-0">
                   {step}
                 </span>
                 <div>
                   <span className="text-2xl mr-2">{icon}</span>
-                  <span className="text-base text-gray-800">{text}</span>
+                  <span className="text-base text-foreground">{text}</span>
                 </div>
               </li>
             ))}
@@ -122,25 +122,25 @@ export default function PwaGuidePage() {
 
       {(os === "desktop" || os === "unknown") && (
         <div className="space-y-4">
-          <h2 className="text-lg font-bold text-gray-900">PC / Mac (Chrome / Edge)</h2>
+          <h2 className="text-lg font-bold text-foreground">PC / Mac (Chrome / Edge)</h2>
           <ol className="space-y-4">
             {[
               { step: 1, icon: "🌐", text: "Chrome 또는 Edge 브라우저를 사용해주세요" },
               { step: 2, icon: "⊕", text: "주소창 오른쪽 끝 설치 아이콘(⊕)을 누르세요" },
               { step: 3, icon: "✅", text: "'설치'를 눌러 완료!" },
             ].map(({ step, icon, text }) => (
-              <li key={step} className="flex items-start gap-4 bg-white border border-gray-200 rounded-2xl px-4 py-4">
+              <li key={step} className="flex items-start gap-4 bg-card border border-border rounded-2xl px-4 py-4">
                 <span className="w-8 h-8 bg-primary text-white rounded-full flex items-center justify-center text-base font-bold shrink-0">
                   {step}
                 </span>
                 <div>
                   <span className="text-2xl mr-2">{icon}</span>
-                  <span className="text-base text-gray-800">{text}</span>
+                  <span className="text-base text-foreground">{text}</span>
                 </div>
               </li>
             ))}
           </ol>
-          <p className="text-sm text-gray-500 mt-2">
+          <p className="text-sm text-muted-foreground mt-2">
             태블릿·스마트폰에서 접속하면 더 자세한 안내가 나와요.
           </p>
         </div>

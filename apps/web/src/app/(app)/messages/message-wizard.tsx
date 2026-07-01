@@ -171,8 +171,8 @@ export function MessageWizard({ workers, sites, customers }: Props) {
     return (
       <div className="text-center py-12">
         <CheckCircleIcon size={64} className="mx-auto text-green-500 mb-4" />
-        <h2 className="text-2xl font-bold text-gray-900 mb-2">문자를 보냈어요!</h2>
-        <p className="text-base text-gray-500 mb-6">{preview?.targetName}님에게 발송 완료</p>
+        <h2 className="text-2xl font-bold text-foreground mb-2">문자를 보냈어요!</h2>
+        <p className="text-base text-muted-foreground mb-6">{preview?.targetName}님에게 발송 완료</p>
         <button
           onClick={reset}
           className="bg-primary text-white rounded-2xl px-8 py-4 text-lg font-semibold active:bg-primary/90"
@@ -184,16 +184,16 @@ export function MessageWizard({ workers, sites, customers }: Props) {
   }
 
   return (
-    <div className="bg-white rounded-2xl border border-gray-200 overflow-hidden">
+    <div className="bg-card rounded-2xl border border-border overflow-hidden">
       {/* 스텝 1: 대상 선택 */}
       <div className={`p-5 ${step !== "target" ? "opacity-50" : ""}`}>
-        <h2 className="text-xl font-bold text-gray-900 mb-4">① 누구에게 보낼까요?</h2>
+        <h2 className="text-xl font-bold text-foreground mb-4">① 누구에게 보낼까요?</h2>
 
         <div className="grid grid-cols-2 gap-3 mb-4">
           <button
             onClick={() => { setTargetType("worker"); setSelectedCustomerId(""); setSelectedSiteId(""); setMessageType("worker_notify"); }}
             className={`py-4 rounded-xl text-lg font-semibold border-2 active:opacity-80 ${
-              targetType === "worker" ? "border-blue-600 bg-primary/10 text-primary/90" : "border-gray-200 text-gray-700"
+              targetType === "worker" ? "border-blue-600 bg-primary/10 text-primary/90" : "border-border text-foreground/90"
             }`}
           >
             👷 작업자
@@ -201,7 +201,7 @@ export function MessageWizard({ workers, sites, customers }: Props) {
           <button
             onClick={() => { setTargetType("customer"); setSelectedWorkerId(""); setSelectedSiteId(""); setMessageType("customer_progress"); }}
             className={`py-4 rounded-xl text-lg font-semibold border-2 active:opacity-80 ${
-              targetType === "customer" ? "border-blue-600 bg-primary/10 text-primary/90" : "border-gray-200 text-gray-700"
+              targetType === "customer" ? "border-blue-600 bg-primary/10 text-primary/90" : "border-border text-foreground/90"
             }`}
           >
             👤 고객
@@ -212,7 +212,7 @@ export function MessageWizard({ workers, sites, customers }: Props) {
           <select
             value={selectedWorkerId}
             onChange={(e) => setSelectedWorkerId(e.target.value)}
-            className="w-full border border-gray-200 rounded-xl px-4 py-4 text-lg text-gray-900 focus:outline-none focus:border-blue-400"
+            className="w-full border border-border rounded-xl px-4 py-4 text-lg text-foreground focus:outline-none focus:border-primary"
           >
             <option value="">작업자 선택...</option>
             {workers.map((w) => (
@@ -225,7 +225,7 @@ export function MessageWizard({ workers, sites, customers }: Props) {
           <select
             value={selectedCustomerId}
             onChange={(e) => { setSelectedCustomerId(e.target.value); setSelectedSiteId(""); }}
-            className="w-full border border-gray-200 rounded-xl px-4 py-4 text-lg text-gray-900 focus:outline-none focus:border-blue-400"
+            className="w-full border border-border rounded-xl px-4 py-4 text-lg text-foreground focus:outline-none focus:border-primary"
           >
             <option value="">고객 선택...</option>
             {customers.map((c) => (
@@ -236,18 +236,18 @@ export function MessageWizard({ workers, sites, customers }: Props) {
 
         {step === "target" && selectedId && (
           <div className="mt-4">
-            <h3 className="text-lg font-semibold text-gray-800 mb-3">메시지 종류</h3>
+            <h3 className="text-lg font-semibold text-foreground mb-3">메시지 종류</h3>
             <div className="space-y-2">
               {(targetType === "worker" ? WORKER_MESSAGE_TYPES : CUSTOMER_MESSAGE_TYPES).map(([type, label, desc]) => (
                 <button
                   key={type}
                   onClick={() => setMessageType(type)}
                   className={`w-full text-left p-4 rounded-xl border-2 ${
-                    messageType === type ? "border-blue-600 bg-primary/10" : "border-gray-200"
+                    messageType === type ? "border-blue-600 bg-primary/10" : "border-border"
                   }`}
                 >
-                  <p className="text-base font-semibold text-gray-900">{label}</p>
-                  <p className="text-sm text-gray-500">{desc}</p>
+                  <p className="text-base font-semibold text-foreground">{label}</p>
+                  <p className="text-sm text-muted-foreground">{desc}</p>
                 </button>
               ))}
             </div>
@@ -264,14 +264,14 @@ export function MessageWizard({ workers, sites, customers }: Props) {
 
       {/* 스텝 2: 현장 & 날짜 */}
       {step === "site" && (
-        <div className="border-t border-gray-100 p-5">
-          <h2 className="text-xl font-bold text-gray-900 mb-4">② 어느 현장인가요?</h2>
+        <div className="border-t border-border p-5">
+          <h2 className="text-xl font-bold text-foreground mb-4">② 어느 현장인가요?</h2>
 
           <div className="space-y-3">
             <select
               value={selectedSiteId}
               onChange={(e) => setSelectedSiteId(e.target.value)}
-              className="w-full border border-gray-200 rounded-xl px-4 py-4 text-lg text-gray-900 focus:outline-none focus:border-blue-400"
+              className="w-full border border-border rounded-xl px-4 py-4 text-lg text-foreground focus:outline-none focus:border-primary"
             >
               <option value="">현장 선택...</option>
               {availableSites.map((s) => (
@@ -283,7 +283,7 @@ export function MessageWizard({ workers, sites, customers }: Props) {
               <select
                 value={selectedTradeId}
                 onChange={(e) => setSelectedTradeId(e.target.value)}
-                className="w-full border border-gray-200 rounded-xl px-4 py-4 text-lg text-gray-900 focus:outline-none focus:border-blue-400"
+                className="w-full border border-border rounded-xl px-4 py-4 text-lg text-foreground focus:outline-none focus:border-primary"
               >
                 <option value="">공종 선택 (선택)...</option>
                 {selectedSite.trades.map((t) => (
@@ -294,7 +294,7 @@ export function MessageWizard({ workers, sites, customers }: Props) {
 
             {/* 진행 알림: 공종·예정일을 비워도 상호 기반 안내로 채워진다는 안내 */}
             {messageType === "customer_progress" && !selectedTradeId && (
-              <p className="text-sm text-gray-500">
+              <p className="text-sm text-muted-foreground">
                 공종·예정일을 비워두면 상호·대표자 이름으로 진행 안내 문구가
                 자동으로 채워집니다.
               </p>
@@ -303,7 +303,7 @@ export function MessageWizard({ workers, sites, customers }: Props) {
             {/* 대금 청구: 청구 단계 선택 */}
             {messageType === "payment_request" && (
               <div>
-                <p className="text-base font-semibold text-gray-800 mb-2">청구 단계</p>
+                <p className="text-base font-semibold text-foreground mb-2">청구 단계</p>
                 <div className="grid grid-cols-3 gap-2">
                   {PAYMENT_STAGES.map(([stage, label]) => (
                     <button
@@ -313,14 +313,14 @@ export function MessageWizard({ workers, sites, customers }: Props) {
                       className={`py-4 rounded-xl text-base font-semibold border-2 active:opacity-80 ${
                         paymentStage === stage
                           ? "border-blue-600 bg-primary/10 text-primary/90"
-                          : "border-gray-200 text-gray-700"
+                          : "border-border text-foreground/90"
                       }`}
                     >
                       {label}
                     </button>
                   ))}
                 </div>
-                <p className="text-sm text-gray-500 mt-2">
+                <p className="text-sm text-muted-foreground mt-2">
                   미수 금액과 입금 계좌가 자동으로 채워집니다.
                 </p>
               </div>
@@ -329,7 +329,7 @@ export function MessageWizard({ workers, sites, customers }: Props) {
             {/* 완료·하자보수: 종류 선택 */}
             {messageType === "work_done" && (
               <div>
-                <p className="text-base font-semibold text-gray-800 mb-2">안내 종류</p>
+                <p className="text-base font-semibold text-foreground mb-2">안내 종류</p>
                 <div className="grid grid-cols-2 gap-2">
                   {([
                     ["completed", "공사 완료"],
@@ -342,7 +342,7 @@ export function MessageWizard({ workers, sites, customers }: Props) {
                       className={`py-4 rounded-xl text-base font-semibold border-2 active:opacity-80 ${
                         workDoneVariant === variant
                           ? "border-blue-600 bg-primary/10 text-primary/90"
-                          : "border-gray-200 text-gray-700"
+                          : "border-border text-foreground/90"
                       }`}
                     >
                       {label}
@@ -355,7 +355,7 @@ export function MessageWizard({ workers, sites, customers }: Props) {
             {/* 작업일/예정일 */}
             {needsDate(messageType) && (
               <div>
-                <label className="block text-base font-semibold text-gray-800 mb-2">
+                <label className="block text-base font-semibold text-foreground mb-2">
                   {messageType === "worker_notify"
                     ? "작업 예정일"
                     : messageType === "work_done" && workDoneVariant === "warranty"
@@ -366,7 +366,7 @@ export function MessageWizard({ workers, sites, customers }: Props) {
                   type="date"
                   value={workDate}
                   onChange={(e) => setWorkDate(e.target.value)}
-                  className="w-full border border-gray-200 rounded-xl px-4 py-4 text-lg text-gray-900 focus:outline-none focus:border-blue-400"
+                  className="w-full border border-border rounded-xl px-4 py-4 text-lg text-foreground focus:outline-none focus:border-primary"
                 />
               </div>
             )}
@@ -378,7 +378,7 @@ export function MessageWizard({ workers, sites, customers }: Props) {
                 placeholder="보낼 내용을 입력하세요..."
                 rows={4}
                 maxLength={300}
-                className="w-full border border-gray-200 rounded-xl px-4 py-3 text-base resize-none focus:outline-none focus:border-blue-400"
+                className="w-full border border-border rounded-xl px-4 py-3 text-base resize-none focus:outline-none focus:border-primary"
               />
             )}
           </div>
@@ -399,7 +399,7 @@ export function MessageWizard({ workers, sites, customers }: Props) {
             </button>
             <button
               onClick={() => setStep("target")}
-              className="w-full bg-gray-100 text-gray-700 rounded-2xl py-3 text-base font-medium"
+              className="w-full bg-muted text-foreground/90 rounded-2xl py-3 text-base font-medium"
             >
               ← 이전
             </button>
@@ -409,14 +409,14 @@ export function MessageWizard({ workers, sites, customers }: Props) {
 
       {/* 스텝 3: 미리보기 + 발송 */}
       {step === "preview" && preview && (
-        <div className="border-t border-gray-100 p-5">
-          <h2 className="text-xl font-bold text-gray-900 mb-1">③ 보낼 내용 확인</h2>
-          <p className="text-base text-gray-500 mb-4">받는 사람: {preview.targetName} ({preview.targetPhone})</p>
+        <div className="border-t border-border p-5">
+          <h2 className="text-xl font-bold text-foreground mb-1">③ 보낼 내용 확인</h2>
+          <p className="text-base text-muted-foreground mb-4">받는 사람: {preview.targetName} ({preview.targetPhone})</p>
 
-          <div className="bg-gray-50 rounded-xl p-4 mb-4">
-            <p className="text-base text-gray-800 whitespace-pre-line">{preview.maskedBody}</p>
+          <div className="bg-muted rounded-xl p-4 mb-4">
+            <p className="text-base text-foreground whitespace-pre-line">{preview.maskedBody}</p>
             {preview.body !== preview.maskedBody && (
-              <div className="flex items-center gap-2 mt-3 pt-3 border-t border-gray-200">
+              <div className="flex items-center gap-2 mt-3 pt-3 border-t border-border">
                 <AlertTriangleIcon size={16} className="text-orange-500 shrink-0" />
                 <p className="text-sm text-orange-700">실제 발송 시 비번이 포함됩니다</p>
               </div>
@@ -440,7 +440,7 @@ export function MessageWizard({ workers, sites, customers }: Props) {
             </button>
             <button
               onClick={() => setStep("site")}
-              className="w-full bg-gray-100 text-gray-700 rounded-2xl py-3 text-base font-medium"
+              className="w-full bg-muted text-foreground/90 rounded-2xl py-3 text-base font-medium"
             >
               ← 수정하기
             </button>

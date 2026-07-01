@@ -74,51 +74,51 @@ export default function WorkerNewPage() {
   return (
     <div className="px-4 pt-6 pb-24">
       <div className="flex items-center gap-3 mb-6">
-        <Link href="/workers" className="p-3 -ml-3 text-gray-600">
+        <Link href="/workers" className="p-3 -ml-3 text-muted-foreground">
           <ArrowLeftIcon size={24} />
         </Link>
-        <h1 className="text-2xl font-bold text-gray-900">작업자 추가</h1>
+        <h1 className="text-2xl font-bold text-foreground">작업자 추가</h1>
       </div>
 
       <div className="space-y-5">
         <div>
-          <label className="block text-base font-semibold text-gray-700 mb-2">이름 *</label>
+          <label className="block text-base font-semibold text-foreground/90 mb-2">이름 *</label>
           <input
             type="text"
             value={name}
             onChange={(e) => setName(e.target.value)}
             placeholder="홍길동"
-            className="w-full border border-gray-200 rounded-2xl px-4 py-4 text-lg focus:outline-none focus:border-blue-400"
+            className="w-full border border-border rounded-2xl px-4 py-4 text-lg focus:outline-none focus:border-primary"
           />
         </div>
 
         <div>
-          <label className="block text-base font-semibold text-gray-700 mb-2">연락처 *</label>
+          <label className="block text-base font-semibold text-foreground/90 mb-2">연락처 *</label>
           <input
             type="tel"
             inputMode="numeric"
             value={phone}
             onChange={(e) => { setError(null); setPhone(formatPhone(e.target.value)); }}
             placeholder="010-0000-0000"
-            className="w-full border border-gray-200 rounded-2xl px-4 py-4 text-lg focus:outline-none focus:border-blue-400"
+            className="w-full border border-border rounded-2xl px-4 py-4 text-lg focus:outline-none focus:border-primary"
           />
-          <p className="mt-1.5 text-base text-gray-500">숫자만 입력하면 자동으로 010-0000-0000 형태로 정리돼요</p>
+          <p className="mt-1.5 text-base text-muted-foreground">숫자만 입력하면 자동으로 010-0000-0000 형태로 정리돼요</p>
         </div>
 
         <div>
-          <label className="block text-base font-semibold text-gray-700 mb-2">업체명 (선택)</label>
+          <label className="block text-base font-semibold text-foreground/90 mb-2">업체명 (선택)</label>
           <input
             type="text"
             value={company}
             onChange={(e) => setCompany(e.target.value)}
             placeholder="홍길동 타일"
-            className="w-full border border-gray-200 rounded-2xl px-4 py-4 text-lg focus:outline-none focus:border-blue-400"
+            className="w-full border border-border rounded-2xl px-4 py-4 text-lg focus:outline-none focus:border-primary"
           />
         </div>
 
         <div>
-          <label className="block text-base font-semibold text-gray-700 mb-1">담당 공종</label>
-          <p className="text-base text-gray-500 mb-3">
+          <label className="block text-base font-semibold text-foreground/90 mb-1">담당 공종</label>
+          <p className="text-base text-muted-foreground mb-3">
             {selectedTrades.length > 0
               ? `${selectedTrades.length}개 선택됨`
               : "1개 이상 선택해주세요"}
@@ -131,7 +131,7 @@ export default function WorkerNewPage() {
                 className={`px-5 py-4 rounded-full border-2 text-base font-medium transition-colors ${
                   selectedTrades.includes(t.code)
                     ? "border-blue-600 bg-primary text-white"
-                    : "border-gray-200 bg-white text-gray-700"
+                    : "border-border bg-card text-foreground/90"
                 }`}
               >
                 {t.label}

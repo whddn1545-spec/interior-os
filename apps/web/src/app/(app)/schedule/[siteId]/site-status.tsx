@@ -36,11 +36,11 @@ const NEXT_STATUS: Record<
   in_progress: {
     next: "done",
     label: "공사 완료",
-    color: "bg-gray-700 text-white",
+    color: "bg-foreground text-background",
     confirmTitle: "이 현장을 공사 완료로 바꿀까요?",
     confirmDesc: "공사 완료로 바꾸면 현장 상태가 '완료'로 표시돼요. 잘못 눌렀다면 '아니요'를 눌러주세요.",
     confirmCta: "네, 공사 완료합니다",
-    confirmColor: "bg-gray-800",
+    confirmColor: "bg-foreground/90",
   },
 };
 
@@ -84,15 +84,15 @@ export function SiteStatusButton({ siteId, currentStatus, variant = "header" }: 
 
       {showConfirm && (
         <div className="fixed inset-0 bg-black/50 z-50 flex items-end">
-          <div className="bg-white w-full rounded-t-3xl p-6 pb-8">
+          <div className="bg-card w-full rounded-t-3xl p-6 pb-8">
             <div className="text-center mb-6">
               {isDone ? (
-                <CheckCircleIcon size={48} className="mx-auto text-gray-700 mb-3" />
+                <CheckCircleIcon size={48} className="mx-auto text-foreground/90 mb-3" />
               ) : (
                 <AlertTriangleIcon size={48} className="mx-auto text-profit mb-3" />
               )}
-              <h3 className="text-2xl font-bold text-gray-900">{next.confirmTitle}</h3>
-              <p className="text-base text-gray-500 mt-2">{next.confirmDesc}</p>
+              <h3 className="text-2xl font-bold text-foreground">{next.confirmTitle}</h3>
+              <p className="text-base text-muted-foreground mt-2">{next.confirmDesc}</p>
             </div>
             <div className="space-y-3">
               <button
@@ -105,7 +105,7 @@ export function SiteStatusButton({ siteId, currentStatus, variant = "header" }: 
               <button
                 onClick={() => setShowConfirm(false)}
                 disabled={isPending}
-                className="w-full bg-gray-100 text-gray-700 rounded-2xl py-4 text-lg font-medium disabled:opacity-50"
+                className="w-full bg-muted text-foreground/90 rounded-2xl py-4 text-lg font-medium disabled:opacity-50"
               >
                 아니요, 그대로 둘게요
               </button>

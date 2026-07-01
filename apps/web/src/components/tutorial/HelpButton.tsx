@@ -16,7 +16,7 @@ export function HelpButton({ tutorialKey }: Props) {
       <button
         type="button"
         onClick={() => setIsOpen(true)}
-        className="fixed bottom-24 right-4 bg-white border-2 border-gray-200 shadow-lg rounded-full px-4 py-2.5 text-base font-semibold text-gray-600 flex items-center gap-1.5 z-40 active:bg-gray-50"
+        className="fixed bottom-24 right-4 bg-card border-2 border-border shadow-lg rounded-full px-4 py-2.5 text-base font-semibold text-foreground flex items-center gap-1.5 z-40 active:bg-muted"
       >
         ❓ 도움말
       </button>

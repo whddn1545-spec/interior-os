@@ -57,7 +57,7 @@ export default async function QuoteDetailPage({ params, searchParams }: { params
   };
 
   const statusConfig: Record<string, { label: string; color: string; icon: React.ReactNode }> = {
-    draft: { label: "임시저장", color: "bg-gray-100 text-gray-600", icon: null },
+    draft: { label: "임시저장", color: "bg-muted text-muted-foreground", icon: null },
     confirmed: { label: "확정됨", color: "bg-blue-100 text-primary/90", icon: <CheckCircleIcon size={16} /> },
     sent: { label: "발송됨", color: "bg-green-100 text-profit", icon: <SendIcon size={16} /> },
     accepted: { label: "계약됨", color: "bg-purple-100 text-purple-700", icon: <CheckCircleIcon size={16} /> },
@@ -68,14 +68,14 @@ export default async function QuoteDetailPage({ params, searchParams }: { params
   const cfg = statusConfig[status] ?? statusConfig.draft;
 
   return (
-    <div className="min-h-screen bg-gray-50 pb-24">
-      <header className="sticky top-0 bg-white border-b border-gray-100 z-10 px-4 py-3 flex items-center gap-3">
-        <Link href={from ?? "/quotes"} className="p-3 -ml-3 text-gray-600">
+    <div className="min-h-screen bg-muted pb-24">
+      <header className="sticky top-0 bg-card border-b border-border z-10 px-4 py-3 flex items-center gap-3">
+        <Link href={from ?? "/quotes"} className="p-3 -ml-3 text-muted-foreground">
           <ArrowLeftIcon size={24} />
         </Link>
         <div className="flex-1">
-          <h1 className="text-xl font-bold text-gray-900">{siteAny?.name ?? "견적서"}</h1>
-          <p className="text-sm text-gray-500">v{quoteAny.version as number} · {siteAny?.customers?.name ?? ""}</p>
+          <h1 className="text-xl font-bold text-foreground">{siteAny?.name ?? "견적서"}</h1>
+          <p className="text-sm text-muted-foreground">v{quoteAny.version as number} · {siteAny?.customers?.name ?? ""}</p>
         </div>
         <span className={`flex items-center gap-1 text-sm px-3 py-1.5 rounded-full font-medium ${cfg.color}`}>
           {cfg.icon}{cfg.label}
@@ -85,11 +85,11 @@ export default async function QuoteDetailPage({ params, searchParams }: { params
       <div className="max-w-lg mx-auto px-4 pt-6 space-y-4">
         {/* 현장 정보 */}
         {siteAny && (
-          <div className="bg-white rounded-2xl p-4 border border-gray-100">
-            <h2 className="text-lg font-semibold text-gray-800 mb-3">현장 정보</h2>
-            <div className="space-y-2 text-base text-gray-700">
+          <div className="bg-card rounded-2xl p-4 border border-border">
+            <h2 className="text-lg font-semibold text-foreground mb-3">현장 정보</h2>
+            <div className="space-y-2 text-base text-foreground/90">
               <div className="flex justify-between">
-                <span className="text-gray-500">고객</span>
+                <span className="text-muted-foreground">고객</span>
                 <span className="font-medium">
                   {siteAny.customers?.name ?? "—"}
                   {siteAny.customers?.phone && (
@@ -98,7 +98,7 @@ export default async function QuoteDetailPage({ params, searchParams }: { params
                 </span>
               </div>
               <div className="flex justify-between">
-                <span className="text-gray-500">주소</span>
+                <span className="text-muted-foreground">주소</span>
                 <span className="font-medium text-right max-w-[220px]">{siteAny.address}</span>
               </div>
             </div>
@@ -115,8 +115,8 @@ export default async function QuoteDetailPage({ params, searchParams }: { params
         )}
 
         {/* 견적 항목 */}
-        <div className="bg-white rounded-2xl p-4 border border-gray-100">
-          <h2 className="text-lg font-semibold text-gray-800 mb-3">견적 항목</h2>
+        <div className="bg-card rounded-2xl p-4 border border-border">
+          <h2 className="text-lg font-semibold text-foreground mb-3">견적 항목</h2>
           <div className="space-y-3">
             {(items ?? []).map((item) => {
               const itemAny = item as unknown as Record<string, unknown>;
@@ -124,15 +124,15 @@ export default async function QuoteDetailPage({ params, searchParams }: { params
               return (
                 <div key={itemAny.id as string} className="flex items-start justify-between gap-2">
                   <div className="flex-1">
-                    <p className="text-base font-medium text-gray-900">
+                    <p className="text-base font-medium text-foreground">
                       {trade?.name_ko ?? ""} · {itemAny.description as string}
                     </p>
-                    <p className="text-sm text-gray-500">
+                    <p className="text-sm text-muted-foreground">
                       {(itemAny.quantity as number).toLocaleString("ko-KR")} {trade?.unit ?? itemAny.unit as string} ·
                       자재 {formatKRW(itemAny.material_cost as number)} + 인건비 {formatKRW(itemAny.labor_cost as number)}
                     </p>
                   </div>
-                  <p className="text-base font-semibold text-gray-900 shrink-0">
+                  <p className="text-base font-semibold text-foreground shrink-0">
                     {formatKRW(itemAny.line_total as number)}
                   </p>
                 </div>
@@ -155,31 +155,31 @@ export default async function QuoteDetailPage({ params, searchParams }: { params
           // 난이도 계수가 더하는 증분(직전 단계 금액 기준)
           const difficultyDelta = afterDifficulty - afterDistance;
           return (
-        <div className="bg-white rounded-2xl p-4 border border-gray-100">
-          <h2 className="text-lg font-semibold text-gray-800 mb-3">금액 내역</h2>
+        <div className="bg-card rounded-2xl p-4 border border-border">
+          <h2 className="text-lg font-semibold text-foreground mb-3">금액 내역</h2>
           <div className="space-y-2 text-base">
-            <div className="flex justify-between text-gray-600">
+            <div className="flex justify-between text-muted-foreground">
               <span>항목 소계</span>
               <span>{formatKRW(subtotal)}</span>
             </div>
-            <div className="flex justify-between text-gray-600">
+            <div className="flex justify-between text-muted-foreground">
               <span>거리 계수 × {distanceFactor}</span>
               <span>+{formatKRW(distanceDelta)}</span>
             </div>
-            <div className="flex justify-between text-gray-600">
+            <div className="flex justify-between text-muted-foreground">
               <span>난이도 계수 × {difficultyFactor}</span>
               <span>+{formatKRW(difficultyDelta)}</span>
             </div>
-            <div className="flex justify-between text-gray-600">
+            <div className="flex justify-between text-muted-foreground">
               <span>예비 ({((quoteAny.reserve_rate as number) * 100).toFixed(0)}%)</span>
               <span>+{formatKRW((quoteAny.total_amount as number) * (quoteAny.reserve_rate as number) / (1 + (quoteAny.reserve_rate as number) + (quoteAny.contingency_rate as number)))}</span>
             </div>
-            <div className="flex justify-between text-gray-600">
+            <div className="flex justify-between text-muted-foreground">
               <span>비상 ({((quoteAny.contingency_rate as number) * 100).toFixed(0)}%)</span>
               <span>+{formatKRW((quoteAny.total_amount as number) * (quoteAny.contingency_rate as number) / (1 + (quoteAny.reserve_rate as number) + (quoteAny.contingency_rate as number)))}</span>
             </div>
-            <hr className="border-gray-200" />
-            <div className="flex justify-between text-xl font-bold text-gray-900">
+            <hr className="border-border" />
+            <div className="flex justify-between text-xl font-bold text-foreground">
               <span>최종 합계</span>
               <span className="text-primary/90">{formatKRW(quoteAny.total_amount as number)}</span>
             </div>
@@ -214,16 +214,16 @@ export default async function QuoteDetailPage({ params, searchParams }: { params
             {contractAny && (
               <Link
                 href={`/contracts/${contractAny.id}?from=/quotes/${id}`}
-                className="bg-white rounded-2xl p-4 border border-gray-100 flex items-center gap-3 min-h-[56px] active:bg-gray-50"
+                className="bg-card rounded-2xl p-4 border border-border flex items-center gap-3 min-h-[56px] active:bg-muted"
               >
                 <FileTextIcon size={24} className="text-purple-600 shrink-0" />
                 <div className="flex-1">
-                  <p className="text-base font-semibold text-gray-900">이 견적으로 만든 계약서 보기</p>
-                  <p className="text-sm text-gray-500">
+                  <p className="text-base font-semibold text-foreground">이 견적으로 만든 계약서 보기</p>
+                  <p className="text-sm text-muted-foreground">
                     계약서 상태: {contractStatusLabel[contractAny.status] ?? contractAny.status}
                   </p>
                 </div>
-                <ChevronRightIcon size={22} className="text-gray-400 shrink-0" />
+                <ChevronRightIcon size={22} className="text-muted-foreground/70 shrink-0" />
               </Link>
             )}
 
@@ -241,8 +241,8 @@ export default async function QuoteDetailPage({ params, searchParams }: { params
 
         {/* 견적 PDF 다운로드 링크 */}
         {(quoteAny.customer_pdf_url as string | null) && (
-          <div className="bg-white rounded-2xl p-4 border border-gray-100">
-            <h2 className="text-lg font-semibold text-gray-800 mb-3">견적서 PDF</h2>
+          <div className="bg-card rounded-2xl p-4 border border-border">
+            <h2 className="text-lg font-semibold text-foreground mb-3">견적서 PDF</h2>
             <div className="space-y-2">
               <a
                 href={quoteAny.customer_pdf_url as string}
@@ -258,7 +258,7 @@ export default async function QuoteDetailPage({ params, searchParams }: { params
                   href={quoteAny.internal_pdf_url as string}
                   target="_blank"
                   rel="noopener noreferrer"
-                  className="flex items-center gap-2 w-full bg-gray-100 text-gray-700 rounded-xl px-4 py-3 text-base font-semibold active:bg-gray-200"
+                  className="flex items-center gap-2 w-full bg-muted text-foreground/90 rounded-xl px-4 py-3 text-base font-semibold active:bg-muted"
                 >
                   <FileTextIcon size={20} />
                   내부용(원가 포함) 열기

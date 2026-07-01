@@ -112,7 +112,7 @@ export function Step3Trades({ distanceFactor, difficultyFactor, defaultAreaPyeon
   if (!hasPrices) {
     return (
       <div className="px-4 pt-6">
-        <h2 className="text-2xl font-bold text-gray-900 mb-4">단가표가 없어요</h2>
+        <h2 className="text-2xl font-bold text-foreground mb-4">단가표가 없어요</h2>
         <div className="bg-amber-50 border border-amber-200 rounded-xl p-5 mb-6">
           <p className="text-lg text-amber-800">
             견적을 계산하려면 먼저 단가표를 입력해야 합니다.
@@ -123,7 +123,7 @@ export function Step3Trades({ distanceFactor, difficultyFactor, defaultAreaPyeon
         </div>
         <button
           onClick={onBack}
-          className="w-full py-4 text-lg border border-gray-300 rounded-xl text-gray-600 font-medium"
+          className="w-full py-4 text-lg border border-border rounded-xl text-muted-foreground font-medium"
         >
           ◀ 이전으로
         </button>
@@ -141,37 +141,37 @@ export function Step3Trades({ distanceFactor, difficultyFactor, defaultAreaPyeon
 
   return (
     <div className="px-4 pt-6">
-      <h2 className="text-2xl font-bold text-gray-900 mb-2">무슨 공사 하나요?</h2>
-      <p className="text-lg text-gray-500 mb-4">공종을 선택하고 수량을 입력하세요</p>
+      <h2 className="text-2xl font-bold text-foreground mb-2">무슨 공사 하나요?</h2>
+      <p className="text-lg text-muted-foreground mb-4">공종을 선택하고 수량을 입력하세요</p>
 
       {isPending && prices.length === 0 ? (
-        <p className="text-gray-400 text-lg py-8 text-center">단가표 불러오는 중...</p>
+        <p className="text-muted-foreground/70 text-lg py-8 text-center">단가표 불러오는 중...</p>
       ) : (
         <div className="space-y-4 mb-6">
           {Object.entries(grouped).map(([groupName, items]) => (
-            <div key={groupName} className="bg-white border border-gray-200 rounded-xl overflow-hidden">
-              <div className="px-4 py-3 bg-gray-50 border-b border-gray-100">
-                <span className="text-base font-semibold text-gray-700">{groupName}</span>
+            <div key={groupName} className="bg-card border border-border rounded-xl overflow-hidden">
+              <div className="px-4 py-3 bg-muted border-b border-border">
+                <span className="text-base font-semibold text-foreground/90">{groupName}</span>
               </div>
               {items.map((price) => {
                 const key = price.tradeId + price.itemName;
                 const isSelected = selected.has(key);
                 const entry = selected.get(key);
                 return (
-                  <div key={key} className={`border-b border-gray-100 last:border-0 ${isSelected ? "bg-primary/10" : ""}`}>
+                  <div key={key} className={`border-b border-border last:border-0 ${isSelected ? "bg-primary/10" : ""}`}>
                     {/* 전체 행 탭으로 선택/해제 */}
                     <button
                       onClick={() => toggle(price)}
                       className="w-full flex items-center gap-3 px-4 py-4 text-left active:bg-blue-100"
                     >
                       <div className={`w-8 h-8 rounded-lg border-2 flex items-center justify-center shrink-0 ${
-                        isSelected ? "border-blue-500 bg-primary/100" : "border-gray-300"
+                        isSelected ? "border-blue-500 bg-primary/100" : "border-border"
                       }`}>
                         {isSelected && <span className="text-white text-xl font-bold leading-none">✓</span>}
                       </div>
                       <div className="flex-1 min-w-0">
-                        <p className="text-base font-semibold text-gray-900">{price.itemName}</p>
-                        <p className="text-sm text-gray-400">
+                        <p className="text-base font-semibold text-foreground">{price.itemName}</p>
+                        <p className="text-sm text-muted-foreground/70">
                           자재 {(price.materialUnitPrice).toLocaleString()}원/{UNIT_LABEL[price.unit] ?? price.unit}
                           {" · "}일당 {(price.laborDayRate).toLocaleString()}원
                         </p>
@@ -180,16 +180,16 @@ export function Step3Trades({ distanceFactor, difficultyFactor, defaultAreaPyeon
                     {/* 수량 입력 — 선택 시 하단에 별도 노출 */}
                     {isSelected && (
                       <div className="flex items-center gap-2 px-4 pb-3 pl-16">
-                        <span className="text-base text-gray-600">수량</span>
+                        <span className="text-base text-muted-foreground">수량</span>
                         <input
                           type="number"
                           inputMode="decimal"
                           value={entry?.quantity ?? ""}
                           onChange={(e) => setQty(key, e.target.value)}
                           min="0"
-                          className="w-24 px-3 py-3 text-xl font-bold border-2 border-blue-300 rounded-xl text-right focus:outline-none focus:ring-2 focus:ring-blue-500"
+                          className="w-24 px-3 py-3 text-xl font-bold border-2 border-blue-300 rounded-xl text-right focus:outline-none focus:ring-2 focus:ring-primary/500"
                         />
-                        <span className="text-base font-medium text-gray-700">{UNIT_LABEL[price.unit] ?? price.unit}</span>
+                        <span className="text-base font-medium text-foreground/90">{UNIT_LABEL[price.unit] ?? price.unit}</span>
                       </div>
                     )}
                   </div>
@@ -203,15 +203,15 @@ export function Step3Trades({ distanceFactor, difficultyFactor, defaultAreaPyeon
       {/* 미리보기 합계 */}
       {preview && (
         <div className="bg-primary/10 border border-primary/30 rounded-xl p-4 mb-6">
-          <div className="flex justify-between text-base text-gray-600 mb-1">
+          <div className="flex justify-between text-base text-muted-foreground mb-1">
             <span>소계</span>
             <span>{formatKRW(preview.subtotal)}</span>
           </div>
-          <div className="flex justify-between text-base text-gray-600 mb-1">
+          <div className="flex justify-between text-base text-muted-foreground mb-1">
             <span>계수 적용 후</span>
             <span>{formatKRW(preview.adjusted)}</span>
           </div>
-          <div className="flex justify-between text-base text-gray-600 mb-2">
+          <div className="flex justify-between text-base text-muted-foreground mb-2">
             <span>예비+비상</span>
             <span>+{formatKRW(preview.reserve + preview.contingency)}</span>
           </div>
@@ -231,7 +231,7 @@ export function Step3Trades({ distanceFactor, difficultyFactor, defaultAreaPyeon
       <div className="flex gap-3">
         <button
           onClick={onBack}
-          className="flex-1 py-4 text-lg border border-gray-300 rounded-xl text-gray-600 font-medium"
+          className="flex-1 py-4 text-lg border border-border rounded-xl text-muted-foreground font-medium"
         >
           ◀ 이전
         </button>

@@ -28,7 +28,7 @@ export default async function SettingsPage() {
 
   return (
     <div className="px-4 pt-6 pb-24">
-      <h1 className="text-2xl font-bold text-gray-900 mb-6">설정</h1>
+      <h1 className="text-2xl font-bold text-foreground mb-6">설정</h1>
 
       {/* 사업자 정보 (누르면 수정) */}
       {t && (
@@ -40,29 +40,29 @@ export default async function SettingsPage() {
       )}
 
       {/* 메뉴 */}
-      <div className="bg-white rounded-2xl border border-gray-200 overflow-hidden mb-4">
+      <div className="bg-card rounded-2xl border border-border overflow-hidden mb-4">
         {MENU.map(({ href, icon: Icon, label, desc }, i) => (
           <Link
             key={href}
             href={href}
-            className={`flex items-center gap-4 px-4 py-4 active:bg-gray-50 ${
-              i < MENU.length - 1 ? "border-b border-gray-100" : ""
+            className={`flex items-center gap-4 px-4 py-4 active:bg-muted ${
+              i < MENU.length - 1 ? "border-b border-border" : ""
             }`}
           >
             <div className="w-10 h-10 bg-primary/10 rounded-xl flex items-center justify-center shrink-0">
               <Icon size={20} className="text-primary" />
             </div>
             <div className="flex-1 min-w-0">
-              <p className="text-base font-semibold text-gray-900">{label}</p>
-              <p className="text-sm text-gray-500 truncate">{desc}</p>
+              <p className="text-base font-semibold text-foreground">{label}</p>
+              <p className="text-sm text-muted-foreground truncate">{desc}</p>
             </div>
-            <ChevronRightIcon size={18} className="text-gray-300 shrink-0" />
+            <ChevronRightIcon size={18} className="text-muted-foreground/50 shrink-0" />
           </Link>
         ))}
       </div>
 
       {/* 로그아웃 */}
-      <div className="bg-white rounded-2xl border border-gray-200 overflow-hidden">
+      <div className="bg-card rounded-2xl border border-border overflow-hidden">
         <form action="/api/auth/signout" method="POST">
           <button
             type="submit"
@@ -76,7 +76,7 @@ export default async function SettingsPage() {
         </form>
       </div>
 
-      <p className="text-center text-xs text-gray-400 mt-8">InteriorOS v1.0</p>
+      <p className="text-center text-xs text-muted-foreground/70 mt-8">InteriorOS v1.0</p>
     </div>
   );
 }

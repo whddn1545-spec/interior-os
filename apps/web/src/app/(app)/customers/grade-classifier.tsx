@@ -9,7 +9,7 @@ const GRADE_LABEL: Record<string, string> = { vip: "VIP", gold: "골드", normal
 const GRADE_COLOR: Record<string, string> = {
   vip: "bg-yellow-100 text-yellow-700 border-yellow-300",
   gold: "bg-amber-100 text-amber-700 border-amber-300",
-  normal: "bg-gray-100 text-gray-600 border-gray-300",
+  normal: "bg-muted text-muted-foreground border-border",
   dormant: "bg-slate-100 text-slate-500 border-slate-300",
 };
 
@@ -74,17 +74,17 @@ export function GradeClassifier() {
 
       {open && (
         <div className="fixed inset-0 bg-black/50 z-50 flex items-end">
-          <div className="bg-white w-full rounded-t-3xl p-6 pb-10 max-h-[90vh] overflow-y-auto">
+          <div className="bg-card w-full rounded-t-3xl p-6 pb-10 max-h-[90vh] overflow-y-auto">
             <div className="flex items-center justify-between mb-4">
-              <h2 className="text-xl font-bold text-gray-900">AI 고객 등급 추천</h2>
-              <button onClick={() => setOpen(false)} className="p-3 text-gray-400 active:bg-gray-100 rounded-xl">
+              <h2 className="text-xl font-bold text-foreground">AI 고객 등급 추천</h2>
+              <button onClick={() => setOpen(false)} className="p-3 text-muted-foreground/70 active:bg-muted rounded-xl">
                 <XIcon size={24} />
               </button>
             </div>
 
             {results.length === 0 && !done && (
               <>
-                <p className="text-base text-gray-600 mb-6">
+                <p className="text-base text-muted-foreground mb-6">
                   공사 횟수, 매출, 최근 방문일을 분석해서<br/>
                   VIP/골드/일반/휴면 등급을 추천해드려요.
                 </p>
@@ -106,7 +106,7 @@ export function GradeClassifier() {
 
             {results.length > 0 && !done && (
               <>
-                <p className="text-base text-gray-600 mb-4">
+                <p className="text-base text-muted-foreground mb-4">
                   적용할 항목을 선택해서 확정하세요.
                 </p>
                 <div className="space-y-3 mb-6">
@@ -123,9 +123,9 @@ export function GradeClassifier() {
                           <span className={`text-sm px-2 py-0.5 rounded-full border font-medium ${GRADE_COLOR[r.recommendedGrade] ?? ""}`}>
                             {GRADE_LABEL[r.recommendedGrade] ?? r.recommendedGrade}
                           </span>
-                          <span className="text-base font-semibold text-gray-900">추천</span>
+                          <span className="text-base font-semibold text-foreground">추천</span>
                         </div>
-                        <p className="text-sm text-gray-500">{r.reason}</p>
+                        <p className="text-sm text-muted-foreground">{r.reason}</p>
                       </div>
                     </label>
                   ))}
@@ -151,7 +151,7 @@ export function GradeClassifier() {
             {done && (
               <div className="text-center py-8">
                 <CheckIcon size={56} className="mx-auto text-green-500 mb-3" />
-                <p className="text-xl font-bold text-gray-900">등급이 업데이트됐어요!</p>
+                <p className="text-xl font-bold text-foreground">등급이 업데이트됐어요!</p>
               </div>
             )}
           </div>

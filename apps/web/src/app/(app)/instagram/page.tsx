@@ -75,7 +75,7 @@ export default async function InstagramPage() {
       {/* 홈으로 돌아가기 (더보기 메뉴로 진입 시 길 잃지 않도록) */}
       <Link
         href="/"
-        className="mb-3 -ml-2 inline-flex h-14 items-center gap-2 rounded-xl px-2 text-base font-semibold text-gray-600 active:bg-gray-100"
+        className="mb-3 -ml-2 inline-flex h-14 items-center gap-2 rounded-xl px-2 text-base font-semibold text-muted-foreground active:bg-muted"
       >
         <ArrowLeftIcon size={24} />
         홈으로
@@ -83,9 +83,9 @@ export default async function InstagramPage() {
 
       <div className="flex items-center gap-3 mb-2">
         <ImageIcon size={28} className="text-pink-600" />
-        <h1 className="text-2xl font-bold text-gray-900">인스타그램 마케팅</h1>
+        <h1 className="text-2xl font-bold text-foreground">인스타그램 마케팅</h1>
       </div>
-      <p className="text-base text-gray-500 mb-6">AI가 추천한 사진으로 게시물을 만들어보세요</p>
+      <p className="text-base text-muted-foreground mb-6">AI가 추천한 사진으로 게시물을 만들어보세요</p>
 
       <InstagramManager
         recommendedPhotos={recommendedPhotos}

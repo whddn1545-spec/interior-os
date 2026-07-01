@@ -123,21 +123,21 @@ export function QuoteWizard({ initialCustomer }: QuoteWizardProps) {
                         ? "bg-primary text-white"
                         : isDone
                         ? "bg-profit/100 text-white"
-                        : "bg-gray-200 text-gray-400"
+                        : "bg-muted text-muted-foreground/70"
                     }`}
                   >
                     {isDone ? "✓" : num}
                   </div>
                   <span
                     className={`text-xs ${
-                      isActive ? "text-primary font-semibold" : "text-gray-400"
+                      isActive ? "text-primary font-semibold" : "text-muted-foreground/70"
                     }`}
                   >
                     {label}
                   </span>
                   {i < STEP_LABELS.length - 1 && (
                     <div
-                      className={`h-0.5 flex-1 ${isDone ? "bg-green-400" : "bg-gray-200"}`}
+                      className={`h-0.5 flex-1 ${isDone ? "bg-green-400" : "bg-muted"}`}
                     />
                   )}
                 </div>
@@ -148,7 +148,7 @@ export function QuoteWizard({ initialCustomer }: QuoteWizardProps) {
           {/* 이어쓰기 중 표시 */}
           {step > 1 && (
             <div className="mt-2 flex items-center justify-between">
-              <p className="text-xs text-gray-400">임시저장 복원됨</p>
+              <p className="text-xs text-muted-foreground/70">임시저장 복원됨</p>
               <button
                 onClick={() => {
                   localStorage.removeItem(DRAFT_KEY);

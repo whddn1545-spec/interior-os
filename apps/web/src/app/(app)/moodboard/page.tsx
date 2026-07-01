@@ -126,20 +126,20 @@ export default function MoodboardPage() {
   const resultUrl = mode === "text" ? textImageUrl : visualUrl;
 
   return (
-    <div className="min-h-screen bg-gray-50 pb-24">
-      <header className="sticky top-0 bg-white border-b border-gray-100 z-10 px-4 py-3 flex items-center gap-3">
+    <div className="min-h-screen bg-muted pb-24">
+      <header className="sticky top-0 bg-card border-b border-border z-10 px-4 py-3 flex items-center gap-3">
         <BackLink fallbackHref="/" />
-        <h1 className="text-xl font-bold text-gray-900">인테리어 무드보드</h1>
+        <h1 className="text-xl font-bold text-foreground">인테리어 무드보드</h1>
       </header>
 
       <div className="max-w-lg mx-auto px-4 pt-4 space-y-5">
 
         {/* 모드 토글 */}
-        <div className="grid grid-cols-2 gap-1 bg-gray-100 rounded-2xl p-1">
+        <div className="grid grid-cols-2 gap-1 bg-muted rounded-2xl p-1">
           <button
             onClick={() => setMode("photo")}
             className={`py-3 rounded-xl text-base font-bold transition-colors active:opacity-70 ${
-              mode === "photo" ? "bg-white text-primary shadow-sm" : "text-gray-500"
+              mode === "photo" ? "bg-card text-primary shadow-sm" : "text-muted-foreground"
             }`}
           >
             📸 완공 시각화
@@ -147,7 +147,7 @@ export default function MoodboardPage() {
           <button
             onClick={() => setMode("text")}
             className={`py-3 rounded-xl text-base font-bold transition-colors active:opacity-70 ${
-              mode === "text" ? "bg-white text-primary shadow-sm" : "text-gray-500"
+              mode === "text" ? "bg-card text-primary shadow-sm" : "text-muted-foreground"
             }`}
           >
             ✨ 아이디어 생성
@@ -164,14 +164,14 @@ export default function MoodboardPage() {
 
             {/* 사진 업로드 */}
             <div>
-              <label className="block text-base font-semibold text-gray-700 mb-2">
+              <label className="block text-base font-semibold text-foreground/90 mb-2">
                 공사 전 사진 / 도면
               </label>
               <input ref={cameraRef} type="file" accept="image/*" capture="environment" className="hidden" onChange={handleFileSelect} />
               <input ref={galleryRef} type="file" accept="image/*" className="hidden" onChange={handleFileSelect} />
 
               {beforePreview ? (
-                <div className="relative rounded-2xl overflow-hidden border border-gray-200">
+                <div className="relative rounded-2xl overflow-hidden border border-border">
                   {/* eslint-disable-next-line @next/next/no-img-element */}
                   <img src={beforePreview} alt="공사 전" className="w-full max-h-64 object-cover" />
                   <button
@@ -195,7 +195,7 @@ export default function MoodboardPage() {
                   </button>
                   <button
                     onClick={() => galleryRef.current?.click()}
-                    className="flex flex-col items-center gap-2 bg-gray-50 border-2 border-dashed border-gray-300 rounded-2xl py-6 text-gray-600 font-semibold active:bg-gray-100"
+                    className="flex flex-col items-center gap-2 bg-muted border-2 border-dashed border-border rounded-2xl py-6 text-muted-foreground font-semibold active:bg-muted"
                   >
                     <ImageIcon size={28} />
                     <span className="text-base">앨범 / 도면</span>
@@ -206,11 +206,11 @@ export default function MoodboardPage() {
 
             {/* 공간 유형 */}
             <div>
-              <label className="block text-base font-semibold text-gray-700 mb-2">공간</label>
+              <label className="block text-base font-semibold text-foreground/90 mb-2">공간</label>
               <div className="grid grid-cols-3 gap-2">
                 {SPACE_TYPES.map(({ value, label }) => (
                   <button key={value} onClick={() => setSpaceType(value)}
-                    className={`py-4 rounded-xl text-base font-semibold transition-colors active:opacity-80 ${spaceType === value ? "bg-primary text-white" : "bg-white border border-gray-300 text-gray-700"}`}>
+                    className={`py-4 rounded-xl text-base font-semibold transition-colors active:opacity-80 ${spaceType === value ? "bg-primary text-white" : "bg-card border border-border text-foreground/90"}`}>
                     {label}
                   </button>
                 ))}
@@ -219,7 +219,7 @@ export default function MoodboardPage() {
 
             {/* 사용 자재 */}
             <div>
-              <label className="block text-base font-semibold text-gray-700 mb-2">사용 자재</label>
+              <label className="block text-base font-semibold text-foreground/90 mb-2">사용 자재</label>
               <div className="space-y-4">
                 {[
                   { key: "floor", label: "바닥재", placeholder: "예: 원목마루, 강마루, 포세린 타일", value: floor, set: setFloor },
@@ -229,13 +229,13 @@ export default function MoodboardPage() {
                   { key: "extra", label: "기타 자재", placeholder: "예: 아트월 대리석 시트지, 몰딩", value: extra, set: setExtra },
                 ].map(({ key, label, placeholder, value, set }) => (
                   <div key={key}>
-                    <label className="block text-base font-semibold text-gray-700 mb-1">{label}</label>
+                    <label className="block text-base font-semibold text-foreground/90 mb-1">{label}</label>
                     <input
                       type="text"
                       value={value}
                       onChange={(e) => set(e.target.value)}
                       placeholder={placeholder}
-                      className="w-full border border-gray-300 rounded-xl px-4 py-3 text-base focus:outline-none focus:ring-2 focus:ring-blue-300"
+                      className="w-full border border-border rounded-xl px-4 py-3 text-base focus:outline-none focus:ring-2 focus:ring-primary/300"
                     />
                   </div>
                 ))}
@@ -244,11 +244,11 @@ export default function MoodboardPage() {
 
             {/* 스타일 */}
             <div>
-              <label className="block text-base font-semibold text-gray-700 mb-2">인테리어 스타일</label>
+              <label className="block text-base font-semibold text-foreground/90 mb-2">인테리어 스타일</label>
               <div className="grid grid-cols-3 gap-2">
                 {STYLES.map(({ value, label }) => (
                   <button key={value} onClick={() => setStyle(value)}
-                    className={`py-4 rounded-xl text-base font-semibold transition-colors active:opacity-80 ${style === value ? "bg-primary text-white" : "bg-white border border-gray-300 text-gray-700"}`}>
+                    className={`py-4 rounded-xl text-base font-semibold transition-colors active:opacity-80 ${style === value ? "bg-primary text-white" : "bg-card border border-border text-foreground/90"}`}>
                     {label}
                   </button>
                 ))}
@@ -257,13 +257,13 @@ export default function MoodboardPage() {
 
             {/* 색상 */}
             <div>
-              <label className="block text-base font-semibold text-gray-700 mb-2">
-                색상 <span className="text-sm font-normal text-gray-500">(최대 3개)</span>
+              <label className="block text-base font-semibold text-foreground/90 mb-2">
+                색상 <span className="text-sm font-normal text-muted-foreground">(최대 3개)</span>
               </label>
               <div className="grid grid-cols-2 gap-2">
                 {COLOR_OPTIONS.map(({ value, label }) => (
                   <button key={value} onClick={() => toggleColor(value)}
-                    className={`py-4 rounded-xl text-base font-semibold transition-colors active:opacity-80 ${selectedColors.includes(value) ? "bg-primary text-white" : "bg-white border border-gray-300 text-gray-700"}`}>
+                    className={`py-4 rounded-xl text-base font-semibold transition-colors active:opacity-80 ${selectedColors.includes(value) ? "bg-primary text-white" : "bg-card border border-border text-foreground/90"}`}>
                     {label}
                   </button>
                 ))}
@@ -272,15 +272,15 @@ export default function MoodboardPage() {
 
             {/* 고객 요청사항 */}
             <div>
-              <label className="block text-base font-semibold text-gray-700 mb-2">
-                고객 요청사항 <span className="text-sm font-normal text-gray-500">(선택)</span>
+              <label className="block text-base font-semibold text-foreground/90 mb-2">
+                고객 요청사항 <span className="text-sm font-normal text-muted-foreground">(선택)</span>
               </label>
               <textarea
                 value={preferences}
                 onChange={(e) => setPreferences(e.target.value)}
                 placeholder="예: 수납공간 많이, 아이 있어서 안전한 소재, 밝고 넓어 보이게, 모던하면서 따뜻한 느낌"
                 rows={3}
-                className="w-full border border-gray-300 rounded-xl px-4 py-3 text-base focus:outline-none focus:ring-2 focus:ring-blue-300 resize-none"
+                className="w-full border border-border rounded-xl px-4 py-3 text-base focus:outline-none focus:ring-2 focus:ring-primary/300 resize-none"
               />
             </div>
 
@@ -317,11 +317,11 @@ export default function MoodboardPage() {
             </div>
 
             <div>
-              <label className="block text-base font-semibold text-gray-700 mb-2">공간</label>
+              <label className="block text-base font-semibold text-foreground/90 mb-2">공간</label>
               <div className="grid grid-cols-3 gap-2">
                 {SPACE_TYPES.map(({ value, label }) => (
                   <button key={value} onClick={() => setSpaceType(value)}
-                    className={`py-3 rounded-xl text-base font-semibold transition-colors active:opacity-80 ${spaceType === value ? "bg-purple-600 text-white" : "bg-white border border-gray-300 text-gray-700"}`}>
+                    className={`py-3 rounded-xl text-base font-semibold transition-colors active:opacity-80 ${spaceType === value ? "bg-purple-600 text-white" : "bg-card border border-border text-foreground/90"}`}>
                     {label}
                   </button>
                 ))}
@@ -329,11 +329,11 @@ export default function MoodboardPage() {
             </div>
 
             <div>
-              <label className="block text-base font-semibold text-gray-700 mb-2">스타일</label>
+              <label className="block text-base font-semibold text-foreground/90 mb-2">스타일</label>
               <div className="grid grid-cols-3 gap-2">
                 {STYLES.map(({ value, label }) => (
                   <button key={value} onClick={() => setStyle(value)}
-                    className={`py-4 rounded-xl text-base font-semibold transition-colors active:opacity-80 ${style === value ? "bg-purple-600 text-white" : "bg-white border border-gray-300 text-gray-700"}`}>
+                    className={`py-4 rounded-xl text-base font-semibold transition-colors active:opacity-80 ${style === value ? "bg-purple-600 text-white" : "bg-card border border-border text-foreground/90"}`}>
                     {label}
                   </button>
                 ))}
@@ -341,13 +341,13 @@ export default function MoodboardPage() {
             </div>
 
             <div>
-              <label className="block text-base font-semibold text-gray-700 mb-2">
-                색상 <span className="text-sm font-normal text-gray-500">(최대 3개)</span>
+              <label className="block text-base font-semibold text-foreground/90 mb-2">
+                색상 <span className="text-sm font-normal text-muted-foreground">(최대 3개)</span>
               </label>
               <div className="grid grid-cols-2 gap-2">
                 {COLOR_OPTIONS.map(({ value, label }) => (
                   <button key={value} onClick={() => toggleColor(value)}
-                    className={`py-4 rounded-xl text-base font-semibold transition-colors active:opacity-80 ${selectedColors.includes(value) ? "bg-purple-600 text-white" : "bg-white border border-gray-300 text-gray-700"}`}>
+                    className={`py-4 rounded-xl text-base font-semibold transition-colors active:opacity-80 ${selectedColors.includes(value) ? "bg-purple-600 text-white" : "bg-card border border-border text-foreground/90"}`}>
                     {label}
                   </button>
                 ))}
@@ -355,11 +355,11 @@ export default function MoodboardPage() {
             </div>
 
             <div>
-              <label className="block text-base font-semibold text-gray-700 mb-2">평수</label>
+              <label className="block text-base font-semibold text-foreground/90 mb-2">평수</label>
               <div className="grid grid-cols-4 gap-2">
                 {AREA_OPTIONS.map(({ value, label }) => (
                   <button key={value} onClick={() => setArea(value)}
-                    className={`py-3 rounded-xl text-base font-semibold transition-colors active:opacity-80 ${area === value ? "bg-purple-600 text-white" : "bg-white border border-gray-300 text-gray-700"}`}>
+                    className={`py-3 rounded-xl text-base font-semibold transition-colors active:opacity-80 ${area === value ? "bg-purple-600 text-white" : "bg-card border border-border text-foreground/90"}`}>
                     {label}
                   </button>
                 ))}
@@ -394,8 +394,8 @@ function ResultCard({ beforeUrl, afterUrl, label }: { beforeUrl?: string | null;
     <div className="space-y-3">
       {beforeUrl && (
         <div>
-          <p className="text-sm font-semibold text-gray-500 mb-1">공사 전</p>
-          <div className="rounded-2xl overflow-hidden border border-gray-200">
+          <p className="text-sm font-semibold text-muted-foreground mb-1">공사 전</p>
+          <div className="rounded-2xl overflow-hidden border border-border">
             {/* eslint-disable-next-line @next/next/no-img-element */}
             <img src={beforeUrl} alt="공사 전" className="w-full max-h-48 object-cover" />
           </div>
@@ -404,7 +404,7 @@ function ResultCard({ beforeUrl, afterUrl, label }: { beforeUrl?: string | null;
 
       <div>
         {beforeUrl && <p className="text-sm font-semibold text-primary mb-1">AI 완공 시각화</p>}
-        <div className="relative rounded-2xl overflow-hidden border border-gray-200">
+        <div className="relative rounded-2xl overflow-hidden border border-border">
           {/* eslint-disable-next-line @next/next/no-img-element */}
           <img src={afterUrl} alt={label} className="w-full" />
           <div className="absolute inset-0 flex items-center justify-center pointer-events-none">
@@ -422,7 +422,7 @@ function ResultCard({ beforeUrl, afterUrl, label }: { beforeUrl?: string | null;
         download={`${label}.png`}
         target="_blank"
         rel="noopener noreferrer"
-        className="flex items-center justify-center gap-2 w-full py-3 border-2 border-gray-300 rounded-xl text-base font-semibold text-gray-700"
+        className="flex items-center justify-center gap-2 w-full py-3 border-2 border-border rounded-xl text-base font-semibold text-foreground/90"
       >
         <DownloadIcon size={20} />
         이미지 저장

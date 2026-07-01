@@ -82,10 +82,10 @@ export function WorkerAssign({ siteId, tasks, workers, assignments }: Props) {
 
       {open && (
         <div className="fixed inset-0 bg-black/50 z-50 flex items-end">
-          <div className="bg-white w-full rounded-t-3xl p-6 pb-10 max-h-[90vh] overflow-y-auto">
+          <div className="bg-card w-full rounded-t-3xl p-6 pb-10 max-h-[90vh] overflow-y-auto">
             <div className="flex items-center justify-between mb-6">
-              <h2 className="text-xl font-bold text-gray-900">작업자 배정</h2>
-              <button onClick={() => setOpen(false)} className="p-3 text-gray-400 active:bg-gray-100 rounded-xl">
+              <h2 className="text-xl font-bold text-foreground">작업자 배정</h2>
+              <button onClick={() => setOpen(false)} className="p-3 text-muted-foreground/70 active:bg-muted rounded-xl">
                 <XIcon size={24} />
               </button>
             </div>
@@ -93,20 +93,20 @@ export function WorkerAssign({ siteId, tasks, workers, assignments }: Props) {
             {/* 현재 배정 현황 */}
             {assignments.length > 0 && (
               <div className="mb-5">
-                <h3 className="text-base font-semibold text-gray-700 mb-2">현재 배정</h3>
+                <h3 className="text-base font-semibold text-foreground/90 mb-2">현재 배정</h3>
                 <div className="space-y-2">
                   {assignments.map((a, i) => (
                     <div key={i} className="bg-profit/10 border border-profit/20 rounded-xl px-4 py-3">
                       <div className="flex items-center justify-between gap-2">
                         <div>
-                          <p className="text-base font-semibold text-gray-900">{a.workerName}</p>
+                          <p className="text-base font-semibold text-foreground">{a.workerName}</p>
                           <p className="text-sm text-profit font-medium">{STATUS_LABEL[a.status] ?? a.status}</p>
                         </div>
                         <div className="flex items-center gap-2 shrink-0">
                           {a.workerPhone && (
                             <a
                               href={`tel:${a.workerPhone}`}
-                              className="flex items-center gap-1 bg-white border border-green-300 text-profit px-3 py-2.5 rounded-xl text-base font-semibold active:bg-profit/10"
+                              className="flex items-center gap-1 bg-card border border-green-300 text-profit px-3 py-2.5 rounded-xl text-base font-semibold active:bg-profit/10"
                             >
                               📞 전화
                             </a>
@@ -121,7 +121,7 @@ export function WorkerAssign({ siteId, tasks, workers, assignments }: Props) {
                         </div>
                       </div>
                       {a.workerPhone && (
-                        <p className="text-sm text-gray-500 mt-1">{a.workerPhone}</p>
+                        <p className="text-sm text-muted-foreground mt-1">{a.workerPhone}</p>
                       )}
                     </div>
                   ))}
@@ -131,7 +131,7 @@ export function WorkerAssign({ siteId, tasks, workers, assignments }: Props) {
 
             {/* 공종/작업 선택 */}
             <div className="mb-4">
-              <label className="block text-base font-semibold text-gray-700 mb-2">배정할 작업</label>
+              <label className="block text-base font-semibold text-foreground/90 mb-2">배정할 작업</label>
               <div className="space-y-2">
                 {tasks.map((task) => (
                   <button
@@ -140,11 +140,11 @@ export function WorkerAssign({ siteId, tasks, workers, assignments }: Props) {
                     className={`w-full text-left px-4 py-3 rounded-xl border-2 transition-colors ${
                       selectedTask?.id === task.id
                         ? "border-blue-500 bg-primary/10"
-                        : "border-gray-200 bg-white"
+                        : "border-border bg-card"
                     }`}
                   >
-                    <p className="text-base font-semibold text-gray-900">{task.title}</p>
-                    <p className="text-sm text-gray-500">{task.startDate} ~ {task.endDate}</p>
+                    <p className="text-base font-semibold text-foreground">{task.title}</p>
+                    <p className="text-sm text-muted-foreground">{task.startDate} ~ {task.endDate}</p>
                   </button>
                 ))}
               </div>
@@ -153,14 +153,14 @@ export function WorkerAssign({ siteId, tasks, workers, assignments }: Props) {
             {/* 작업자 선택 */}
             {selectedTask && (
               <div className="mb-5">
-                <label className="block text-base font-semibold text-gray-700 mb-2">
+                <label className="block text-base font-semibold text-foreground/90 mb-2">
                   작업자 선택
                   {filteredWorkers.length < workers.length && (
-                    <span className="text-sm font-normal text-gray-500 ml-2">({selectedTask.title} 공종 필터)</span>
+                    <span className="text-sm font-normal text-muted-foreground ml-2">({selectedTask.title} 공종 필터)</span>
                   )}
                 </label>
                 {filteredWorkers.length === 0 ? (
-                  <p className="text-base text-gray-400">등록된 작업자가 없어요. 작업자 탭에서 추가해주세요.</p>
+                  <p className="text-base text-muted-foreground/70">등록된 작업자가 없어요. 작업자 탭에서 추가해주세요.</p>
                 ) : (
                   <div className="space-y-2">
                     {filteredWorkers.map((w) => (
@@ -168,12 +168,12 @@ export function WorkerAssign({ siteId, tasks, workers, assignments }: Props) {
                         key={w.id}
                         onClick={() => setSelectedWorker(w.id)}
                         className={`w-full flex items-center justify-between px-4 py-3 rounded-xl border-2 ${
-                          selectedWorker === w.id ? "border-green-500 bg-profit/10" : "border-gray-200 bg-white"
+                          selectedWorker === w.id ? "border-green-500 bg-profit/10" : "border-border bg-card"
                         }`}
                       >
                         <div className="text-left">
-                          <p className="text-base font-semibold text-gray-900">{w.name}</p>
-                          <p className="text-sm text-gray-500">{w.phone}</p>
+                          <p className="text-base font-semibold text-foreground">{w.name}</p>
+                          <p className="text-sm text-muted-foreground">{w.phone}</p>
                         </div>
                         {selectedWorker === w.id && <CheckIcon size={20} className="text-profit shrink-0" />}
                       </button>

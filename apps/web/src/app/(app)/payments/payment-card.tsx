@@ -35,7 +35,7 @@ export function PaymentCard({ schedule }: { schedule: PaymentBoardItem }) {
   const [feedback, setFeedback] = useState<string | null>(null);
   const [draft, setDraft] = useState<ReminderDraft | null>(null);
 
-  const stage = STAGE_BADGE[schedule.stage] ?? { label: schedule.stageLabel, cls: "bg-gray-100 text-gray-700" };
+  const stage = STAGE_BADGE[schedule.stage] ?? { label: schedule.stageLabel, cls: "bg-muted text-foreground/90" };
   const dDays = daysUntil(schedule.dueDate);
 
   const borderCls =
@@ -43,7 +43,7 @@ export function PaymentCard({ schedule }: { schedule: PaymentBoardItem }) {
       ? "border-red-400 border-2"
       : schedule.urgency === "soon"
         ? "border-orange-400 border-2"
-        : "border-gray-200 border";
+        : "border-border border";
 
   function handleMarkPaid() {
     const amount = Number(paidAmount);
@@ -108,7 +108,7 @@ export function PaymentCard({ schedule }: { schedule: PaymentBoardItem }) {
     : "약정일 미정";
 
   return (
-    <div className={`relative rounded-2xl bg-white p-5 shadow-sm ${borderCls}`}>
+    <div className={`relative rounded-2xl bg-card p-5 shadow-sm ${borderCls}`}>
       {/* 긴급도 배지 */}
       {schedule.urgency === "overdue" && (
         <span className="absolute right-4 top-4 rounded-full bg-loss px-3 py-1 text-sm font-bold text-white">
@@ -126,7 +126,7 @@ export function PaymentCard({ schedule }: { schedule: PaymentBoardItem }) {
         href={`/sites/${schedule.siteId}?from=/payments`}
         className="block group -mx-1 px-1 py-2 rounded-xl active:bg-primary/10"
       >
-        <p className="text-xl font-bold text-gray-900">{schedule.customerName}</p>
+        <p className="text-xl font-bold text-foreground">{schedule.customerName}</p>
         <p className="text-base text-primary underline decoration-blue-200">{schedule.siteName} →</p>
       </Link>
 
@@ -141,24 +141,24 @@ export function PaymentCard({ schedule }: { schedule: PaymentBoardItem }) {
       </p>
 
       {/* 약정일 */}
-      <p className="mt-1 text-base text-gray-500">약정일: {dueDateStr}</p>
+      <p className="mt-1 text-base text-muted-foreground">약정일: {dueDateStr}</p>
 
       {feedback && (
-        <p className="mt-3 rounded-lg bg-gray-50 px-3 py-2 text-sm font-medium text-gray-700">
+        <p className="mt-3 rounded-lg bg-muted px-3 py-2 text-sm font-medium text-foreground/90">
           {feedback}
         </p>
       )}
 
       {/* 입금 확인 인라인 폼 */}
       {showPaidForm && (
-        <div className="mt-4 rounded-xl bg-gray-50 p-4">
-          <label className="mb-2 block text-sm font-bold text-gray-700">입금 금액 확인</label>
+        <div className="mt-4 rounded-xl bg-muted p-4">
+          <label className="mb-2 block text-sm font-bold text-foreground/90">입금 금액 확인</label>
           <input
             type="number"
             inputMode="numeric"
             value={paidAmount}
             onChange={(e) => setPaidAmount(e.target.value)}
-            className="mb-3 h-14 w-full rounded-xl border border-gray-300 px-4 text-lg font-bold"
+            className="mb-3 h-14 w-full rounded-xl border border-border px-4 text-lg font-bold"
           />
           <div className="flex gap-2">
             <button
@@ -172,7 +172,7 @@ export function PaymentCard({ schedule }: { schedule: PaymentBoardItem }) {
             <button
               type="button"
               onClick={() => setShowPaidForm(false)}
-              className="flex h-14 flex-1 items-center justify-center rounded-xl bg-gray-200 text-lg font-bold text-gray-700"
+              className="flex h-14 flex-1 items-center justify-center rounded-xl bg-muted text-lg font-bold text-foreground/90"
             >
               취소
             </button>
@@ -183,7 +183,7 @@ export function PaymentCard({ schedule }: { schedule: PaymentBoardItem }) {
       {/* 독촉 문자 토글 */}
       {showReminders && (
         <div className="mt-4">
-          <p className="mb-2 text-base font-bold text-gray-700">
+          <p className="mb-2 text-base font-bold text-foreground/90">
             어떤 말투로 만들까요?
           </p>
           <div className="grid grid-cols-3 gap-2">
@@ -193,7 +193,7 @@ export function PaymentCard({ schedule }: { schedule: PaymentBoardItem }) {
                 type="button"
                 onClick={() => handleReminder(t.key)}
                 disabled={isPending}
-                className="flex h-14 items-center justify-center rounded-xl bg-gray-100 px-2 text-base font-bold text-gray-800 disabled:opacity-50"
+                className="flex h-14 items-center justify-center rounded-xl bg-muted px-2 text-base font-bold text-foreground disabled:opacity-50"
               >
                 {t.label}
               </button>
@@ -208,7 +208,7 @@ export function PaymentCard({ schedule }: { schedule: PaymentBoardItem }) {
           <p className="text-base font-bold text-blue-900">
             문자 내용을 만들었어요 — 문자 앱에서 보내주세요
           </p>
-          <p className="mt-2 whitespace-pre-wrap rounded-lg bg-white p-3 text-base leading-relaxed text-gray-800">
+          <p className="mt-2 whitespace-pre-wrap rounded-lg bg-card p-3 text-base leading-relaxed text-foreground">
             {draft.body}
           </p>
           <div className="mt-3 flex flex-col gap-2">
@@ -223,14 +223,14 @@ export function PaymentCard({ schedule }: { schedule: PaymentBoardItem }) {
             <button
               type="button"
               onClick={handleCopyDraft}
-              className="flex items-center justify-center rounded-xl bg-gray-200 py-4 text-lg font-bold text-gray-800"
+              className="flex items-center justify-center rounded-xl bg-muted py-4 text-lg font-bold text-foreground"
             >
               📋 문자 내용 복사
             </button>
             <button
               type="button"
               onClick={() => setDraft(null)}
-              className="flex items-center justify-center rounded-xl bg-white py-4 text-base font-bold text-gray-500"
+              className="flex items-center justify-center rounded-xl bg-card py-4 text-base font-bold text-muted-foreground"
             >
               닫기
             </button>

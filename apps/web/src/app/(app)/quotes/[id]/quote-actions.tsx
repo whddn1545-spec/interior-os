@@ -257,18 +257,18 @@ export function QuoteActions({ quoteId, status, siteId, customerId, totalAmount 
             <PencilIcon size={20} />
             {loadingEdit ? "불러오는 중..." : "항목 수정하기"}
           </button>
-          <p className="text-base text-gray-500 text-center px-2">
+          <p className="text-base text-muted-foreground text-center px-2">
             항목 한 줄을 빼거나 수량을 고치면 금액이 자동으로 다시 계산돼요
           </p>
           <button
             onClick={handleDuplicate}
             disabled={isPending}
-            className="flex items-center justify-center gap-2 w-full bg-gray-100 text-gray-700 rounded-2xl py-4 text-lg font-medium disabled:opacity-50"
+            className="flex items-center justify-center gap-2 w-full bg-muted text-foreground/90 rounded-2xl py-4 text-lg font-medium disabled:opacity-50"
           >
             <CopyIcon size={20} />
             {isPending ? "복제 중..." : "이 견적 복제하기"}
           </button>
-          <p className="text-base text-gray-500 text-center px-2">
+          <p className="text-base text-muted-foreground text-center px-2">
             같은 현장의 항목·금액을 그대로 복사해 새 견적으로 만들어요
           </p>
 
@@ -279,11 +279,11 @@ export function QuoteActions({ quoteId, status, siteId, customerId, totalAmount 
               )
             }
             disabled={isPending}
-            className="w-full bg-gray-100 text-gray-700 rounded-2xl py-4 text-lg font-medium disabled:opacity-50"
+            className="w-full bg-muted text-foreground/90 rounded-2xl py-4 text-lg font-medium disabled:opacity-50"
           >
             📝 처음부터 새로 견적 작성
           </button>
-          <p className="text-base text-gray-500 text-center px-2">
+          <p className="text-base text-muted-foreground text-center px-2">
             이 견적은 그대로 두고, 같은 고객으로 새 견적을 처음부터 만들어요
           </p>
 
@@ -321,7 +321,7 @@ export function QuoteActions({ quoteId, status, siteId, customerId, totalAmount 
           <button
             onClick={() => handleGeneratePdf("internal")}
             disabled={generatingPdf !== null}
-            className="flex items-center justify-center gap-2 w-full bg-gray-100 text-gray-700 rounded-2xl py-4 text-lg font-semibold disabled:opacity-50"
+            className="flex items-center justify-center gap-2 w-full bg-muted text-foreground/90 rounded-2xl py-4 text-lg font-semibold disabled:opacity-50"
           >
             <FileTextIcon size={20} />
             {generatingPdf === "internal" ? "생성 중..." : "내부용(원가 포함) PDF"}
@@ -343,7 +343,7 @@ export function QuoteActions({ quoteId, status, siteId, customerId, totalAmount 
           <button
             onClick={handleRevert}
             disabled={isPending}
-            className="flex items-center justify-center gap-2 w-full bg-gray-100 text-gray-600 rounded-2xl py-3 text-base font-medium disabled:opacity-50"
+            className="flex items-center justify-center gap-2 w-full bg-muted text-muted-foreground rounded-2xl py-3 text-base font-medium disabled:opacity-50"
           >
             <RotateCcwIcon size={16} />
             임시저장으로 되돌리기
@@ -365,12 +365,12 @@ export function QuoteActions({ quoteId, status, siteId, customerId, totalAmount 
       {/* 확정 확인 다이얼로그 */}
       {showConfirmDialog && (
         <div className="fixed inset-0 bg-black/50 z-50 flex items-end">
-          <div className="bg-white w-full rounded-t-3xl p-6 pb-8">
+          <div className="bg-card w-full rounded-t-3xl p-6 pb-8">
             <div className="text-center mb-6">
               <CheckCircleIcon size={48} className="mx-auto text-primary mb-3" />
-              <h3 className="text-2xl font-bold text-gray-900">이 금액으로 확정할까요?</h3>
+              <h3 className="text-2xl font-bold text-foreground">이 금액으로 확정할까요?</h3>
               <p className="text-3xl font-black text-primary/90 mt-2">{formatKRW(totalAmount)}</p>
-              <p className="text-base text-gray-500 mt-2">
+              <p className="text-base text-muted-foreground mt-2">
                 확정 후에는 고객용 PDF를 만들거나 계약서를 작성할 수 있어요
               </p>
             </div>
@@ -384,7 +384,7 @@ export function QuoteActions({ quoteId, status, siteId, customerId, totalAmount 
               </button>
               <button
                 onClick={() => setShowConfirmDialog(false)}
-                className="w-full bg-gray-100 text-gray-700 rounded-2xl py-4 text-lg font-medium"
+                className="w-full bg-muted text-foreground/90 rounded-2xl py-4 text-lg font-medium"
               >
                 다시 확인할게요
               </button>
@@ -396,11 +396,11 @@ export function QuoteActions({ quoteId, status, siteId, customerId, totalAmount 
       {/* 삭제 확인 다이얼로그 */}
       {showDeleteDialog && (
         <div className="fixed inset-0 bg-black/50 z-50 flex items-end">
-          <div className="bg-white w-full rounded-t-3xl p-6 pb-8">
+          <div className="bg-card w-full rounded-t-3xl p-6 pb-8">
             <div className="text-center mb-6">
               <AlertTriangleIcon size={48} className="mx-auto text-red-500 mb-3" />
-              <h3 className="text-2xl font-bold text-gray-900">이 견적을 삭제할까요?</h3>
-              <p className="text-base text-gray-500 mt-2">
+              <h3 className="text-2xl font-bold text-foreground">이 견적을 삭제할까요?</h3>
+              <p className="text-base text-muted-foreground mt-2">
                 삭제하면 이 임시저장 견적과 모든 항목이 완전히 지워져요. 되돌릴 수 없어요.
               </p>
             </div>
@@ -415,7 +415,7 @@ export function QuoteActions({ quoteId, status, siteId, customerId, totalAmount 
               <button
                 onClick={() => setShowDeleteDialog(false)}
                 disabled={isPending}
-                className="w-full bg-gray-100 text-gray-700 rounded-2xl py-4 text-lg font-medium disabled:opacity-50"
+                className="w-full bg-muted text-foreground/90 rounded-2xl py-4 text-lg font-medium disabled:opacity-50"
               >
                 아니요, 그대로 둘게요
               </button>
@@ -427,14 +427,14 @@ export function QuoteActions({ quoteId, status, siteId, customerId, totalAmount 
       {/* 계약서 생성 다이얼로그 */}
       {showContractDialog && (
         <div className="fixed inset-0 bg-black/50 z-50 flex items-end overflow-y-auto">
-          <div className="bg-white w-full rounded-t-3xl p-6 pb-8 mt-auto">
-            <h3 className="text-2xl font-bold text-gray-900 mb-1">계약서 만들기</h3>
-            <p className="text-base text-gray-500 mb-6">대금 지급 조건을 설정해주세요</p>
+          <div className="bg-card w-full rounded-t-3xl p-6 pb-8 mt-auto">
+            <h3 className="text-2xl font-bold text-foreground mb-1">계약서 만들기</h3>
+            <p className="text-base text-muted-foreground mb-6">대금 지급 조건을 설정해주세요</p>
 
             <div className="space-y-4 mb-6">
               {/* 빠른 선택 프리셋 */}
               <div>
-                <p className="text-sm font-medium text-gray-500 mb-2">자주 쓰는 비율 (계약금/중도금/잔금)</p>
+                <p className="text-sm font-medium text-muted-foreground mb-2">자주 쓰는 비율 (계약금/중도금/잔금)</p>
                 <div className="grid grid-cols-2 gap-2">
                   {[
                     { d: 30, i: 40, label: "30 / 40 / 30" },
@@ -449,7 +449,7 @@ export function QuoteActions({ quoteId, status, siteId, customerId, totalAmount 
                         type="button"
                         onClick={() => { setDepositRate(d); setInterimRate(i); }}
                         className={`py-3 rounded-xl border-2 text-base font-semibold transition-colors ${
-                          isActive ? "border-blue-500 bg-primary/10 text-primary/90" : "border-gray-200 bg-white text-gray-700"
+                          isActive ? "border-blue-500 bg-primary/10 text-primary/90" : "border-border bg-card text-foreground/90"
                         }`}
                       >
                         {label}
@@ -461,19 +461,19 @@ export function QuoteActions({ quoteId, status, siteId, customerId, totalAmount 
 
               {/* 직접 조정 */}
               <div>
-                <label className="block text-lg font-medium text-gray-700 mb-3">직접 조정</label>
+                <label className="block text-lg font-medium text-foreground/90 mb-3">직접 조정</label>
                 <div className="space-y-3">
                   {[
                     { label: "계약금", value: depositRate, set: setDepositRate },
                     { label: "중도금", value: interimRate, set: setInterimRate },
                   ].map(({ label, value, set }) => (
-                    <div key={label} className="flex items-center justify-between bg-gray-50 rounded-xl px-4 py-3">
-                      <span className="text-base font-medium text-gray-700 w-16">{label}</span>
+                    <div key={label} className="flex items-center justify-between bg-muted rounded-xl px-4 py-3">
+                      <span className="text-base font-medium text-foreground/90 w-16">{label}</span>
                       <div className="flex items-center gap-3">
                         <button
                           type="button"
                           onClick={() => set(Math.max(0, value - 5))}
-                          className="w-10 h-10 rounded-xl bg-white border border-gray-300 text-xl font-bold text-gray-700 flex items-center justify-center active:bg-gray-100"
+                          className="w-10 h-10 rounded-xl bg-card border border-border text-xl font-bold text-foreground/90 flex items-center justify-center active:bg-muted"
                         >
                           −
                         </button>
@@ -481,31 +481,31 @@ export function QuoteActions({ quoteId, status, siteId, customerId, totalAmount 
                         <button
                           type="button"
                           onClick={() => set(Math.min(80, value + 5))}
-                          className="w-10 h-10 rounded-xl bg-white border border-gray-300 text-xl font-bold text-gray-700 flex items-center justify-center active:bg-gray-100"
+                          className="w-10 h-10 rounded-xl bg-card border border-border text-xl font-bold text-foreground/90 flex items-center justify-center active:bg-muted"
                         >
                           +
                         </button>
-                        <span className="text-sm text-gray-500 w-20 text-right">{formatKRW(totalAmount * value / 100)}</span>
+                        <span className="text-sm text-muted-foreground w-20 text-right">{formatKRW(totalAmount * value / 100)}</span>
                       </div>
                     </div>
                   ))}
                 </div>
               </div>
 
-              <div className="bg-gray-50 rounded-xl p-3">
+              <div className="bg-muted rounded-xl p-3">
                 <div className="flex justify-between text-base">
-                  <span className="text-gray-600">잔금 ({Math.max(0, finalRate)}%)</span>
-                  <span className="font-semibold text-gray-900">{formatKRW(totalAmount * Math.max(0, finalRate) / 100)}</span>
+                  <span className="text-muted-foreground">잔금 ({Math.max(0, finalRate)}%)</span>
+                  <span className="font-semibold text-foreground">{formatKRW(totalAmount * Math.max(0, finalRate) / 100)}</span>
                 </div>
               </div>
               <div>
-                <label className="block text-lg font-medium text-gray-700 mb-2">특약사항 (선택)</label>
+                <label className="block text-lg font-medium text-foreground/90 mb-2">특약사항 (선택)</label>
                 <textarea
                   value={specialTerms}
                   onChange={(e) => setSpecialTerms(e.target.value)}
                   placeholder="하자 보증 기간, 추가 요청사항 등..."
                   rows={3}
-                  className="w-full border border-gray-200 rounded-xl px-3 py-3 text-base resize-none focus:outline-none focus:border-blue-400"
+                  className="w-full border border-border rounded-xl px-3 py-3 text-base resize-none focus:outline-none focus:border-primary"
                 />
               </div>
             </div>
@@ -520,7 +520,7 @@ export function QuoteActions({ quoteId, status, siteId, customerId, totalAmount 
               </button>
               <button
                 onClick={() => setShowContractDialog(false)}
-                className="w-full bg-gray-100 text-gray-700 rounded-2xl py-4 text-lg font-medium"
+                className="w-full bg-muted text-foreground/90 rounded-2xl py-4 text-lg font-medium"
               >
                 취소
               </button>
@@ -532,9 +532,9 @@ export function QuoteActions({ quoteId, status, siteId, customerId, totalAmount 
       {/* 항목 수정 화면 (draft 전용) */}
       {editItems && editFactors && (
         <div className="fixed inset-0 bg-black/50 z-50 flex items-end overflow-y-auto">
-          <div className="bg-white w-full rounded-t-3xl p-6 pb-8 mt-auto max-h-[90vh] overflow-y-auto">
-            <h3 className="text-2xl font-bold text-gray-900 mb-1">항목 수정하기</h3>
-            <p className="text-base text-gray-500 mb-5">
+          <div className="bg-card w-full rounded-t-3xl p-6 pb-8 mt-auto max-h-[90vh] overflow-y-auto">
+            <h3 className="text-2xl font-bold text-foreground mb-1">항목 수정하기</h3>
+            <p className="text-base text-muted-foreground mb-5">
               빼고 싶은 항목은 빼고, 수량은 직접 고칠 수 있어요
             </p>
 
@@ -548,11 +548,11 @@ export function QuoteActions({ quoteId, status, siteId, customerId, totalAmount 
               {editItems.map((item) => (
                 <div
                   key={item.id}
-                  className="border border-gray-200 rounded-2xl p-4"
+                  className="border border-border rounded-2xl p-4"
                 >
                   <div className="flex items-start justify-between gap-3 mb-3">
                     <div className="flex-1">
-                      <p className="text-base font-semibold text-gray-900">
+                      <p className="text-base font-semibold text-foreground">
                         {item.tradeName ? `${item.tradeName} · ` : ""}{item.description}
                       </p>
                     </div>
@@ -565,21 +565,21 @@ export function QuoteActions({ quoteId, status, siteId, customerId, totalAmount 
                     </button>
                   </div>
                   <div className="flex items-center gap-2">
-                    <span className="text-base text-gray-500 shrink-0">수량</span>
+                    <span className="text-base text-muted-foreground shrink-0">수량</span>
                     <input
                       type="number"
                       inputMode="decimal"
                       min={0}
                       value={item.quantity}
                       onChange={(e) => handleEditQty(item.id, e.target.value)}
-                      className="w-28 px-3 py-3 text-lg border border-gray-300 rounded-xl text-right focus:outline-none focus:ring-2 focus:ring-blue-500"
+                      className="w-28 px-3 py-3 text-lg border border-border rounded-xl text-right focus:outline-none focus:ring-2 focus:ring-primary/500"
                     />
-                    <span className="text-base text-gray-500">{item.unit}</span>
+                    <span className="text-base text-muted-foreground">{item.unit}</span>
                   </div>
                 </div>
               ))}
               {editItems.length === 0 && (
-                <p className="text-base text-gray-500 text-center py-6">
+                <p className="text-base text-muted-foreground text-center py-6">
                   모든 항목을 뺐어요. 견적을 유지하려면 항목이 최소 한 개는 있어야 해요.
                 </p>
               )}
@@ -587,13 +587,13 @@ export function QuoteActions({ quoteId, status, siteId, customerId, totalAmount 
 
             {/* 실시간 합계 */}
             {editPreview && (
-              <div className="bg-gray-50 border border-gray-200 rounded-2xl p-4 mb-5">
-                <div className="flex justify-between text-base text-gray-600 mb-1">
+              <div className="bg-muted border border-border rounded-2xl p-4 mb-5">
+                <div className="flex justify-between text-base text-muted-foreground mb-1">
                   <span>소계</span>
                   <span>{formatKRW(editPreview.subtotal)}</span>
                 </div>
-                <div className="flex justify-between items-baseline border-t border-gray-300 pt-2 mt-2">
-                  <span className="text-lg font-bold text-gray-900">새 합계</span>
+                <div className="flex justify-between items-baseline border-t border-border pt-2 mt-2">
+                  <span className="text-lg font-bold text-foreground">새 합계</span>
                   <span className="text-2xl font-black text-primary/90">{formatKRW(editPreview.total)}</span>
                 </div>
               </div>
@@ -610,7 +610,7 @@ export function QuoteActions({ quoteId, status, siteId, customerId, totalAmount 
               <button
                 onClick={handleCancelEdit}
                 disabled={isPending}
-                className="w-full bg-gray-100 text-gray-700 rounded-2xl py-4 text-lg font-medium disabled:opacity-50"
+                className="w-full bg-muted text-foreground/90 rounded-2xl py-4 text-lg font-medium disabled:opacity-50"
               >
                 취소
               </button>

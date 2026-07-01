@@ -186,7 +186,7 @@ export default async function SitesPage({
                 )}
                 {f.label}
                 {count > 0 && (
-                  <span className={`text-xs px-1.5 rounded-full ${isActive ? "bg-white/25 text-white" : "bg-muted text-muted-foreground"}`}>
+                  <span className={`text-xs px-1.5 rounded-full ${isActive ? "bg-card/25 text-white" : "bg-muted text-muted-foreground"}`}>
                     {count}
                   </span>
                 )}

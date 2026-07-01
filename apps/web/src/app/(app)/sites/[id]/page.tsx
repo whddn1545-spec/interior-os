@@ -161,7 +161,7 @@ export default async function SiteHubPage({
   const marginRate = budget > 0 ? Math.round(((budget - totalExpenses) / budget) * 100) : null;
 
   return (
-    <div className="min-h-screen bg-gray-50 pb-24">
+    <div className="min-h-screen bg-muted pb-24">
       {/* 헤더 */}
       <header className="sticky top-0 bg-card/95 backdrop-blur border-b border-border z-10 px-4 py-3 flex items-center gap-2">
         <Link href={from ?? "/sites"} className="p-3 -ml-3 text-muted-foreground" aria-label="뒤로 가기">
@@ -198,7 +198,7 @@ export default async function SiteHubPage({
       </header>
 
       {/* 탭 */}
-      <nav className="sticky top-[60px] bg-white border-b border-gray-100 z-10 flex gap-1 px-2 overflow-x-auto">
+      <nav className="sticky top-[60px] bg-card border-b border-border z-10 flex gap-1 px-2 overflow-x-auto">
         {TABS.map((t) => {
           const isActive = t.key === activeTab;
           const badge =
@@ -217,14 +217,14 @@ export default async function SiteHubPage({
                 : (from ? `/sites/${id}?tab=${t.key}&from=${encodeURIComponent(from)}` : `/sites/${id}?tab=${t.key}`)
               }
               className={`flex min-h-[56px] flex-1 min-w-[72px] items-center justify-center gap-1 px-3 text-base font-bold border-b-2 ${
-                isActive ? "border-blue-700 text-primary/90" : "border-transparent text-gray-500"
+                isActive ? "border-blue-700 text-primary/90" : "border-transparent text-muted-foreground"
               }`}
             >
               {t.label}
               {badge > 0 && (
                 <span
                   className={`text-sm rounded-full px-1.5 ${
-                    isActive ? "bg-blue-100 text-primary/90" : "bg-gray-100 text-gray-500"
+                    isActive ? "bg-blue-100 text-primary/90" : "bg-muted text-muted-foreground"
                   }`}
                 >
                   {badge}
@@ -240,9 +240,9 @@ export default async function SiteHubPage({
         {activeTab === "overview" && (
           <>
             {/* 현장 정보 */}
-            <div className="bg-white rounded-2xl p-4 border border-gray-100 space-y-3">
+            <div className="bg-card rounded-2xl p-4 border border-border space-y-3">
               <div className="flex items-center justify-between gap-3">
-                <h2 className="text-lg font-bold text-gray-900">현장 정보</h2>
+                <h2 className="text-lg font-bold text-foreground">현장 정보</h2>
                 <span className="text-base font-semibold text-primary/90 bg-primary/10 px-3 py-1 rounded-full">
                   {SITE_STATUS_LABEL[siteAny.status] ?? siteAny.status}
                 </span>
@@ -251,36 +251,36 @@ export default async function SiteHubPage({
                 {customer?.name && (
                   <Link
                     href={`/customers/${customer.id}`}
-                    className="flex items-center gap-3 -mx-1 px-1 py-2 rounded-xl active:bg-gray-50"
+                    className="flex items-center gap-3 -mx-1 px-1 py-2 rounded-xl active:bg-muted"
                   >
-                    <UserIcon size={20} className="text-gray-400 shrink-0" />
-                    <span className="text-gray-500 w-16 shrink-0">고객</span>
+                    <UserIcon size={20} className="text-muted-foreground/70 shrink-0" />
+                    <span className="text-muted-foreground w-16 shrink-0">고객</span>
                     <span className="flex-1 font-medium text-primary truncate">{customer.name}</span>
-                    <ChevronRightIcon size={18} className="text-gray-300 shrink-0" />
+                    <ChevronRightIcon size={18} className="text-muted-foreground/50 shrink-0" />
                   </Link>
                 )}
                 {customer?.phone && (
                   <a
                     href={`tel:${customer.phone}`}
-                    className="flex items-center gap-3 -mx-1 px-1 py-2 rounded-xl active:bg-gray-50"
+                    className="flex items-center gap-3 -mx-1 px-1 py-2 rounded-xl active:bg-muted"
                   >
                     <span className="w-5 shrink-0" />
-                    <span className="text-gray-500 w-16 shrink-0">연락처</span>
+                    <span className="text-muted-foreground w-16 shrink-0">연락처</span>
                     <span className="flex-1 font-medium text-primary">{customer.phone}</span>
                   </a>
                 )}
                 {siteAny.address && (
                   <div className="flex items-start gap-3 px-1 py-2">
-                    <MapPinIcon size={20} className="text-gray-400 shrink-0 mt-0.5" />
-                    <span className="text-gray-500 w-16 shrink-0">주소</span>
-                    <span className="flex-1 font-medium text-gray-800">{siteAny.address}</span>
+                    <MapPinIcon size={20} className="text-muted-foreground/70 shrink-0 mt-0.5" />
+                    <span className="text-muted-foreground w-16 shrink-0">주소</span>
+                    <span className="flex-1 font-medium text-foreground">{siteAny.address}</span>
                   </div>
                 )}
                 {(siteAny.start_date || siteAny.end_date) && (
                   <div className="flex items-start gap-3 px-1 py-2">
-                    <CalendarIcon size={20} className="text-gray-400 shrink-0 mt-0.5" />
-                    <span className="text-gray-500 w-16 shrink-0">공사기간</span>
-                    <span className="flex-1 font-medium text-gray-800">
+                    <CalendarIcon size={20} className="text-muted-foreground/70 shrink-0 mt-0.5" />
+                    <span className="text-muted-foreground w-16 shrink-0">공사기간</span>
+                    <span className="flex-1 font-medium text-foreground">
                       {formatDateKR(siteAny.start_date)} ~ {formatDateKR(siteAny.end_date)}
                     </span>
                   </div>
@@ -292,21 +292,21 @@ export default async function SiteHubPage({
             <div className="grid grid-cols-2 gap-3">
               <Link
                 href={`/schedule/${id}?from=/sites/${id}`}
-                className="flex flex-col items-center justify-center gap-1 bg-white border border-gray-100 rounded-2xl py-5 active:bg-gray-50"
+                className="flex flex-col items-center justify-center gap-1 bg-card border border-border rounded-2xl py-5 active:bg-muted"
               >
                 <CalendarIcon size={26} className="text-profit" />
-                <span className="text-base font-semibold text-gray-800">공사 일정</span>
-                <span className="text-sm text-gray-500">
+                <span className="text-base font-semibold text-foreground">공사 일정</span>
+                <span className="text-sm text-muted-foreground">
                   {taskTotal > 0 ? `${taskTotal}개 작업` : "일정 만들기"}
                 </span>
               </Link>
               <Link
                 href={`/photos/${id}?from=/sites/${id}`}
-                className="flex flex-col items-center justify-center gap-1 bg-white border border-gray-100 rounded-2xl py-5 active:bg-gray-50"
+                className="flex flex-col items-center justify-center gap-1 bg-card border border-border rounded-2xl py-5 active:bg-muted"
               >
                 <CameraIcon size={26} className="text-purple-600" />
-                <span className="text-base font-semibold text-gray-800">현장 사진</span>
-                <span className="text-sm text-gray-500">
+                <span className="text-base font-semibold text-foreground">현장 사진</span>
+                <span className="text-sm text-muted-foreground">
                   {photoTotal > 0 ? `${photoTotal}장` : "사진 올리기"}
                 </span>
               </Link>
@@ -413,35 +413,35 @@ export default async function SiteHubPage({
                     ? `/quotes/new?customerId=${customer.id}`
                     : "/quotes/new"
               }
-              className="flex items-center gap-3 bg-white rounded-2xl p-4 border border-gray-100 active:bg-gray-50"
+              className="flex items-center gap-3 bg-card rounded-2xl p-4 border border-border active:bg-muted"
             >
               <FileTextIcon size={24} className="text-primary shrink-0" />
               <div className="flex-1">
-                <p className="text-base font-semibold text-gray-900">
+                <p className="text-base font-semibold text-foreground">
                   {latestQuote ? "최신 견적 보기" : "새 견적 만들기"}
                 </p>
-                <p className="text-sm text-gray-500">
+                <p className="text-sm text-muted-foreground">
                   {latestQuote
                     ? `v${latestQuote.version} · ${formatKRW(latestQuote.total_amount)}`
                     : "이 현장 견적이 아직 없어요"}
                 </p>
               </div>
-              <ChevronRightIcon size={20} className="text-gray-300 shrink-0" />
+              <ChevronRightIcon size={20} className="text-muted-foreground/50 shrink-0" />
             </Link>
 
             {contractAny && (
               <Link
                 href={`/contracts/${contractAny.id}?from=/sites/${id}`}
-                className="flex items-center gap-3 bg-white rounded-2xl p-4 border border-gray-100 active:bg-gray-50"
+                className="flex items-center gap-3 bg-card rounded-2xl p-4 border border-border active:bg-muted"
               >
                 <FileSignatureIcon size={24} className="text-profit shrink-0" />
                 <div className="flex-1">
-                  <p className="text-base font-semibold text-gray-900">계약서 보기</p>
-                  <p className="text-sm text-gray-500">
+                  <p className="text-base font-semibold text-foreground">계약서 보기</p>
+                  <p className="text-sm text-muted-foreground">
                     {CONTRACT_STATUS_LABEL[contractAny.status] ?? contractAny.status}
                   </p>
                 </div>
-                <ChevronRightIcon size={20} className="text-gray-300 shrink-0" />
+                <ChevronRightIcon size={20} className="text-muted-foreground/50 shrink-0" />
               </Link>
             )}
 
@@ -490,7 +490,7 @@ export default async function SiteHubPage({
         {activeTab === "quotes" && (
           <div className="space-y-2">
             {quoteList.length === 0 ? (
-              <div className="bg-white rounded-2xl p-6 text-center text-gray-400 border border-gray-100">
+              <div className="bg-card rounded-2xl p-6 text-center text-muted-foreground/70 border border-border">
                 <p className="text-lg">이 현장 견적이 아직 없어요</p>
                 <Link
                   href={customer?.id ? `/quotes/new?customerId=${customer.id}` : "/quotes/new"}
@@ -504,19 +504,19 @@ export default async function SiteHubPage({
                 <Link
                   key={q.id}
                   href={`/quotes/${q.id}?from=/sites/${id}`}
-                  className="flex items-center gap-3 bg-white border border-gray-200 rounded-2xl px-4 py-4 active:bg-gray-50"
+                  className="flex items-center gap-3 bg-card border border-border rounded-2xl px-4 py-4 active:bg-muted"
                 >
                   <FileTextIcon size={22} className="text-primary shrink-0" />
                   <div className="flex-1 min-w-0">
-                    <p className="text-base font-semibold text-gray-900">
+                    <p className="text-base font-semibold text-foreground">
                       견적 v{q.version}
                     </p>
-                    <p className="text-sm text-gray-500">
+                    <p className="text-sm text-muted-foreground">
                       {QUOTE_STATUS_LABEL[q.status] ?? q.status} · {formatDateKR(q.created_at)}
                     </p>
                   </div>
-                  <p className="text-base font-bold text-gray-900 shrink-0">{formatKRW(q.total_amount)}</p>
-                  <ChevronRightIcon size={18} className="text-gray-300 shrink-0" />
+                  <p className="text-base font-bold text-foreground shrink-0">{formatKRW(q.total_amount)}</p>
+                  <ChevronRightIcon size={18} className="text-muted-foreground/50 shrink-0" />
                 </Link>
               ))
             )}
@@ -527,39 +527,39 @@ export default async function SiteHubPage({
         {activeTab === "photos" && (
           <Link
             href={`/photos/${id}?from=/sites/${id}`}
-            className="flex items-center gap-3 bg-white rounded-2xl p-4 border border-gray-100 active:bg-gray-50"
+            className="flex items-center gap-3 bg-card rounded-2xl p-4 border border-border active:bg-muted"
           >
             <CameraIcon size={26} className="text-purple-600 shrink-0" />
             <div className="flex-1">
-              <p className="text-base font-semibold text-gray-900">
+              <p className="text-base font-semibold text-foreground">
                 {photoTotal > 0 ? `사진 ${photoTotal}장 보기` : "사진 올리기"}
               </p>
-              <p className="text-sm text-gray-500">현장 사진 관리 화면으로 이동</p>
+              <p className="text-sm text-muted-foreground">현장 사진 관리 화면으로 이동</p>
             </div>
-            <ChevronRightIcon size={20} className="text-gray-300 shrink-0" />
+            <ChevronRightIcon size={20} className="text-muted-foreground/50 shrink-0" />
           </Link>
         )}
 
         {/* 받을돈 탭 */}
         {activeTab === "finance" && (
           <div className="space-y-3">
-            <div className="bg-white rounded-2xl p-4 border border-gray-100">
+            <div className="bg-card rounded-2xl p-4 border border-border">
               <div className="flex justify-between items-baseline">
-                <span className="text-base text-gray-500">미수금</span>
+                <span className="text-base text-muted-foreground">미수금</span>
                 <span className="text-2xl font-black text-primary/90">{formatKRW(outstanding)}</span>
               </div>
               {paidTotal > 0 && (
                 <div className="flex justify-between items-baseline mt-2">
-                  <span className="text-base text-gray-500">입금완료</span>
-                  <span className="text-base font-semibold text-gray-700">{formatKRW(paidTotal)}</span>
+                  <span className="text-base text-muted-foreground">입금완료</span>
+                  <span className="text-base font-semibold text-foreground/90">{formatKRW(paidTotal)}</span>
                 </div>
               )}
             </div>
 
             {paymentList.length === 0 ? (
-              <div className="bg-white rounded-2xl p-6 text-center text-gray-400 border border-gray-100">
+              <div className="bg-card rounded-2xl p-6 text-center text-muted-foreground/70 border border-border">
                 <p className="text-lg">아직 결제 일정이 없어요</p>
-                <p className="mt-2 text-base text-gray-500">견적을 확정하면 계약금·중도금·잔금이 자동으로 생겨요</p>
+                <p className="mt-2 text-base text-muted-foreground">견적을 확정하면 계약금·중도금·잔금이 자동으로 생겨요</p>
               </div>
             ) : (
               <>
@@ -567,21 +567,21 @@ export default async function SiteHubPage({
                   {paymentList.map((p) => (
                     <div
                       key={p.id}
-                      className="flex items-center gap-3 bg-white border border-gray-200 rounded-2xl px-4 py-4"
+                      className="flex items-center gap-3 bg-card border border-border rounded-2xl px-4 py-4"
                     >
                       <WalletIcon
                         size={22}
                         className={p.paid_at ? "text-profit shrink-0" : "text-primary shrink-0"}
                       />
                       <div className="flex-1 min-w-0">
-                        <p className="text-base font-semibold text-gray-900">{p.stage_label}</p>
-                        <p className="text-sm text-gray-500">
+                        <p className="text-base font-semibold text-foreground">{p.stage_label}</p>
+                        <p className="text-sm text-muted-foreground">
                           {p.paid_at ? "입금완료" : `약정일 ${formatDateKR(p.due_date)}`}
                         </p>
                       </div>
                       <p
                         className={`text-base font-bold shrink-0 ${
-                          p.paid_at ? "text-gray-400 line-through" : "text-gray-900"
+                          p.paid_at ? "text-muted-foreground/70 line-through" : "text-foreground"
                         }`}
                       >
                         {formatKRW(p.amount)}
@@ -591,7 +591,7 @@ export default async function SiteHubPage({
                 </div>
                 <Link
                   href="/payments"
-                  className="flex items-center justify-center min-h-[56px] rounded-2xl bg-gray-100 text-base font-bold text-gray-700 active:bg-gray-200"
+                  className="flex items-center justify-center min-h-[56px] rounded-2xl bg-muted text-base font-bold text-foreground/90 active:bg-muted"
                 >
                   받을 돈 전체 보기
                 </Link>

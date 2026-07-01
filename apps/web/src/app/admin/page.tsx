@@ -69,64 +69,64 @@ export default async function AdminPage() {
   const PLAN_LABEL: Record<string, string> = { basic: "Basic", pro: "Pro", team: "Team" };
 
   return (
-    <div className="min-h-screen bg-gray-50 pb-24">
-      <header className="sticky top-0 bg-white border-b border-gray-100 z-10 px-4 py-3 flex items-center gap-3">
-        <Link href="/" className="p-2 -ml-2 text-gray-600">
+    <div className="min-h-screen bg-background pb-24">
+      <header className="sticky top-0 bg-card border-b border-border z-10 px-4 py-3 flex items-center gap-3">
+        <Link href="/" className="p-2 -ml-2 text-muted-foreground">
           <ArrowLeftIcon size={24} />
         </Link>
-        <h1 className="text-xl font-bold text-gray-900">관리자 콘솔</h1>
-        <span className="ml-auto text-sm text-gray-400">최근 30일</span>
+        <h1 className="text-xl font-bold text-foreground">관리자 콘솔</h1>
+        <span className="ml-auto text-sm text-muted-foreground/60">최근 30일</span>
       </header>
 
       <div className="max-w-2xl mx-auto px-4 pt-6 space-y-6">
         {/* 핵심 지표 */}
         <div className="grid grid-cols-2 gap-3">
-          <div className="bg-white border border-gray-200 rounded-2xl p-4">
+          <div className="bg-card border border-border rounded-2xl p-4">
             <UsersIcon size={20} className="text-blue-600 mb-2" />
-            <p className="text-3xl font-black text-gray-900">{(tenants ?? []).length}</p>
-            <p className="text-sm text-gray-500">전체 테넌트</p>
+            <p className="text-3xl font-black text-foreground">{(tenants ?? []).length}</p>
+            <p className="text-sm text-muted-foreground">전체 테넌트</p>
           </div>
-          <div className="bg-white border border-gray-200 rounded-2xl p-4">
+          <div className="bg-card border border-border rounded-2xl p-4">
             <BrainIcon size={20} className="text-purple-600 mb-2" />
-            <p className="text-3xl font-black text-gray-900">{(aiLogs ?? []).length}</p>
-            <p className="text-sm text-gray-500">AI 호출 (30일)</p>
+            <p className="text-3xl font-black text-foreground">{(aiLogs ?? []).length}</p>
+            <p className="text-sm text-muted-foreground">AI 호출 (30일)</p>
           </div>
-          <div className="bg-white border border-gray-200 rounded-2xl p-4">
+          <div className="bg-card border border-border rounded-2xl p-4">
             <DollarSignIcon size={20} className="text-green-600 mb-2" />
-            <p className="text-3xl font-black text-gray-900">${totalCostUsd.toFixed(2)}</p>
-            <p className="text-sm text-gray-500">AI 비용 (30일)</p>
+            <p className="text-3xl font-black text-foreground">${totalCostUsd.toFixed(2)}</p>
+            <p className="text-sm text-muted-foreground">AI 비용 (30일)</p>
           </div>
-          <div className="bg-white border border-gray-200 rounded-2xl p-4">
+          <div className="bg-card border border-border rounded-2xl p-4">
             <TrendingUpIcon size={20} className="text-amber-600 mb-2" />
-            <p className="text-3xl font-black text-gray-900">{(recentUsers ?? []).length}</p>
-            <p className="text-sm text-gray-500">신규 사용자 (30일)</p>
+            <p className="text-3xl font-black text-foreground">{(recentUsers ?? []).length}</p>
+            <p className="text-sm text-muted-foreground">신규 사용자 (30일)</p>
           </div>
         </div>
 
         {/* 모델별 비용 */}
-        <div className="bg-white border border-gray-200 rounded-2xl p-4">
-          <h2 className="text-lg font-bold text-gray-900 mb-3">모델별 AI 비용</h2>
+        <div className="bg-card border border-border rounded-2xl p-4">
+          <h2 className="text-lg font-bold text-foreground mb-3">모델별 AI 비용</h2>
           <div className="space-y-2">
             {Array.from(byModel.entries()).sort((a, b) => b[1].cost - a[1].cost).map(([model, data]) => (
-              <div key={model} className="flex items-center justify-between py-2 border-b border-gray-100 last:border-0">
+              <div key={model} className="flex items-center justify-between py-2 border-b border-border last:border-0">
                 <div>
-                  <p className="text-base font-semibold text-gray-900">{model}</p>
-                  <p className="text-sm text-gray-500">{data.calls.toLocaleString()}회</p>
+                  <p className="text-base font-semibold text-foreground">{model}</p>
+                  <p className="text-sm text-muted-foreground">{data.calls.toLocaleString()}회</p>
                 </div>
-                <p className="text-lg font-bold text-gray-700">${data.cost.toFixed(3)}</p>
+                <p className="text-lg font-bold text-foreground/90">${data.cost.toFixed(3)}</p>
               </div>
             ))}
-            {byModel.size === 0 && <p className="text-gray-400 text-base text-center py-4">AI 호출 없음</p>}
+            {byModel.size === 0 && <p className="text-muted-foreground/60 text-base text-center py-4">AI 호출 없음</p>}
           </div>
         </div>
 
         {/* 기능별 호출 횟수 */}
-        <div className="bg-white border border-gray-200 rounded-2xl p-4">
-          <h2 className="text-lg font-bold text-gray-900 mb-3">기능별 AI 사용</h2>
+        <div className="bg-card border border-border rounded-2xl p-4">
+          <h2 className="text-lg font-bold text-foreground mb-3">기능별 AI 사용</h2>
           <div className="space-y-2">
             {Array.from(byTask.entries()).sort((a, b) => b[1] - a[1]).map(([task, count]) => (
-              <div key={task} className="flex items-center justify-between py-2 border-b border-gray-100 last:border-0">
-                <p className="text-base text-gray-700 font-medium">{task}</p>
+              <div key={task} className="flex items-center justify-between py-2 border-b border-border last:border-0">
+                <p className="text-base text-foreground/90 font-medium">{task}</p>
                 <span className="bg-purple-100 text-purple-700 text-sm font-bold px-3 py-1 rounded-full">{count}회</span>
               </div>
             ))}
@@ -134,21 +134,21 @@ export default async function AdminPage() {
         </div>
 
         {/* 테넌트 목록 */}
-        <div className="bg-white border border-gray-200 rounded-2xl p-4">
-          <h2 className="text-lg font-bold text-gray-900 mb-3">테넌트 목록</h2>
+        <div className="bg-card border border-border rounded-2xl p-4">
+          <h2 className="text-lg font-bold text-foreground mb-3">테넌트 목록</h2>
           <div className="space-y-2">
             {(tenants ?? []).map((t) => {
               const tAny = t as unknown as Record<string, unknown>;
               return (
-                <div key={tAny.id as string} className="flex items-center justify-between py-2 border-b border-gray-100 last:border-0">
+                <div key={tAny.id as string} className="flex items-center justify-between py-2 border-b border-border last:border-0">
                   <div>
-                    <p className="text-base font-semibold text-gray-900">{tAny.business_name as string}</p>
-                    <p className="text-sm text-gray-500">{tAny.owner_name as string} · {new Date(tAny.created_at as string).toLocaleDateString("ko-KR")}</p>
+                    <p className="text-base font-semibold text-foreground">{tAny.business_name as string}</p>
+                    <p className="text-sm text-muted-foreground">{tAny.owner_name as string} · {new Date(tAny.created_at as string).toLocaleDateString("ko-KR")}</p>
                   </div>
                   <span className={`text-sm px-2 py-0.5 rounded-full font-medium ${
                     tAny.plan === "pro" ? "bg-blue-100 text-blue-700"
                     : tAny.plan === "team" ? "bg-purple-100 text-purple-700"
-                    : "bg-gray-100 text-gray-600"
+                    : "bg-muted text-muted-foreground"
                   }`}>
                     {PLAN_LABEL[tAny.plan as string] ?? tAny.plan as string}
                   </span>
@@ -156,20 +156,20 @@ export default async function AdminPage() {
               );
             })}
             {!tenants || tenants.length === 0 && (
-              <p className="text-gray-400 text-base text-center py-4">테넌트 없음</p>
+              <p className="text-muted-foreground/60 text-base text-center py-4">테넌트 없음</p>
             )}
           </div>
         </div>
 
         {/* 최근 가입자 */}
         {recentUsers && recentUsers.length > 0 && (
-          <div className="bg-white border border-gray-200 rounded-2xl p-4">
-            <h2 className="text-lg font-bold text-gray-900 mb-3">최근 가입자</h2>
+          <div className="bg-card border border-border rounded-2xl p-4">
+            <h2 className="text-lg font-bold text-foreground mb-3">최근 가입자</h2>
             <div className="space-y-2">
               {(recentUsers as unknown as Record<string, unknown>[]).map((u) => (
-                <div key={u.id as string} className="flex items-center justify-between py-2 border-b border-gray-100 last:border-0">
-                  <p className="text-base text-gray-800">{u.display_name as string ?? "이름 없음"}</p>
-                  <p className="text-sm text-gray-500">{new Date(u.created_at as string).toLocaleDateString("ko-KR")}</p>
+                <div key={u.id as string} className="flex items-center justify-between py-2 border-b border-border last:border-0">
+                  <p className="text-base text-foreground/90">{u.display_name as string ?? "이름 없음"}</p>
+                  <p className="text-sm text-muted-foreground">{new Date(u.created_at as string).toLocaleDateString("ko-KR")}</p>
                 </div>
               ))}
             </div>

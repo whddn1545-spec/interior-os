@@ -12,12 +12,12 @@ export default async function NewQuotePage({
   const initialCustomer = customerId ? await getCustomerById(customerId) : null;
 
   return (
-    <div className="min-h-screen bg-gray-50">
-      <header className="sticky top-0 bg-white border-b border-gray-100 z-10 px-4 py-3 flex items-center gap-3">
-        <Link href="/quotes" className="p-3 -ml-3 text-gray-600">
+    <div className="min-h-screen bg-muted">
+      <header className="sticky top-0 bg-card border-b border-border z-10 px-4 py-3 flex items-center gap-3">
+        <Link href="/quotes" className="p-3 -ml-3 text-muted-foreground">
           <ArrowLeftIcon size={24} />
         </Link>
-        <h1 className="text-xl font-bold text-gray-900">새 견적 만들기</h1>
+        <h1 className="text-xl font-bold text-foreground">새 견적 만들기</h1>
       </header>
       <QuoteWizard initialCustomer={initialCustomer ?? undefined} />
     </div>
