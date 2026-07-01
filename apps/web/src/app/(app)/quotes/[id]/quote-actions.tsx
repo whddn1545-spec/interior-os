@@ -2,7 +2,7 @@
 
 import { useState, useTransition } from "react";
 import { useRouter } from "next/navigation";
-import { CheckCircleIcon, RotateCcwIcon, FileTextIcon, MessageSquareIcon, FileSignatureIcon, Share2Icon, CopyIcon, Trash2Icon, AlertTriangleIcon, PencilIcon, MinusCircleIcon } from "lucide-react";
+import { CheckCircleIcon, RotateCcwIcon, FileTextIcon, MessageSquareIcon, FileSignatureIcon, Share2Icon, CopyIcon, Trash2Icon, AlertTriangleIcon, PencilIcon, MinusCircleIcon, LinkIcon } from "lucide-react";
 import { confirmQuote } from "../new/actions";
 import { revertQuoteToDraft, generateQuotePdf, createContractFromQuote, deleteQuote, duplicateQuote, getQuoteForEdit, updateQuoteItems } from "./actions";
 import type { EditableQuoteItem } from "./actions";
@@ -193,6 +193,21 @@ export function QuoteActions({ quoteId, status, siteId, customerId, totalAmount 
     }
   }
 
+  async function handleSharePublicLink() {
+    const url = `${window.location.origin}/q/${quoteId}`;
+    try {
+      if (navigator.share) {
+        await navigator.share({ title: "인테리어 견적서", text: "견적서를 확인해주세요", url });
+      } else {
+        await navigator.clipboard.writeText(url);
+        toast.success("고객 링크가 복사됐어요", { description: "카카오톡·문자로 바로 보내세요" });
+      }
+    } catch {
+      await navigator.clipboard.writeText(url);
+      toast.success("링크가 복사됐어요");
+    }
+  }
+
   async function handleShare() {
     if (!pdfUrl) return;
     try {
@@ -309,6 +324,16 @@ export function QuoteActions({ quoteId, status, siteId, customerId, totalAmount 
             <FileTextIcon size={22} />
             {generatingPdf === "customer" ? "PDF 생성 중..." : "고객용 견적서 PDF"}
           </button>
+
+          {/* 고객 공유 링크 — 가장 빠른 공유 방법 */}
+          <button
+            onClick={handleSharePublicLink}
+            className="flex items-center justify-center gap-2 w-full bg-profit text-white rounded-2xl py-4 text-lg font-bold active:bg-profit/90"
+          >
+            <LinkIcon size={20} />
+            고객 링크 복사 (카카오/문자)
+          </button>
+
           {pdfUrl && (
             <button
               onClick={handleShare}
