@@ -13,7 +13,7 @@ export default function NotFound() {
       </p>
       <Link
         href="/"
-        className="bg-blue-600 text-white text-xl font-bold rounded-2xl px-10 py-5 active:bg-blue-700"
+        className="bg-primary text-white text-xl font-bold rounded-2xl px-10 py-5 active:bg-primary/90"
       >
         홈으로 가기
       </Link>

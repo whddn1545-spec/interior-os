@@ -70,14 +70,14 @@ export function FactorsEditor({ zones }: { zones: Zone[] }) {
           </div>
           <button
             onClick={() => setAdding(true)}
-            className="text-sm font-medium text-blue-600 px-3 py-2 rounded-xl active:bg-blue-50"
+            className="text-sm font-medium text-primary px-3 py-2 rounded-xl active:bg-primary/10"
           >
             + 구역 추가
           </button>
         </div>
 
         {adding && (
-          <div className="px-4 py-4 border-b border-gray-100 bg-blue-50">
+          <div className="px-4 py-4 border-b border-gray-100 bg-primary/10">
             <p className="text-sm font-semibold text-gray-700 mb-3">새 거리 구역</p>
             <div className="flex gap-2 mb-2">
               <input
@@ -103,7 +103,7 @@ export function FactorsEditor({ zones }: { zones: Zone[] }) {
               <button
                 onClick={addZone}
                 disabled={isPending}
-                className="bg-blue-600 text-white px-4 py-3 rounded-xl text-base font-semibold disabled:opacity-50 active:bg-blue-700"
+                className="bg-primary text-white px-4 py-3 rounded-xl text-base font-semibold disabled:opacity-50 active:bg-primary/90"
               >
                 추가
               </button>
@@ -115,7 +115,7 @@ export function FactorsEditor({ zones }: { zones: Zone[] }) {
         {zones.length === 0 && !adding ? (
           <div className="px-4 py-6 text-center text-gray-400">
             <p className="mb-2">거리 구역이 없어요</p>
-            <button onClick={() => setAdding(true)} className="text-blue-600 text-sm font-medium">+ 구역 추가하기</button>
+            <button onClick={() => setAdding(true)} className="text-primary text-sm font-medium">+ 구역 추가하기</button>
           </div>
         ) : (
           <ul className="divide-y divide-gray-100">
@@ -138,7 +138,7 @@ export function FactorsEditor({ zones }: { zones: Zone[] }) {
                       <button
                         onClick={() => saveZone(zone.id, zone.name)}
                         disabled={isPending}
-                        className="bg-blue-600 text-white px-4 py-3 rounded-xl text-base font-semibold disabled:opacity-50 active:bg-blue-700"
+                        className="bg-primary text-white px-4 py-3 rounded-xl text-base font-semibold disabled:opacity-50 active:bg-primary/90"
                       >
                         저장
                       </button>
@@ -158,7 +158,7 @@ export function FactorsEditor({ zones }: { zones: Zone[] }) {
                     </div>
                     <button
                       onClick={() => startEdit(zone)}
-                      className="text-blue-600 text-sm font-medium px-3 py-2 rounded-xl active:bg-blue-50"
+                      className="text-primary text-sm font-medium px-3 py-2 rounded-xl active:bg-primary/10"
                     >
                       수정
                     </button>
@@ -202,7 +202,7 @@ export function FactorsEditor({ zones }: { zones: Zone[] }) {
                 <p className="text-base font-medium text-gray-800">{r.label}</p>
                 <p className="text-sm text-gray-500">{r.desc}</p>
               </div>
-              <span className="text-lg font-bold text-blue-600">+{r.defaultVal}%</span>
+              <span className="text-lg font-bold text-primary">+{r.defaultVal}%</span>
             </li>
           ))}
         </ul>

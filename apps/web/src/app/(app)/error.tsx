@@ -25,7 +25,7 @@ export default function AppError({
       </p>
       <button
         onClick={reset}
-        className="bg-blue-600 text-white text-xl font-bold rounded-2xl px-10 py-5 active:bg-blue-700"
+        className="bg-primary text-white text-xl font-bold rounded-2xl px-10 py-5 active:bg-primary/90"
       >
         다시 시도
       </button>

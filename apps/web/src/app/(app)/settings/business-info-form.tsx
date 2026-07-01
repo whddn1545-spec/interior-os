@@ -46,14 +46,14 @@ export function BusinessInfoCard({ businessName, ownerName, plan }: Props) {
       <button
         type="button"
         onClick={() => setOpen(true)}
-        className="w-full text-left bg-blue-600 rounded-2xl px-4 py-5 mb-6 text-white active:bg-blue-700"
+        className="w-full text-left bg-primary rounded-2xl px-4 py-5 mb-6 text-white active:bg-primary/90"
       >
         <div className="flex items-center justify-between gap-3">
           <div className="min-w-0">
             <p className="text-xl font-bold truncate">{businessName}</p>
             <p className="text-blue-200 mt-0.5">{ownerName} 대표 · {planLabel}</p>
           </div>
-          <span className="flex items-center gap-1.5 bg-blue-500/60 rounded-full px-3 py-2 shrink-0">
+          <span className="flex items-center gap-1.5 bg-primary/100/60 rounded-full px-3 py-2 shrink-0">
             <PencilIcon size={16} />
             <span className="text-base font-semibold">정보 수정</span>
           </span>
@@ -118,7 +118,7 @@ export function BusinessInfoCard({ businessName, ownerName, plan }: Props) {
                   </div>
 
                   {error && (
-                    <div className="bg-red-50 border border-red-200 rounded-xl px-4 py-3 text-red-700 text-base">
+                    <div className="bg-red-50 border border-loss/30 rounded-xl px-4 py-3 text-loss text-base">
                       {error}
                     </div>
                   )}
@@ -126,7 +126,7 @@ export function BusinessInfoCard({ businessName, ownerName, plan }: Props) {
                   <button
                     type="submit"
                     disabled={isPending}
-                    className="w-full bg-blue-600 text-white py-4 rounded-2xl text-lg font-bold disabled:opacity-50"
+                    className="w-full bg-primary text-white py-4 rounded-2xl text-lg font-bold disabled:opacity-50"
                   >
                     {isPending ? "저장 중..." : "저장하기"}
                   </button>

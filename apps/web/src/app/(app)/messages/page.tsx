@@ -22,8 +22,8 @@ export default async function MessagesPage() {
   const statusLabel: Record<string, string> = { queued: "대기중", sent: "발송됨", failed: "실패" };
   const statusColor: Record<string, string> = {
     queued: "bg-gray-100 text-gray-600",
-    sent: "bg-green-100 text-green-700",
-    failed: "bg-red-100 text-red-600",
+    sent: "bg-green-100 text-profit",
+    failed: "bg-red-100 text-loss",
   };
 
   return (

@@ -169,7 +169,7 @@ export default async function SchedulePage({ params, searchParams }: { params: P
         <div className="max-w-2xl mx-auto bg-white rounded-2xl border border-gray-100 p-4 space-y-3">
           <div className="flex items-center justify-between gap-3">
             <h2 className="text-lg font-bold text-gray-900">현장 정보</h2>
-            <span className="text-base font-semibold text-blue-700 bg-blue-50 px-3 py-1 rounded-full">
+            <span className="text-base font-semibold text-primary/90 bg-primary/10 px-3 py-1 rounded-full">
               {SITE_STATUS_LABEL[siteStatus] ?? siteStatus}
             </span>
           </div>
@@ -177,7 +177,7 @@ export default async function SchedulePage({ params, searchParams }: { params: P
           {/* 현장 종합 허브로 이동 — 견적·일정·사진·받을돈을 한 화면에서 */}
           <Link
             href={`/sites/${siteId}?from=/schedule/${siteId}`}
-            className="flex items-center gap-2 -mx-1 px-3 py-4 rounded-xl bg-blue-50 text-blue-700 active:bg-blue-100"
+            className="flex items-center gap-2 -mx-1 px-3 py-4 rounded-xl bg-primary/10 text-primary/90 active:bg-blue-100"
           >
             <LayoutGridIcon size={20} className="shrink-0" />
             <span className="flex-1 text-base font-bold">현장 종합 보기</span>
@@ -192,7 +192,7 @@ export default async function SchedulePage({ params, searchParams }: { params: P
               >
                 <UserIcon size={20} className="text-gray-400 shrink-0" />
                 <span className="text-gray-500 w-16 shrink-0">고객</span>
-                <span className="flex-1 font-medium text-blue-600 truncate">{customer.name}</span>
+                <span className="flex-1 font-medium text-primary truncate">{customer.name}</span>
                 <ChevronRightIcon size={18} className="text-gray-300 shrink-0" />
               </Link>
             )}
@@ -217,7 +217,7 @@ export default async function SchedulePage({ params, searchParams }: { params: P
               }
               className="flex flex-col items-center justify-center gap-1 bg-gray-50 rounded-2xl py-4 active:bg-gray-100"
             >
-              <FileTextIcon size={22} className="text-blue-600" />
+              <FileTextIcon size={22} className="text-primary" />
               <span className="text-base font-semibold text-gray-800">견적</span>
               <span className="text-sm text-gray-500">
                 {quoteList.length > 0 ? `${quoteList.length}건` : "만들기"}
@@ -229,7 +229,7 @@ export default async function SchedulePage({ params, searchParams }: { params: P
                 !contract && !latestQuote ? "pointer-events-none opacity-50" : ""
               }`}
             >
-              <FileSignatureIcon size={22} className="text-green-600" />
+              <FileSignatureIcon size={22} className="text-profit" />
               <span className="text-base font-semibold text-gray-800">계약</span>
               <span className="text-sm text-gray-500">{contract ? "보기" : "없음"}</span>
             </Link>
@@ -262,6 +262,8 @@ export default async function SchedulePage({ params, searchParams }: { params: P
                 durationDays: tAny.duration_days as number,
                 kind: tAny.kind as "work" | "reserve" | "contingency",
                 status: tAny.status as string,
+                dependsOn: (tAny.depends_on as string[]) ?? [],
+                tradeId: (tAny.trade_id as string | null) ?? "",
               };
             })}
             siteId={siteId}

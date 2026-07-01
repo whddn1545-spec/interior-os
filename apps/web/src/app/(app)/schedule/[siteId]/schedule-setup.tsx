@@ -2,6 +2,7 @@
 
 import { useState, useTransition } from "react";
 import { useRouter } from "next/navigation";
+import Link from "next/link";
 import { CalendarIcon } from "lucide-react";
 import { generateScheduleFromQuote } from "./actions";
 
@@ -40,12 +41,12 @@ export function ScheduleSetup({ siteId, confirmedQuoteId }: Props) {
         <p className="text-base text-gray-500 mb-6">
           확정된 견적서가 있어야 일정을 자동으로 만들 수 있어요
         </p>
-        <a
+        <Link
           href="/quotes/new"
-          className="inline-block bg-blue-600 text-white rounded-2xl px-8 py-4 text-lg font-semibold active:bg-blue-700"
+          className="inline-block bg-primary text-white rounded-2xl px-8 py-4 text-lg font-semibold active:bg-primary/90"
         >
           새 견적 만들기
-        </a>
+        </Link>
       </div>
     );
   }
@@ -75,7 +76,7 @@ export function ScheduleSetup({ siteId, confirmedQuoteId }: Props) {
       </div>
 
       {error && (
-        <div className="bg-red-50 border border-red-200 rounded-xl px-4 py-3 text-red-700 mb-4">
+        <div className="bg-red-50 border border-loss/30 rounded-xl px-4 py-3 text-loss mb-4">
           {error}
         </div>
       )}
@@ -83,7 +84,7 @@ export function ScheduleSetup({ siteId, confirmedQuoteId }: Props) {
       <button
         onClick={handleGenerate}
         disabled={isPending}
-        className="w-full bg-blue-600 text-white rounded-2xl py-5 text-xl font-bold disabled:opacity-50 active:bg-blue-700"
+        className="w-full bg-primary text-white rounded-2xl py-5 text-xl font-bold disabled:opacity-50 active:bg-primary/90"
       >
         {isPending ? "일정 생성 중..." : "🚀 일정 자동 생성"}
       </button>

@@ -35,8 +35,8 @@ export default async function ContractDetailPage({ params, searchParams }: { par
 
   const statusConfig: Record<string, { label: string; color: string }> = {
     draft: { label: "임시저장", color: "bg-gray-100 text-gray-600" },
-    confirmed: { label: "확정됨", color: "bg-blue-100 text-blue-700" },
-    signed: { label: "서명완료", color: "bg-green-100 text-green-700" },
+    confirmed: { label: "확정됨", color: "bg-blue-100 text-primary/90" },
+    signed: { label: "서명완료", color: "bg-green-100 text-profit" },
   };
   const status = c.status as string;
   const cfg = statusConfig[status] ?? statusConfig.draft;
@@ -69,7 +69,7 @@ export default async function ContractDetailPage({ params, searchParams }: { par
                 </div>
                 <div className="flex justify-between">
                   <span className="text-gray-500">연락처</span>
-                  <a href={`tel:${quoteAny.sites.customers.phone}`} className="font-medium text-blue-600">{quoteAny.sites.customers.phone}</a>
+                  <a href={`tel:${quoteAny.sites.customers.phone}`} className="font-medium text-primary">{quoteAny.sites.customers.phone}</a>
                 </div>
               </>
             )}
@@ -104,7 +104,7 @@ export default async function ContractDetailPage({ params, searchParams }: { par
               <hr className="border-gray-200" />
               <div className="flex justify-between text-xl font-bold text-gray-900">
                 <span>총 계약금액</span>
-                <span className="text-blue-700">{formatKRW(total)}</span>
+                <span className="text-primary/90">{formatKRW(total)}</span>
               </div>
             </div>
           </div>
@@ -116,7 +116,7 @@ export default async function ContractDetailPage({ params, searchParams }: { par
             href={`/quotes/${c.quote_id}`}
             className="bg-white rounded-2xl p-4 border border-gray-100 flex items-center gap-3 min-h-[56px] active:bg-gray-50"
           >
-            <FileTextIcon size={24} className="text-blue-600 shrink-0" />
+            <FileTextIcon size={24} className="text-primary shrink-0" />
             <div className="flex-1">
               <p className="text-base font-semibold text-gray-900">이 계약의 원본 견적 보기</p>
               <p className="text-sm text-gray-500">금액 근거가 된 견적서를 확인할 수 있어요</p>
@@ -139,14 +139,14 @@ export default async function ContractDetailPage({ params, searchParams }: { par
             <AlertTriangleIcon size={22} className="text-orange-500 shrink-0 mt-0.5" />
             <div>
               <p className="text-base font-semibold text-orange-800">계약서를 확인해주세요</p>
-              <p className="text-sm text-orange-700 mt-0.5">내용을 검토 후 "확정"을 눌러야 고객에게 보낼 수 있어요</p>
+              <p className="text-sm text-orange-700 mt-0.5">내용을 검토 후 &quot;확정&quot;을 눌러야 고객에게 보낼 수 있어요</p>
             </div>
           </div>
         )}
 
         {status === "confirmed" && (
-          <div className="bg-blue-50 border border-blue-200 rounded-2xl p-4 flex items-start gap-3">
-            <CheckCircleIcon size={22} className="text-blue-600 shrink-0 mt-0.5" />
+          <div className="bg-primary/10 border border-primary/30 rounded-2xl p-4 flex items-start gap-3">
+            <CheckCircleIcon size={22} className="text-primary shrink-0 mt-0.5" />
             <p className="text-base text-blue-800 font-medium">계약서가 확정되었어요. PDF를 생성하거나 서명 요청을 보낼 수 있어요.</p>
           </div>
         )}

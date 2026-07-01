@@ -45,7 +45,7 @@ export function QuoteListActions({ quoteId }: Props) {
   return (
     <div className="mt-3 border-t border-gray-100 pt-3">
       {error && (
-        <div className="mb-3 bg-red-50 border border-red-200 rounded-xl px-3 py-2 text-red-700 text-base">
+        <div className="mb-3 bg-red-50 border border-loss/30 rounded-xl px-3 py-2 text-loss text-base">
           {error}
         </div>
       )}
@@ -63,7 +63,7 @@ export function QuoteListActions({ quoteId }: Props) {
           type="button"
           onClick={() => setShowDeleteDialog(true)}
           disabled={isPending}
-          className="flex flex-1 items-center justify-center gap-1.5 bg-red-50 text-red-600 border border-red-200 rounded-xl py-4 text-base font-semibold disabled:opacity-50 active:bg-red-100"
+          className="flex flex-1 items-center justify-center gap-1.5 bg-red-50 text-loss border border-loss/30 rounded-xl py-4 text-base font-semibold disabled:opacity-50 active:bg-red-100"
         >
           <Trash2Icon size={18} />
           삭제
@@ -85,7 +85,7 @@ export function QuoteListActions({ quoteId }: Props) {
                 type="button"
                 onClick={handleDelete}
                 disabled={isPending}
-                className="w-full bg-red-600 text-white rounded-2xl py-5 text-xl font-bold disabled:opacity-50 active:bg-red-700"
+                className="w-full bg-loss text-white rounded-2xl py-5 text-xl font-bold disabled:opacity-50 active:bg-red-700"
               >
                 {isPending ? "삭제 중..." : "네, 삭제합니다"}
               </button>

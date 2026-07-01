@@ -177,45 +177,45 @@ export default async function HomePage() {
   const remainingSteps = onboardingSteps.filter((s) => !s.done).length;
 
   const quickActions = [
-    { href: "/quotes/new", emoji: "📄", label: "새 견적", bg: "bg-blue-600", active: "active:bg-blue-700" },
-    { href: "/messages", emoji: "✉️", label: "문자 보내기", bg: "bg-green-600", active: "active:bg-green-700" },
-    { href: "/payments", emoji: "💰", label: "잔금 확인", bg: "bg-amber-600", active: "active:bg-amber-700" },
-    { href: "/photos", emoji: "📷", label: "사진 올리기", bg: "bg-purple-600", active: "active:bg-purple-700" },
-    { href: "/workers", emoji: "👷", label: "작업자 관리", bg: "bg-slate-600", active: "active:bg-slate-700" },
-    { href: "/settings", emoji: "⚙️", label: "설정·단가표", bg: "bg-gray-600", active: "active:bg-gray-700" },
+    { href: "/quotes/new", emoji: "📄", label: "새 견적" },
+    { href: "/messages", emoji: "✉️", label: "문자 보내기" },
+    { href: "/payments", emoji: "💰", label: "잔금 확인" },
+    { href: "/photos", emoji: "📷", label: "사진 올리기" },
+    { href: "/workers", emoji: "👷", label: "작업자 관리" },
+    { href: "/settings", emoji: "⚙️", label: "설정·단가표" },
   ];
 
   return (
     <div className="px-4 pt-6 pb-24 space-y-6">
       {/* 날짜 헤더 */}
       <div>
-        <h1 className="text-3xl font-black text-gray-900">오늘의 업무</h1>
-        <p className="text-lg text-gray-500">{formatKoreanDate(now)}</p>
+        <h1 className="text-[28px] font-black tracking-tight text-foreground">오늘의 업무</h1>
+        <p className="text-base text-muted-foreground mt-0.5">{formatKoreanDate(now)}</p>
       </div>
 
       {/* 섹션 1: 오늘 진행 현장 */}
       <section>
-        <h2 className="text-xl font-bold text-gray-800 mb-3">📍 오늘 진행 현장</h2>
+        <h2 className="text-xl font-bold text-foreground mb-3">📍 오늘 진행 현장</h2>
         {todayTasks.length === 0 ? (
           recentSites.length > 0 ? (
             <div className="space-y-2">
-              <p className="text-base text-gray-400 mb-1">최근 진행 현장</p>
+              <p className="text-base text-muted-foreground mb-1">최근 진행 현장</p>
               {recentSites.map((site) => (
                 <Link
                   key={site.id}
                   href={`/sites/${site.id}?from=/`}
-                  className="bg-white border border-gray-200 rounded-2xl px-5 py-4 flex items-center justify-between active:bg-gray-50"
+                  className="bg-card border border-border rounded-2xl px-5 py-4 flex items-center justify-between active:bg-muted transition-colors"
                 >
                   <div className="min-w-0">
-                    <p className="text-xl font-bold text-gray-900 truncate">{site.name}</p>
-                    <p className="text-base text-gray-500 truncate">{site.address ?? ""}</p>
+                    <p className="text-xl font-bold text-foreground truncate">{site.name}</p>
+                    <p className="text-base text-muted-foreground truncate">{site.address ?? ""}</p>
                   </div>
                   <a
                     href={mapHref(site.address, site.name)}
                     target="_blank"
                     rel="noopener noreferrer"
                     onClick={(e) => e.stopPropagation()}
-                    className="shrink-0 ml-3 bg-gray-100 text-gray-700 text-base font-semibold rounded-xl px-3 py-2.5 active:bg-gray-200"
+                    className="shrink-0 ml-3 inline-flex items-center min-h-12 px-4 bg-info/12 text-info rounded-xl text-base font-semibold active:bg-info/20"
                   >
                     지도 보기
                   </a>
@@ -223,7 +223,7 @@ export default async function HomePage() {
               ))}
             </div>
           ) : (
-            <div className="bg-gray-100 rounded-2xl px-5 py-8 text-center text-gray-500 text-lg">
+            <div className="bg-surface rounded-2xl px-5 py-8 text-center text-muted-foreground text-lg">
               오늘 예정된 현장이 없어요
             </div>
           )
@@ -236,19 +236,20 @@ export default async function HomePage() {
                 <Link
                   key={task.id}
                   href={`/schedule/${task.site_id}?from=/`}
-                  className="block bg-white border border-gray-200 rounded-2xl px-5 py-4 active:bg-gray-50"
+                  className="relative block overflow-hidden bg-card border border-border rounded-2xl pl-5 pr-4 py-4 shadow-sm active:bg-muted transition-colors"
                 >
-                  <p className="text-2xl font-bold text-gray-900">{site?.name ?? "현장"}</p>
-                  <p className="text-base text-gray-500 mb-3">{task.title}</p>
+                  <span className="absolute left-0 top-0 bottom-0 w-1.5 bg-primary" />
+                  <p className="text-2xl font-bold text-foreground">{site?.name ?? "현장"}</p>
+                  <p className="text-base text-muted-foreground mb-3">{task.title}</p>
                   {worker && (
                     <div className="flex items-center gap-2 mb-3">
                       <span className="text-2xl">👷</span>
-                      <span className="text-lg font-semibold text-gray-800">{worker.name}</span>
+                      <span className="text-[17px] font-semibold text-foreground">{worker.name}</span>
                       {worker.phone && (
                         <a
                           href={`tel:${worker.phone}`}
                           onClick={(e) => e.stopPropagation()}
-                          className="ml-auto flex items-center gap-1 bg-green-100 text-green-700 px-3 py-1.5 rounded-xl text-base font-semibold shrink-0"
+                          className="ml-auto inline-flex items-center gap-1.5 min-h-12 px-4 bg-profit/12 text-profit rounded-xl text-[17px] font-bold active:bg-profit/20"
                         >
                           📞 전화
                         </a>
@@ -260,7 +261,7 @@ export default async function HomePage() {
                     target="_blank"
                     rel="noopener noreferrer"
                     onClick={(e) => e.stopPropagation()}
-                    className="inline-block bg-blue-50 text-blue-700 text-lg font-bold rounded-xl px-4 py-2.5"
+                    className="inline-flex items-center min-h-12 px-4 bg-info/12 text-info rounded-xl text-[17px] font-bold active:bg-info/20"
                   >
                     🗺️ 지도 보기
                   </a>
@@ -273,9 +274,9 @@ export default async function HomePage() {
 
       {/* 섹션 2: 받을 돈 */}
       <section>
-        <h2 className="text-xl font-bold text-gray-800 mb-3">💰 지금 받아야 할 돈</h2>
+        <h2 className="text-xl font-bold text-foreground mb-3">💰 지금 받아야 할 돈</h2>
         {payments.length === 0 ? (
-          <div className="bg-green-50 border border-green-200 rounded-2xl px-5 py-6 text-center text-green-700 text-lg font-semibold">
+          <div className="bg-profit/10 border border-profit/20 rounded-2xl px-5 py-6 text-center text-profit text-lg font-semibold">
             미수금이 없어요 👍
           </div>
         ) : (
@@ -288,21 +289,21 @@ export default async function HomePage() {
                 <Link
                   key={p.id}
                   href="/payments"
-                  className={`block bg-white rounded-2xl px-5 py-4 flex items-center justify-between active:bg-red-50 ${isOverdue ? "border-2 border-red-500" : "border border-red-200"}`}
+                  className={`block bg-card rounded-2xl px-5 py-4 flex items-center justify-between active:bg-muted transition-colors ${isOverdue ? "border-2 border-loss" : "border border-loss/30"}`}
                 >
                   <div className="min-w-0">
                     <div className="flex items-center gap-2 mb-0.5">
-                      {isOverdue && <span className="text-xs font-bold text-white bg-red-500 px-2 py-0.5 rounded-full shrink-0">연체</span>}
-                      <p className="text-xl font-bold text-gray-900 truncate">
+                      {isOverdue && <span className="text-xs font-bold text-loss-foreground bg-loss px-2 py-0.5 rounded-full shrink-0">연체</span>}
+                      <p className="text-xl font-bold text-foreground truncate">
                         {customer?.name ?? site?.name ?? "고객"}
                       </p>
                     </div>
-                    <p className="text-base text-gray-500">
+                    <p className="text-base text-muted-foreground">
                       {p.stage_label}
                       {p.due_date ? ` · 약정일 ${p.due_date}` : ""}
                     </p>
                   </div>
-                  <p className="text-2xl font-black text-red-600 shrink-0 ml-3">
+                  <p className="text-2xl font-black text-loss tabular-nums shrink-0 ml-3">
                     {Number(p.amount).toLocaleString("ko-KR")}원
                   </p>
                 </Link>
@@ -312,17 +313,17 @@ export default async function HomePage() {
         )}
         <Link
           href="/payments"
-          className="mt-3 block text-center bg-amber-100 text-amber-800 text-lg font-bold rounded-2xl py-4"
+          className="mt-3 block text-center bg-warning/15 text-warning-foreground text-lg font-bold rounded-2xl py-4 active:bg-warning/25"
         >
           받을 돈 전체 보기
         </Link>
       </section>
 
-      {/* 시작 가이드 — 단가표·견적 설정이 끝나지 않은 동안 계속 노출 */}
+      {/* 시작 가이드 */}
       {isNewUser && (
         <section>
-          <h2 className="text-xl font-bold text-gray-800 mb-1">🚀 이렇게 시작하세요</h2>
-          <p className="text-base text-gray-500 mb-3">
+          <h2 className="text-xl font-bold text-foreground mb-1">🚀 이렇게 시작하세요</h2>
+          <p className="text-base text-muted-foreground mb-3">
             {remainingSteps > 0
               ? `아래 순서대로 따라 하면 첫 견적까지 끝나요 (남은 단계 ${remainingSteps}개)`
               : "아래 순서대로 따라 하면 첫 견적까지 끝나요"}
@@ -332,27 +333,27 @@ export default async function HomePage() {
               s.done ? (
                 <div
                   key={s.href}
-                  className="flex items-center gap-4 bg-green-50 border-2 border-green-200 rounded-2xl px-5 py-4"
+                  className="flex items-center gap-4 bg-profit/10 border-2 border-profit/20 rounded-2xl px-5 py-4"
                 >
                   <span className="shrink-0 text-3xl">✅</span>
                   <div className="min-w-0 flex-1">
-                    <p className="text-base font-bold text-green-700">{s.step} · 완료</p>
-                    <p className="text-xl font-bold text-gray-500 line-through">{s.title}</p>
+                    <p className="text-base font-bold text-profit">{s.step} · 완료</p>
+                    <p className="text-xl font-bold text-muted-foreground line-through">{s.title}</p>
                   </div>
                 </div>
               ) : (
                 <Link
                   key={s.href}
                   href={s.href}
-                  className="flex items-center gap-4 bg-white border-2 border-blue-200 rounded-2xl px-5 py-4 active:bg-blue-50"
+                  className="flex items-center gap-4 bg-card border-2 border-primary/30 rounded-2xl px-5 py-4 active:bg-accent transition-colors"
                 >
                   <span className="shrink-0 text-3xl">{s.emoji}</span>
                   <div className="min-w-0 flex-1">
-                    <p className="text-base font-bold text-blue-600">{s.step}</p>
-                    <p className="text-xl font-bold text-gray-900">{s.title}</p>
-                    <p className="text-base text-gray-500">{s.desc}</p>
+                    <p className="text-base font-bold text-primary">{s.step}</p>
+                    <p className="text-xl font-bold text-foreground">{s.title}</p>
+                    <p className="text-base text-muted-foreground">{s.desc}</p>
                   </div>
-                  <span className="shrink-0 text-2xl text-gray-300">›</span>
+                  <span className="shrink-0 text-2xl text-muted-foreground">›</span>
                 </Link>
               )
             )}
@@ -362,16 +363,18 @@ export default async function HomePage() {
 
       {/* 섹션 3: 빠른 실행 */}
       <section>
-        <h2 className="text-xl font-bold text-gray-800 mb-3">⚡ 바로 하기</h2>
+        <h2 className="text-xl font-bold text-foreground mb-3">⚡ 바로 하기</h2>
         <div className="grid grid-cols-2 gap-3">
           {quickActions.map((a) => (
             <Link
               key={a.href}
               href={a.href}
-              className={`flex flex-col items-center gap-2 ${a.bg} ${a.active} text-white rounded-2xl py-6 shadow-sm`}
+              className="flex flex-col items-center gap-2 bg-card border border-border rounded-2xl py-6 active:bg-muted transition-colors"
             >
-              <span className="text-3xl">{a.emoji}</span>
-              <span className="text-lg font-bold">{a.label}</span>
+              <span className="flex items-center justify-center w-14 h-14 rounded-full bg-primary/10 text-3xl">
+                {a.emoji}
+              </span>
+              <span className="text-[17px] font-bold text-foreground">{a.label}</span>
             </Link>
           ))}
         </div>

@@ -77,7 +77,7 @@ export function FinanceForm({ sites }: { sites: Site[] }) {
     <>
       <button
         onClick={() => setOpen(true)}
-        className="flex items-center gap-1.5 bg-blue-600 text-white px-4 py-2.5 rounded-xl text-base font-semibold active:bg-blue-700"
+        className="flex items-center gap-1.5 bg-primary text-white px-4 py-2.5 rounded-xl text-base font-semibold active:bg-primary/90"
       >
         <PlusIcon size={18} />
         입출금 추가
@@ -94,7 +94,7 @@ export function FinanceForm({ sites }: { sites: Site[] }) {
             </div>
 
             {addedCount > 0 && (
-              <div className="bg-green-50 border border-green-200 rounded-xl px-4 py-4 mb-4 text-green-800 text-base font-semibold">
+              <div className="bg-profit/10 border border-profit/20 rounded-xl px-4 py-4 mb-4 text-green-800 text-base font-semibold">
                 지금까지 {addedCount}건 추가됐어요. 계속 입력하거나 닫기를 눌러주세요.
               </div>
             )}
@@ -123,8 +123,8 @@ export function FinanceForm({ sites }: { sites: Site[] }) {
                 <label className="block text-base font-semibold text-gray-700 mb-2">종류</label>
                 <div className="grid grid-cols-2 gap-3">
                   {[
-                    { value: "in", label: "수입", color: "text-green-700 border-green-400 bg-green-50" },
-                    { value: "out", label: "지출", color: "text-red-600 border-red-400 bg-red-50" },
+                    { value: "in", label: "수입", color: "text-profit border-green-400 bg-profit/10" },
+                    { value: "out", label: "지출", color: "text-loss border-red-400 bg-red-50" },
                   ].map(({ value, label, color }) => (
                     <label key={value} className="flex items-center gap-3 cursor-pointer">
                       <input
@@ -201,7 +201,7 @@ export function FinanceForm({ sites }: { sites: Site[] }) {
               </div>
 
               {error && (
-                <div className="bg-red-50 border border-red-200 rounded-xl px-4 py-3 text-red-700 text-base">
+                <div className="bg-red-50 border border-loss/30 rounded-xl px-4 py-3 text-loss text-base">
                   {error}
                 </div>
               )}
@@ -209,7 +209,7 @@ export function FinanceForm({ sites }: { sites: Site[] }) {
               <button
                 type="submit"
                 disabled={isPending}
-                className="w-full bg-blue-600 text-white py-4 rounded-xl text-lg font-bold disabled:opacity-50 active:bg-blue-700"
+                className="w-full bg-primary text-white py-4 rounded-xl text-lg font-bold disabled:opacity-50 active:bg-primary/90"
               >
                 {isPending ? "저장 중..." : "저장하기"}
               </button>

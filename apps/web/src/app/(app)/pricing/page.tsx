@@ -71,6 +71,7 @@ function PricingContent() {
 
   useEffect(() => {
     if (searchParams.get("error") === "canceled") {
+      // eslint-disable-next-line react-hooks/set-state-in-effect
       setError("결제가 취소되었어요. 다시 시도해주세요.");
     }
   }, [searchParams]);
@@ -147,7 +148,7 @@ function PricingContent() {
         </div>
 
         {error && (
-          <div className="bg-red-50 border border-red-200 rounded-xl px-4 py-3 text-red-700 text-base">
+          <div className="bg-red-50 border border-loss/30 rounded-xl px-4 py-3 text-loss text-base">
             {error}
           </div>
         )}
@@ -158,7 +159,7 @@ function PricingContent() {
             className={`bg-white rounded-2xl border-2 p-5 relative ${plan.color}`}
           >
             {plan.badge && (
-              <span className="absolute -top-3 left-4 bg-blue-600 text-white text-sm font-bold px-3 py-1 rounded-full">
+              <span className="absolute -top-3 left-4 bg-primary text-white text-sm font-bold px-3 py-1 rounded-full">
                 {plan.badge}
               </span>
             )}
@@ -193,7 +194,7 @@ function PricingContent() {
                 onClick={() => handleSubscribe(plan.id, plan.price)}
                 disabled={isPending && selectedPlan === plan.id}
                 className={`w-full py-4 rounded-xl text-base font-bold text-white disabled:opacity-50 ${
-                  plan.id === "pro" ? "bg-blue-600" : "bg-purple-600"
+                  plan.id === "pro" ? "bg-primary" : "bg-purple-600"
                 }`}
               >
                 {isPending && selectedPlan === plan.id ? "결제 창 열기 중..." : `${plan.priceLabel} 시작하기`}

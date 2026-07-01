@@ -105,7 +105,7 @@ export function CustomerEditForm({ customerId, initial }: Props) {
                       onClick={() => setSource(opt.value)}
                       className={`py-3 rounded-2xl border-2 text-base font-medium transition-colors ${
                         source === opt.value
-                          ? "border-blue-600 bg-blue-600 text-white"
+                          ? "border-blue-600 bg-primary text-white"
                           : "border-gray-200 bg-white text-gray-700"
                       }`}
                     >
@@ -125,13 +125,13 @@ export function CustomerEditForm({ customerId, initial }: Props) {
               </div>
 
               {error && (
-                <div className="bg-red-50 border border-red-200 rounded-xl px-4 py-3 text-red-700">{error}</div>
+                <div className="bg-red-50 border border-loss/30 rounded-xl px-4 py-3 text-loss">{error}</div>
               )}
 
               <button
                 onClick={handleSave}
                 disabled={isPending}
-                className="w-full bg-blue-600 text-white rounded-2xl py-5 text-xl font-bold disabled:opacity-50 flex items-center justify-center gap-2"
+                className="w-full bg-primary text-white rounded-2xl py-5 text-xl font-bold disabled:opacity-50 flex items-center justify-center gap-2"
               >
                 <CheckIcon size={22} />
                 {isPending ? "저장 중..." : "저장"}

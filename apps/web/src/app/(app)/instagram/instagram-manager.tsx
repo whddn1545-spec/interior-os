@@ -94,7 +94,7 @@ export function InstagramManager({ recommendedPhotos, existingPosts }: Props) {
   return (
     <div className="space-y-6">
       {error && (
-        <div className="bg-red-50 border border-red-200 rounded-xl px-4 py-3 text-red-700 text-base flex items-center gap-2">
+        <div className="bg-red-50 border border-loss/30 rounded-xl px-4 py-3 text-loss text-base flex items-center gap-2">
           <XIcon size={18} className="shrink-0" />
           {error}
         </div>
@@ -149,8 +149,8 @@ export function InstagramManager({ recommendedPhotos, existingPosts }: Props) {
                       </div>
                       <div className="flex-1 min-w-0">
                         <span className={`text-xs px-2 py-0.5 rounded-full font-medium ${
-                          post.status === "published" ? "bg-green-100 text-green-700"
-                          : post.status === "confirmed" ? "bg-blue-100 text-blue-700"
+                          post.status === "published" ? "bg-green-100 text-profit"
+                          : post.status === "confirmed" ? "bg-blue-100 text-primary/90"
                           : "bg-gray-100 text-gray-600"
                         }`}>
                           {STATUS_LABEL[post.status] ?? post.status}
@@ -164,7 +164,7 @@ export function InstagramManager({ recommendedPhotos, existingPosts }: Props) {
                           <button
                             onClick={() => handleConfirm(post.id)}
                             disabled={isPending}
-                            className="flex-1 flex items-center justify-center gap-1 py-3 bg-blue-600 text-white rounded-xl text-base font-semibold active:bg-blue-700"
+                            className="flex-1 flex items-center justify-center gap-1 py-3 bg-primary text-white rounded-xl text-base font-semibold active:bg-primary/90"
                           >
                             <CheckIcon size={18} />
                             확정하기
@@ -192,7 +192,7 @@ export function InstagramManager({ recommendedPhotos, existingPosts }: Props) {
 
       {step === "edit" && selectedPhoto && (
         <div className="space-y-4">
-          <button onClick={() => setStep("select")} className="text-blue-600 text-base font-medium">
+          <button onClick={() => setStep("select")} className="text-primary text-base font-medium">
             ← 사진 다시 선택
           </button>
 
@@ -230,7 +230,7 @@ export function InstagramManager({ recommendedPhotos, existingPosts }: Props) {
               <label className="block text-base font-semibold text-gray-700 mb-2">해시태그</label>
               <div className="flex flex-wrap gap-2">
                 {hashtags.map((tag, i) => (
-                  <span key={i} className="bg-blue-50 text-blue-700 text-sm px-3 py-1 rounded-full">
+                  <span key={i} className="bg-primary/10 text-primary/90 text-sm px-3 py-1 rounded-full">
                     {tag}
                   </span>
                 ))}
@@ -245,7 +245,7 @@ export function InstagramManager({ recommendedPhotos, existingPosts }: Props) {
           <button
             onClick={handleSaveDraft}
             disabled={isPending || !caption}
-            className="w-full py-4 bg-blue-600 text-white rounded-xl text-lg font-bold disabled:opacity-50"
+            className="w-full py-4 bg-primary text-white rounded-xl text-lg font-bold disabled:opacity-50"
           >
             {isPending ? "저장 중..." : "임시저장"}
           </button>

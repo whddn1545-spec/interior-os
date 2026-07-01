@@ -40,9 +40,9 @@ export default async function PricesPage() {
         <PriceDocumentUploader trades={tradesData} />
 
         {!hasAnyPrices && (
-          <div className="bg-blue-50 border border-blue-200 rounded-2xl p-5 mb-6">
+          <div className="bg-primary/10 border border-primary/30 rounded-2xl p-5 mb-6">
             <h2 className="text-lg font-bold text-blue-800 mb-2">직접 입력도 할 수 있어요</h2>
-            <p className="text-base text-blue-700 mb-4">
+            <p className="text-base text-primary/90 mb-4">
               업계 평균 기본값을 불러온 후 내 사업에 맞게 수정하세요.
             </p>
             <PriceEditor

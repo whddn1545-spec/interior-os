@@ -87,7 +87,7 @@ export function WorkerCard({
         {worker.phone && (
           <a
             href={`tel:${worker.phone}`}
-            className="flex items-center gap-1 bg-green-100 text-green-700 px-3 py-1.5 rounded-xl text-sm font-semibold shrink-0"
+            className="flex items-center gap-1 bg-green-100 text-profit px-3 py-1.5 rounded-xl text-sm font-semibold shrink-0"
           >
             📞 전화
           </a>
@@ -126,7 +126,7 @@ export function WorkerCard({
           <span className="text-sm text-gray-500">잔액</span>
           <span
             className={`text-xl font-black ${
-              unsettled ? "text-orange-600" : "text-green-600"
+              unsettled ? "text-orange-600" : "text-profit"
             }`}
           >
             {worker.balance.toLocaleString("ko-KR")}원
@@ -152,16 +152,16 @@ export function WorkerCard({
 
       {/* 정산 확인 */}
       {showConfirm && (
-        <div className="mt-3 bg-green-50 border border-green-200 rounded-2xl p-4">
+        <div className="mt-3 bg-profit/10 border border-profit/20 rounded-2xl p-4">
           <p className="text-base font-semibold text-green-900 mb-1">
             {worker.name}님 정산을 완료할까요?
           </p>
-          <p className="text-sm text-green-700 mb-3">
+          <p className="text-sm text-profit mb-3">
             잔액 {worker.balance.toLocaleString("ko-KR")}원이 정산 완료돼요.
           </p>
           <div className="flex gap-2">
             <button onClick={() => setShowConfirm(false)} className="flex-1 py-3 rounded-xl border border-gray-300 text-gray-700 text-base font-medium active:bg-gray-100">아니요</button>
-            <button onClick={confirmMarkPaid} disabled={isPending} className="flex-1 py-3 rounded-xl bg-green-600 text-white text-base font-bold disabled:opacity-50 active:bg-green-700">네, 완료</button>
+            <button onClick={confirmMarkPaid} disabled={isPending} className="flex-1 py-3 rounded-xl bg-profit text-white text-base font-bold disabled:opacity-50 active:bg-green-700">네, 완료</button>
           </div>
         </div>
       )}
@@ -172,14 +172,14 @@ export function WorkerCard({
           type="button"
           onClick={handleMarkPaid}
           disabled={isPending || worker.balance <= 0}
-          className="flex flex-1 items-center justify-center rounded-xl bg-green-600 py-3.5 text-base font-bold text-white disabled:opacity-40 active:bg-green-700"
+          className="flex flex-1 items-center justify-center rounded-xl bg-profit py-3.5 text-base font-bold text-white disabled:opacity-40 active:bg-green-700"
         >
           {isPending ? "처리 중..." : "정산 완료"}
         </button>
         <button
           type="button"
           onClick={handleCopyStatement}
-          className="flex flex-1 items-center justify-center rounded-xl bg-blue-600 py-3.5 text-base font-bold text-white active:bg-blue-700"
+          className="flex flex-1 items-center justify-center rounded-xl bg-primary py-3.5 text-base font-bold text-white active:bg-primary/90"
         >
           정산 명세 문자
         </button>

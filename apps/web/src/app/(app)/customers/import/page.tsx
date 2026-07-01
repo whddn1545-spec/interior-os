@@ -69,9 +69,9 @@ export default function CustomerImportPage() {
         {step === "upload" && (
           <>
             {/* 안내 */}
-            <div className="bg-blue-50 border border-blue-200 rounded-2xl p-4 text-base text-blue-800">
+            <div className="bg-primary/10 border border-primary/30 rounded-2xl p-4 text-base text-blue-800">
               <p className="font-semibold mb-2">CSV 파일로 고객을 한 번에 가져올 수 있어요</p>
-              <ul className="space-y-1 text-sm text-blue-700">
+              <ul className="space-y-1 text-sm text-primary/90">
                 <li>• 첫 줄: 이름, 전화번호 (필수) / 주소, 메모 (선택)</li>
                 <li>• 스마트폰 연락처 → 공유 → CSV로 내보내기 가능</li>
                 <li>• 중복 전화번호는 자동으로 건너뜁니다</li>
@@ -97,14 +97,14 @@ export default function CustomerImportPage() {
             <button
               onClick={() => fileInputRef.current?.click()}
               disabled={isPending}
-              className="w-full flex items-center justify-center gap-3 bg-blue-600 text-white rounded-2xl py-5 text-lg font-bold disabled:opacity-50"
+              className="w-full flex items-center justify-center gap-3 bg-primary text-white rounded-2xl py-5 text-lg font-bold disabled:opacity-50"
             >
               <UploadIcon size={24} />
               {isPending ? "분석 중..." : "CSV 파일 선택"}
             </button>
 
             {error && (
-              <div className="bg-red-50 border border-red-200 rounded-xl px-4 py-3 text-red-700 text-base">
+              <div className="bg-red-50 border border-loss/30 rounded-xl px-4 py-3 text-loss text-base">
                 {error}
               </div>
             )}
@@ -119,8 +119,8 @@ export default function CustomerImportPage() {
                 <p className="text-2xl font-black text-gray-900">{preview.total}</p>
                 <p className="text-sm text-gray-500">전체</p>
               </div>
-              <div className="bg-green-50 border border-green-200 rounded-2xl p-3 text-center">
-                <p className="text-2xl font-black text-green-700">{preview.total - preview.duplicates}</p>
+              <div className="bg-profit/10 border border-profit/20 rounded-2xl p-3 text-center">
+                <p className="text-2xl font-black text-profit">{preview.total - preview.duplicates}</p>
                 <p className="text-sm text-gray-500">신규</p>
               </div>
               <div className="bg-amber-50 border border-amber-200 rounded-2xl p-3 text-center">
@@ -164,7 +164,7 @@ export default function CustomerImportPage() {
             </div>
 
             {error && (
-              <div className="bg-red-50 border border-red-200 rounded-xl px-4 py-3 text-red-700 text-base">
+              <div className="bg-red-50 border border-loss/30 rounded-xl px-4 py-3 text-loss text-base">
                 {error}
               </div>
             )}
@@ -179,7 +179,7 @@ export default function CustomerImportPage() {
               <button
                 onClick={handleImport}
                 disabled={isPending || (skipDuplicates && preview.total === preview.duplicates)}
-                className="flex-1 py-4 bg-blue-600 text-white rounded-xl text-base font-bold disabled:opacity-50"
+                className="flex-1 py-4 bg-primary text-white rounded-xl text-base font-bold disabled:opacity-50"
               >
                 {isPending ? "가져오는 중..." : `${skipDuplicates ? preview.total - preview.duplicates : preview.total}명 가져오기`}
               </button>
@@ -194,7 +194,7 @@ export default function CustomerImportPage() {
             <p className="text-lg text-gray-600 mb-8">{importedCount}명의 고객이 등록되었어요</p>
             <button
               onClick={() => router.push("/customers")}
-              className="w-full bg-blue-600 text-white py-4 rounded-xl text-lg font-bold"
+              className="w-full bg-primary text-white py-4 rounded-xl text-lg font-bold"
             >
               고객 목록 보기
             </button>

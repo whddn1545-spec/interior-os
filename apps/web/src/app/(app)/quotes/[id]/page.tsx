@@ -58,10 +58,10 @@ export default async function QuoteDetailPage({ params, searchParams }: { params
 
   const statusConfig: Record<string, { label: string; color: string; icon: React.ReactNode }> = {
     draft: { label: "임시저장", color: "bg-gray-100 text-gray-600", icon: null },
-    confirmed: { label: "확정됨", color: "bg-blue-100 text-blue-700", icon: <CheckCircleIcon size={16} /> },
-    sent: { label: "발송됨", color: "bg-green-100 text-green-700", icon: <SendIcon size={16} /> },
+    confirmed: { label: "확정됨", color: "bg-blue-100 text-primary/90", icon: <CheckCircleIcon size={16} /> },
+    sent: { label: "발송됨", color: "bg-green-100 text-profit", icon: <SendIcon size={16} /> },
     accepted: { label: "계약됨", color: "bg-purple-100 text-purple-700", icon: <CheckCircleIcon size={16} /> },
-    rejected: { label: "거절됨", color: "bg-red-100 text-red-600", icon: null },
+    rejected: { label: "거절됨", color: "bg-red-100 text-loss", icon: null },
   };
 
   const status = quoteAny.status as string;
@@ -93,7 +93,7 @@ export default async function QuoteDetailPage({ params, searchParams }: { params
                 <span className="font-medium">
                   {siteAny.customers?.name ?? "—"}
                   {siteAny.customers?.phone && (
-                    <> · <a href={`tel:${siteAny.customers.phone}`} className="text-blue-600">{siteAny.customers.phone}</a></>
+                    <> · <a href={`tel:${siteAny.customers.phone}`} className="text-primary">{siteAny.customers.phone}</a></>
                   )}
                 </span>
               </div>
@@ -105,7 +105,7 @@ export default async function QuoteDetailPage({ params, searchParams }: { params
             {/* 현장 종합 허브 — 이 현장의 견적·일정·사진·받을돈을 한 화면에서 */}
             <Link
               href={`/sites/${siteAny.id}?from=/quotes/${id}`}
-              className="mt-3 flex items-center gap-2 px-3 py-4 rounded-xl bg-blue-50 text-blue-700 active:bg-blue-100"
+              className="mt-3 flex items-center gap-2 px-3 py-4 rounded-xl bg-primary/10 text-primary/90 active:bg-blue-100"
             >
               <LayoutGridIcon size={20} className="shrink-0" />
               <span className="flex-1 text-base font-bold">현장 종합 보기</span>
@@ -181,7 +181,7 @@ export default async function QuoteDetailPage({ params, searchParams }: { params
             <hr className="border-gray-200" />
             <div className="flex justify-between text-xl font-bold text-gray-900">
               <span>최종 합계</span>
-              <span className="text-blue-700">{formatKRW(quoteAny.total_amount as number)}</span>
+              <span className="text-primary/90">{formatKRW(quoteAny.total_amount as number)}</span>
             </div>
           </div>
         </div>
@@ -194,7 +194,7 @@ export default async function QuoteDetailPage({ params, searchParams }: { params
             <AlertTriangleIcon size={22} className="text-orange-500 shrink-0 mt-0.5" />
             <div>
               <p className="text-base font-semibold text-orange-800">아직 확정되지 않은 견적이에요</p>
-              <p className="text-sm text-orange-700 mt-0.5">금액을 검토한 후 "확정하기"를 눌러야 고객에게 보낼 수 있어요</p>
+              <p className="text-sm text-orange-700 mt-0.5">금액을 검토한 후 &quot;확정하기&quot;를 눌러야 고객에게 보낼 수 있어요</p>
             </div>
           </div>
         )}
@@ -202,11 +202,11 @@ export default async function QuoteDetailPage({ params, searchParams }: { params
         {/* 확정된 경우 PDF/계약 버튼 */}
         {(status === "confirmed" || status === "sent" || status === "accepted") && (
           <>
-            <div className="bg-blue-50 border border-blue-200 rounded-2xl p-4 flex items-start gap-3">
-              <CheckCircleIcon size={22} className="text-blue-600 shrink-0 mt-0.5" />
+            <div className="bg-primary/10 border border-primary/30 rounded-2xl p-4 flex items-start gap-3">
+              <CheckCircleIcon size={22} className="text-primary shrink-0 mt-0.5" />
               <div>
                 <p className="text-base font-semibold text-blue-800">견적이 확정되었어요</p>
-                <p className="text-sm text-blue-700 mt-0.5">이제 공사 일정을 만들거나, PDF 생성·문자 발송·계약서 작성을 할 수 있어요</p>
+                <p className="text-sm text-primary/90 mt-0.5">이제 공사 일정을 만들거나, PDF 생성·문자 발송·계약서 작성을 할 수 있어요</p>
               </div>
             </div>
 
@@ -231,7 +231,7 @@ export default async function QuoteDetailPage({ params, searchParams }: { params
             {siteAny && (
               <Link
                 href={`/schedule/${siteAny.id}`}
-                className="flex items-center justify-center gap-2 w-full bg-green-600 text-white rounded-2xl py-5 text-xl font-bold active:bg-green-700"
+                className="flex items-center justify-center gap-2 w-full bg-profit text-white rounded-2xl py-5 text-xl font-bold active:bg-green-700"
               >
                 📅 공사 일정 만들기
               </Link>
@@ -248,7 +248,7 @@ export default async function QuoteDetailPage({ params, searchParams }: { params
                 href={quoteAny.customer_pdf_url as string}
                 target="_blank"
                 rel="noopener noreferrer"
-                className="flex items-center gap-2 w-full bg-blue-600 text-white rounded-xl px-4 py-3 text-base font-semibold active:bg-blue-700"
+                className="flex items-center gap-2 w-full bg-primary text-white rounded-xl px-4 py-3 text-base font-semibold active:bg-primary/90"
               >
                 <FileTextIcon size={20} />
                 고객용 견적서 열기

@@ -8,8 +8,8 @@ const STATUS_LABEL: Record<string, string> = {
 };
 
 const STATUS_COLOR: Record<string, string> = {
-  lead: "text-gray-500", quoting: "text-yellow-600", contracted: "text-blue-600",
-  in_progress: "text-green-600", done: "text-gray-400", canceled: "text-red-400",
+  lead: "text-gray-500", quoting: "text-yellow-600", contracted: "text-primary",
+  in_progress: "text-profit", done: "text-gray-400", canceled: "text-red-400",
 };
 
 export default async function SchedulePage() {
@@ -51,9 +51,9 @@ export default async function SchedulePage() {
       </div>
 
       {/* 오늘 기준 안내 */}
-      <div className="bg-blue-50 border border-blue-100 rounded-2xl px-4 py-3 mb-4 flex items-center gap-2">
-        <CalendarIcon size={18} className="text-blue-600 shrink-0" />
-        <p className="text-sm text-blue-700">오늘: {new Date().toLocaleDateString("ko-KR", { month: "long", day: "numeric", weekday: "short" })}</p>
+      <div className="bg-primary/10 border border-blue-100 rounded-2xl px-4 py-3 mb-4 flex items-center gap-2">
+        <CalendarIcon size={18} className="text-primary shrink-0" />
+        <p className="text-sm text-primary/90">오늘: {new Date().toLocaleDateString("ko-KR", { month: "long", day: "numeric", weekday: "short" })}</p>
       </div>
 
       {sites.length === 0 ? (
@@ -63,7 +63,7 @@ export default async function SchedulePage() {
           <p className="text-base text-gray-400 mt-1 mb-6">견적을 확정하면 여기에서 일정을 만들 수 있어요</p>
           <Link
             href="/quotes"
-            className="inline-flex items-center justify-center gap-2 bg-blue-600 text-white rounded-2xl px-8 py-4 text-lg font-bold"
+            className="inline-flex items-center justify-center gap-2 bg-primary text-white rounded-2xl px-8 py-4 text-lg font-bold"
           >
             견적 확정된 현장 보기
             <ChevronRightIcon size={20} className="shrink-0" />
@@ -97,7 +97,7 @@ export default async function SchedulePage() {
                   <div className="flex-1 min-w-0 mr-3">
                     <div className="flex items-center gap-2 mb-1">
                       {isActive && (
-                        <span className="w-2 h-2 bg-green-500 rounded-full shrink-0" />
+                        <span className="w-2 h-2 bg-profit/100 rounded-full shrink-0" />
                       )}
                       <p className="text-lg font-semibold text-gray-900 truncate">{sAny.name as string}</p>
                     </div>
@@ -126,7 +126,7 @@ export default async function SchedulePage() {
                     </div>
                     <div className="h-2 bg-gray-100 rounded-full overflow-hidden">
                       <div
-                        className="h-full bg-blue-500 rounded-full transition-all"
+                        className="h-full bg-primary/100 rounded-full transition-all"
                         style={{ width: `${progress}%` }}
                       />
                     </div>
@@ -134,7 +134,7 @@ export default async function SchedulePage() {
                 )}
 
                 {totalTasks === 0 && (
-                  <div className="flex items-center justify-center gap-2 bg-blue-600 text-white rounded-xl py-4 px-4 text-base font-bold">
+                  <div className="flex items-center justify-center gap-2 bg-primary text-white rounded-xl py-4 px-4 text-base font-bold">
                     눌러서 공사 일정 만들기
                     <ChevronRightIcon size={20} className="shrink-0" />
                   </div>

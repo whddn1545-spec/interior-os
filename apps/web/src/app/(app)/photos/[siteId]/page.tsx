@@ -74,11 +74,11 @@ export default async function SitePhotosPage({ params, searchParams }: { params:
 
       {/* 분쟁방패 배너 */}
       {photoList.length > 0 && (
-        <div className="bg-green-50 border border-green-200 rounded-2xl px-4 py-3 mb-4 flex items-start gap-3">
-          <ShieldCheckIcon size={22} className="text-green-600 shrink-0 mt-0.5" />
+        <div className="bg-profit/10 border border-profit/20 rounded-2xl px-4 py-3 mb-4 flex items-start gap-3">
+          <ShieldCheckIcon size={22} className="text-profit shrink-0 mt-0.5" />
           <div>
             <p className="text-sm font-bold text-green-800">분쟁방패 활성화</p>
-            <p className="text-xs text-green-600">날짜·시간이 기록된 공사 사진은 분쟁 발생 시 강력한 증거가 됩니다.</p>
+            <p className="text-xs text-profit">날짜·시간이 기록된 공사 사진은 분쟁 발생 시 강력한 증거가 됩니다.</p>
           </div>
         </div>
       )}

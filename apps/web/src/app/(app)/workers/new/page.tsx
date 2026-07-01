@@ -130,7 +130,7 @@ export default function WorkerNewPage() {
                 onClick={() => toggleTrade(t.code)}
                 className={`px-5 py-4 rounded-full border-2 text-base font-medium transition-colors ${
                   selectedTrades.includes(t.code)
-                    ? "border-blue-600 bg-blue-600 text-white"
+                    ? "border-blue-600 bg-primary text-white"
                     : "border-gray-200 bg-white text-gray-700"
                 }`}
               >
@@ -141,13 +141,13 @@ export default function WorkerNewPage() {
         </div>
 
         {error && (
-          <div className="bg-red-50 border border-red-200 rounded-xl px-4 py-3 text-red-700">{error}</div>
+          <div className="bg-red-50 border border-loss/30 rounded-xl px-4 py-3 text-loss">{error}</div>
         )}
 
         <button
           onClick={handleSubmit}
           disabled={isPending}
-          className="w-full bg-blue-600 text-white rounded-2xl py-5 text-xl font-bold disabled:opacity-50"
+          className="w-full bg-primary text-white rounded-2xl py-5 text-xl font-bold disabled:opacity-50"
         >
           {isPending ? "저장 중..." : "작업자 추가"}
         </button>

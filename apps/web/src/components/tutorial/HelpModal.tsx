@@ -57,7 +57,7 @@ export function HelpModal({ tutorialKey, onClose }: Props) {
           <button
             type="button"
             onClick={onClose}
-            className="w-full bg-blue-600 text-white text-xl font-bold rounded-2xl py-5 active:bg-blue-700"
+            className="w-full bg-primary text-white text-xl font-bold rounded-2xl py-5 active:bg-primary/90"
           >
             알겠어요!
           </button>

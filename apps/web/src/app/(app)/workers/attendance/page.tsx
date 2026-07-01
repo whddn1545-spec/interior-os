@@ -45,7 +45,7 @@ export default async function WorkerAttendancePage() {
       <div className="mx-auto w-full max-w-2xl px-4 py-6">
 
       {error && (
-        <p className="mb-4 rounded-xl bg-red-50 px-4 py-3 text-sm font-medium text-red-600">
+        <p className="mb-4 rounded-xl bg-red-50 px-4 py-3 text-sm font-medium text-loss">
           {error}
         </p>
       )}

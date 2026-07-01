@@ -158,14 +158,14 @@ export function Step3Trades({ distanceFactor, difficultyFactor, defaultAreaPyeon
                 const isSelected = selected.has(key);
                 const entry = selected.get(key);
                 return (
-                  <div key={key} className={`border-b border-gray-100 last:border-0 ${isSelected ? "bg-blue-50" : ""}`}>
+                  <div key={key} className={`border-b border-gray-100 last:border-0 ${isSelected ? "bg-primary/10" : ""}`}>
                     {/* 전체 행 탭으로 선택/해제 */}
                     <button
                       onClick={() => toggle(price)}
                       className="w-full flex items-center gap-3 px-4 py-4 text-left active:bg-blue-100"
                     >
                       <div className={`w-8 h-8 rounded-lg border-2 flex items-center justify-center shrink-0 ${
-                        isSelected ? "border-blue-500 bg-blue-500" : "border-gray-300"
+                        isSelected ? "border-blue-500 bg-primary/100" : "border-gray-300"
                       }`}>
                         {isSelected && <span className="text-white text-xl font-bold leading-none">✓</span>}
                       </div>
@@ -202,7 +202,7 @@ export function Step3Trades({ distanceFactor, difficultyFactor, defaultAreaPyeon
 
       {/* 미리보기 합계 */}
       {preview && (
-        <div className="bg-blue-50 border border-blue-200 rounded-xl p-4 mb-6">
+        <div className="bg-primary/10 border border-primary/30 rounded-xl p-4 mb-6">
           <div className="flex justify-between text-base text-gray-600 mb-1">
             <span>소계</span>
             <span>{formatKRW(preview.subtotal)}</span>
@@ -215,7 +215,7 @@ export function Step3Trades({ distanceFactor, difficultyFactor, defaultAreaPyeon
             <span>예비+비상</span>
             <span>+{formatKRW(preview.reserve + preview.contingency)}</span>
           </div>
-          <div className="flex justify-between text-xl font-bold text-blue-700 border-t border-blue-200 pt-2">
+          <div className="flex justify-between text-xl font-bold text-primary/90 border-t border-primary/30 pt-2">
             <span>예상 합계</span>
             <span>{formatKRW(preview.total)}</span>
           </div>
@@ -223,7 +223,7 @@ export function Step3Trades({ distanceFactor, difficultyFactor, defaultAreaPyeon
       )}
 
       {nextError && (
-        <div className="bg-red-50 border border-red-200 rounded-xl px-4 py-3 text-red-700 text-base">
+        <div className="bg-red-50 border border-loss/30 rounded-xl px-4 py-3 text-loss text-base">
           {nextError}
         </div>
       )}
@@ -238,7 +238,7 @@ export function Step3Trades({ distanceFactor, difficultyFactor, defaultAreaPyeon
         <button
           onClick={handleNext}
           disabled={selected.size === 0}
-          className="flex-1 py-4 text-lg bg-blue-600 text-white rounded-xl font-semibold disabled:opacity-40 disabled:cursor-not-allowed"
+          className="flex-1 py-4 text-lg bg-primary text-white rounded-xl font-semibold disabled:opacity-40 disabled:cursor-not-allowed"
         >
           계산 ▶
         </button>

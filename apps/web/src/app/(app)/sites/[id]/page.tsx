@@ -152,7 +152,7 @@ export default async function SiteHubPage({
         {customer?.phone && (
           <a
             href={`tel:${customer.phone}`}
-            className="flex items-center gap-1 bg-green-100 text-green-700 px-3 py-2.5 rounded-xl text-base font-semibold shrink-0"
+            className="flex items-center gap-1 bg-green-100 text-profit px-3 py-2.5 rounded-xl text-base font-semibold shrink-0"
             aria-label="고객 전화"
           >
             <PhoneIcon size={16} />
@@ -181,14 +181,14 @@ export default async function SiteHubPage({
                 : (from ? `/sites/${id}?tab=${t.key}&from=${encodeURIComponent(from)}` : `/sites/${id}?tab=${t.key}`)
               }
               className={`flex min-h-[56px] flex-1 min-w-[72px] items-center justify-center gap-1 px-3 text-base font-bold border-b-2 ${
-                isActive ? "border-blue-700 text-blue-700" : "border-transparent text-gray-500"
+                isActive ? "border-blue-700 text-primary/90" : "border-transparent text-gray-500"
               }`}
             >
               {t.label}
               {badge > 0 && (
                 <span
                   className={`text-sm rounded-full px-1.5 ${
-                    isActive ? "bg-blue-100 text-blue-700" : "bg-gray-100 text-gray-500"
+                    isActive ? "bg-blue-100 text-primary/90" : "bg-gray-100 text-gray-500"
                   }`}
                 >
                   {badge}
@@ -207,7 +207,7 @@ export default async function SiteHubPage({
             <div className="bg-white rounded-2xl p-4 border border-gray-100 space-y-3">
               <div className="flex items-center justify-between gap-3">
                 <h2 className="text-lg font-bold text-gray-900">현장 정보</h2>
-                <span className="text-base font-semibold text-blue-700 bg-blue-50 px-3 py-1 rounded-full">
+                <span className="text-base font-semibold text-primary/90 bg-primary/10 px-3 py-1 rounded-full">
                   {SITE_STATUS_LABEL[siteAny.status] ?? siteAny.status}
                 </span>
               </div>
@@ -219,7 +219,7 @@ export default async function SiteHubPage({
                   >
                     <UserIcon size={20} className="text-gray-400 shrink-0" />
                     <span className="text-gray-500 w-16 shrink-0">고객</span>
-                    <span className="flex-1 font-medium text-blue-600 truncate">{customer.name}</span>
+                    <span className="flex-1 font-medium text-primary truncate">{customer.name}</span>
                     <ChevronRightIcon size={18} className="text-gray-300 shrink-0" />
                   </Link>
                 )}
@@ -230,7 +230,7 @@ export default async function SiteHubPage({
                   >
                     <span className="w-5 shrink-0" />
                     <span className="text-gray-500 w-16 shrink-0">연락처</span>
-                    <span className="flex-1 font-medium text-blue-600">{customer.phone}</span>
+                    <span className="flex-1 font-medium text-primary">{customer.phone}</span>
                   </a>
                 )}
                 {siteAny.address && (
@@ -258,7 +258,7 @@ export default async function SiteHubPage({
                 href={`/schedule/${id}?from=/sites/${id}`}
                 className="flex flex-col items-center justify-center gap-1 bg-white border border-gray-100 rounded-2xl py-5 active:bg-gray-50"
               >
-                <CalendarIcon size={26} className="text-green-600" />
+                <CalendarIcon size={26} className="text-profit" />
                 <span className="text-base font-semibold text-gray-800">공사 일정</span>
                 <span className="text-sm text-gray-500">
                   {taskTotal > 0 ? `${taskTotal}개 작업` : "일정 만들기"}
@@ -282,12 +282,12 @@ export default async function SiteHubPage({
                 href={from ? `/sites/${id}?tab=finance&from=${encodeURIComponent(from)}` : `/sites/${id}?tab=finance`}
                 className="flex items-center gap-3 bg-white rounded-2xl p-4 border border-gray-100 active:bg-gray-50"
               >
-                <WalletIcon size={24} className="text-blue-600 shrink-0" />
+                <WalletIcon size={24} className="text-primary shrink-0" />
                 <div className="flex-1">
                   <p className="text-base font-semibold text-gray-900">미수금</p>
                   <p className="text-sm text-gray-500">받을 돈 자세히 보기</p>
                 </div>
-                <p className="text-lg font-bold text-blue-700 shrink-0">{formatKRW(outstanding)}</p>
+                <p className="text-lg font-bold text-primary/90 shrink-0">{formatKRW(outstanding)}</p>
                 <ChevronRightIcon size={20} className="text-gray-300 shrink-0" />
               </Link>
             )}
@@ -303,7 +303,7 @@ export default async function SiteHubPage({
               }
               className="flex items-center gap-3 bg-white rounded-2xl p-4 border border-gray-100 active:bg-gray-50"
             >
-              <FileTextIcon size={24} className="text-blue-600 shrink-0" />
+              <FileTextIcon size={24} className="text-primary shrink-0" />
               <div className="flex-1">
                 <p className="text-base font-semibold text-gray-900">
                   {latestQuote ? "최신 견적 보기" : "새 견적 만들기"}
@@ -322,7 +322,7 @@ export default async function SiteHubPage({
                 href={`/contracts/${contractAny.id}?from=/sites/${id}`}
                 className="flex items-center gap-3 bg-white rounded-2xl p-4 border border-gray-100 active:bg-gray-50"
               >
-                <FileSignatureIcon size={24} className="text-green-600 shrink-0" />
+                <FileSignatureIcon size={24} className="text-profit shrink-0" />
                 <div className="flex-1">
                   <p className="text-base font-semibold text-gray-900">계약서 보기</p>
                   <p className="text-sm text-gray-500">
@@ -343,7 +343,7 @@ export default async function SiteHubPage({
                 <p className="text-lg">이 현장 견적이 아직 없어요</p>
                 <Link
                   href={customer?.id ? `/quotes/new?customerId=${customer.id}` : "/quotes/new"}
-                  className="mt-3 inline-flex min-h-[56px] items-center justify-center rounded-xl bg-blue-700 px-6 text-base font-bold text-white"
+                  className="mt-3 inline-flex min-h-[56px] items-center justify-center rounded-xl bg-primary/90 px-6 text-base font-bold text-white"
                 >
                   새 견적 만들기
                 </Link>
@@ -355,7 +355,7 @@ export default async function SiteHubPage({
                   href={`/quotes/${q.id}?from=/sites/${id}`}
                   className="flex items-center gap-3 bg-white border border-gray-200 rounded-2xl px-4 py-4 active:bg-gray-50"
                 >
-                  <FileTextIcon size={22} className="text-blue-600 shrink-0" />
+                  <FileTextIcon size={22} className="text-primary shrink-0" />
                   <div className="flex-1 min-w-0">
                     <p className="text-base font-semibold text-gray-900">
                       견적 v{q.version}
@@ -395,7 +395,7 @@ export default async function SiteHubPage({
             <div className="bg-white rounded-2xl p-4 border border-gray-100">
               <div className="flex justify-between items-baseline">
                 <span className="text-base text-gray-500">미수금</span>
-                <span className="text-2xl font-black text-blue-700">{formatKRW(outstanding)}</span>
+                <span className="text-2xl font-black text-primary/90">{formatKRW(outstanding)}</span>
               </div>
               {paidTotal > 0 && (
                 <div className="flex justify-between items-baseline mt-2">
@@ -420,7 +420,7 @@ export default async function SiteHubPage({
                     >
                       <WalletIcon
                         size={22}
-                        className={p.paid_at ? "text-green-600 shrink-0" : "text-blue-600 shrink-0"}
+                        className={p.paid_at ? "text-profit shrink-0" : "text-primary shrink-0"}
                       />
                       <div className="flex-1 min-w-0">
                         <p className="text-base font-semibold text-gray-900">{p.stage_label}</p>

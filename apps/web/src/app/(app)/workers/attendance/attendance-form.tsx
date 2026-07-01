@@ -64,7 +64,7 @@ export function AttendanceForm({
       <button
         type="button"
         onClick={() => setOpen(true)}
-        className="flex flex-1 items-center justify-center rounded-xl bg-blue-600 py-4 text-base font-bold text-white active:bg-blue-700"
+        className="flex flex-1 items-center justify-center rounded-xl bg-primary py-4 text-base font-bold text-white active:bg-primary/90"
       >
         + 오늘 출역 기록
       </button>
@@ -76,7 +76,7 @@ export function AttendanceForm({
       <p className="mb-3 text-sm font-bold text-gray-700">{workerName} 출역 기록</p>
 
       {done ? (
-        <p className="rounded-lg bg-green-100 px-3 py-3 text-center text-base font-bold text-green-700">
+        <p className="rounded-lg bg-green-100 px-3 py-3 text-center text-base font-bold text-profit">
           기록 완료 ✅
         </p>
       ) : (
@@ -119,7 +119,7 @@ export function AttendanceForm({
           />
 
           {feedback && (
-            <p className="mb-3 rounded-lg bg-red-50 px-3 py-2 text-sm font-medium text-red-600">
+            <p className="mb-3 rounded-lg bg-red-50 px-3 py-2 text-sm font-medium text-loss">
               {feedback}
             </p>
           )}
@@ -129,7 +129,7 @@ export function AttendanceForm({
               type="button"
               onClick={handleSubmit}
               disabled={isPending || sites.length === 0}
-              className="flex h-14 flex-1 items-center justify-center rounded-xl bg-blue-600 text-lg font-bold text-white disabled:opacity-50 active:bg-blue-700"
+              className="flex h-14 flex-1 items-center justify-center rounded-xl bg-primary text-lg font-bold text-white disabled:opacity-50 active:bg-primary/90"
             >
               {isPending ? "기록 중..." : "기록하기"}
             </button>

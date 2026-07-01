@@ -62,7 +62,7 @@ export function PhotoCard({ photo, siteId, trades, signedUrl }: PhotoCardProps) 
             </>
           )}
           {photo.isTagged && (
-            <div className="absolute top-2 right-2 bg-green-500 text-white text-xs px-2 py-0.5 rounded-full">
+            <div className="absolute top-2 right-2 bg-profit/100 text-white text-xs px-2 py-0.5 rounded-full">
               AI 분석
             </div>
           )}
@@ -75,7 +75,7 @@ export function PhotoCard({ photo, siteId, trades, signedUrl }: PhotoCardProps) 
         </div>
         <div className="p-2">
           {photo.phase && (
-            <p className="text-xs font-medium text-blue-700">{PHASE_LABEL[photo.phase] ?? photo.phase}</p>
+            <p className="text-xs font-medium text-primary/90">{PHASE_LABEL[photo.phase] ?? photo.phase}</p>
           )}
           {photo.tradeName && (
             <p className="text-xs text-gray-600">{photo.tradeName}</p>
@@ -107,7 +107,7 @@ export function PhotoCard({ photo, siteId, trades, signedUrl }: PhotoCardProps) 
                     key={p}
                     onClick={() => setPhase(p)}
                     className={`py-3 rounded-xl border-2 text-sm font-medium transition-colors ${
-                      phase === p ? "border-blue-500 bg-blue-50 text-blue-700" : "border-gray-200 text-gray-600"
+                      phase === p ? "border-blue-500 bg-primary/10 text-primary/90" : "border-gray-200 text-gray-600"
                     }`}
                   >
                     {PHASE_LABEL[p]}
@@ -122,7 +122,7 @@ export function PhotoCard({ photo, siteId, trades, signedUrl }: PhotoCardProps) 
                 <button
                   onClick={() => setTradeId("")}
                   className={`py-3 rounded-xl border-2 text-sm font-medium transition-colors ${
-                    tradeId === "" ? "border-blue-500 bg-blue-50 text-blue-700" : "border-gray-200 text-gray-600"
+                    tradeId === "" ? "border-blue-500 bg-primary/10 text-primary/90" : "border-gray-200 text-gray-600"
                   }`}
                 >
                   선택 안 함
@@ -132,7 +132,7 @@ export function PhotoCard({ photo, siteId, trades, signedUrl }: PhotoCardProps) 
                     key={t.id}
                     onClick={() => setTradeId(t.id)}
                     className={`py-3 rounded-xl border-2 text-sm font-medium transition-colors ${
-                      tradeId === t.id ? "border-blue-500 bg-blue-50 text-blue-700" : "border-gray-200 text-gray-600"
+                      tradeId === t.id ? "border-blue-500 bg-primary/10 text-primary/90" : "border-gray-200 text-gray-600"
                     }`}
                   >
                     {t.nameKo}
@@ -144,7 +144,7 @@ export function PhotoCard({ photo, siteId, trades, signedUrl }: PhotoCardProps) 
             <button
               onClick={handleSave}
               disabled={isPending}
-              className="w-full py-4 bg-blue-600 text-white rounded-xl text-lg font-bold disabled:opacity-50 flex items-center justify-center gap-2"
+              className="w-full py-4 bg-primary text-white rounded-xl text-lg font-bold disabled:opacity-50 flex items-center justify-center gap-2"
             >
               <CheckIcon size={20} />
               {isPending ? "저장 중..." : "저장"}

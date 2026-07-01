@@ -18,9 +18,9 @@ interface EditableItem extends ExtractedPriceItem {
 }
 
 const CONFIDENCE_LABEL = {
-  high: { label: "확실", cls: "text-green-700 bg-green-50" },
+  high: { label: "확실", cls: "text-profit bg-profit/10" },
   medium: { label: "보통", cls: "text-amber-700 bg-amber-50" },
-  low: { label: "불확실", cls: "text-red-700 bg-red-50" },
+  low: { label: "불확실", cls: "text-loss bg-red-50" },
 };
 
 export function PriceDocumentUploader({ trades }: { trades: Trade[] }) {
@@ -134,13 +134,13 @@ export function PriceDocumentUploader({ trades }: { trades: Trade[] }) {
     return (
       <div className="mb-6">
         {error && (
-          <div className="bg-red-50 border border-red-200 rounded-xl px-4 py-3 text-red-700 text-base mb-3 flex gap-2 items-start">
+          <div className="bg-red-50 border border-loss/30 rounded-xl px-4 py-3 text-loss text-base mb-3 flex gap-2 items-start">
             <AlertTriangleIcon size={18} className="shrink-0 mt-0.5" />
             {error}
           </div>
         )}
         {success && (
-          <div className="bg-green-50 border border-green-200 rounded-xl px-4 py-3 text-green-700 text-base mb-3 flex gap-2 items-center">
+          <div className="bg-profit/10 border border-profit/20 rounded-xl px-4 py-3 text-profit text-base mb-3 flex gap-2 items-center">
             <CheckIcon size={18} />
             {success}
           </div>
@@ -198,7 +198,7 @@ export function PriceDocumentUploader({ trades }: { trades: Trade[] }) {
       </div>
 
       {error && (
-        <div className="bg-red-50 border border-red-200 rounded-xl px-4 py-3 text-red-700 text-base mb-3">
+        <div className="bg-red-50 border border-loss/30 rounded-xl px-4 py-3 text-loss text-base mb-3">
           {error}
         </div>
       )}

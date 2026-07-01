@@ -77,16 +77,19 @@ export function MessageWizard({ workers, sites, customers }: Props) {
     const workerId = searchParams.get("workerId");
 
     if (workerId) {
+      // eslint-disable-next-line react-hooks/set-state-in-effect
       setTargetType("worker");
       setSelectedWorkerId(workerId);
       setMessageType("worker_notify");
     } else if (customerId) {
+      // eslint-disable-next-line react-hooks/set-state-in-effect
       setTargetType("customer");
       setSelectedCustomerId(customerId);
       setMessageType("customer_progress");
     }
 
     if (siteId) {
+      // eslint-disable-next-line react-hooks/set-state-in-effect
       setSelectedSiteId(siteId);
       // 대상까지 정해졌다면 바로 현장 단계로 진입
       if (workerId || customerId) setStep("site");
@@ -172,7 +175,7 @@ export function MessageWizard({ workers, sites, customers }: Props) {
         <p className="text-base text-gray-500 mb-6">{preview?.targetName}님에게 발송 완료</p>
         <button
           onClick={reset}
-          className="bg-blue-600 text-white rounded-2xl px-8 py-4 text-lg font-semibold active:bg-blue-700"
+          className="bg-primary text-white rounded-2xl px-8 py-4 text-lg font-semibold active:bg-primary/90"
         >
           또 보내기
         </button>
@@ -190,7 +193,7 @@ export function MessageWizard({ workers, sites, customers }: Props) {
           <button
             onClick={() => { setTargetType("worker"); setSelectedCustomerId(""); setSelectedSiteId(""); setMessageType("worker_notify"); }}
             className={`py-4 rounded-xl text-lg font-semibold border-2 active:opacity-80 ${
-              targetType === "worker" ? "border-blue-600 bg-blue-50 text-blue-700" : "border-gray-200 text-gray-700"
+              targetType === "worker" ? "border-blue-600 bg-primary/10 text-primary/90" : "border-gray-200 text-gray-700"
             }`}
           >
             👷 작업자
@@ -198,7 +201,7 @@ export function MessageWizard({ workers, sites, customers }: Props) {
           <button
             onClick={() => { setTargetType("customer"); setSelectedWorkerId(""); setSelectedSiteId(""); setMessageType("customer_progress"); }}
             className={`py-4 rounded-xl text-lg font-semibold border-2 active:opacity-80 ${
-              targetType === "customer" ? "border-blue-600 bg-blue-50 text-blue-700" : "border-gray-200 text-gray-700"
+              targetType === "customer" ? "border-blue-600 bg-primary/10 text-primary/90" : "border-gray-200 text-gray-700"
             }`}
           >
             👤 고객
@@ -240,7 +243,7 @@ export function MessageWizard({ workers, sites, customers }: Props) {
                   key={type}
                   onClick={() => setMessageType(type)}
                   className={`w-full text-left p-4 rounded-xl border-2 ${
-                    messageType === type ? "border-blue-600 bg-blue-50" : "border-gray-200"
+                    messageType === type ? "border-blue-600 bg-primary/10" : "border-gray-200"
                   }`}
                 >
                   <p className="text-base font-semibold text-gray-900">{label}</p>
@@ -251,7 +254,7 @@ export function MessageWizard({ workers, sites, customers }: Props) {
 
             <button
               onClick={() => setStep("site")}
-              className="mt-4 w-full bg-blue-600 text-white rounded-2xl py-4 text-lg font-semibold active:bg-blue-700"
+              className="mt-4 w-full bg-primary text-white rounded-2xl py-4 text-lg font-semibold active:bg-primary/90"
             >
               다음 →
             </button>
@@ -309,7 +312,7 @@ export function MessageWizard({ workers, sites, customers }: Props) {
                       onClick={() => setPaymentStage(stage)}
                       className={`py-4 rounded-xl text-base font-semibold border-2 active:opacity-80 ${
                         paymentStage === stage
-                          ? "border-blue-600 bg-blue-50 text-blue-700"
+                          ? "border-blue-600 bg-primary/10 text-primary/90"
                           : "border-gray-200 text-gray-700"
                       }`}
                     >
@@ -338,7 +341,7 @@ export function MessageWizard({ workers, sites, customers }: Props) {
                       onClick={() => setWorkDoneVariant(variant)}
                       className={`py-4 rounded-xl text-base font-semibold border-2 active:opacity-80 ${
                         workDoneVariant === variant
-                          ? "border-blue-600 bg-blue-50 text-blue-700"
+                          ? "border-blue-600 bg-primary/10 text-primary/90"
                           : "border-gray-200 text-gray-700"
                       }`}
                     >
@@ -381,7 +384,7 @@ export function MessageWizard({ workers, sites, customers }: Props) {
           </div>
 
           {error && (
-            <div className="mt-3 bg-red-50 border border-red-200 rounded-xl px-4 py-3 text-red-700">
+            <div className="mt-3 bg-red-50 border border-loss/30 rounded-xl px-4 py-3 text-loss">
               {error}
             </div>
           )}
@@ -390,7 +393,7 @@ export function MessageWizard({ workers, sites, customers }: Props) {
             <button
               onClick={loadPreview}
               disabled={!selectedSiteId}
-              className="w-full bg-blue-600 text-white rounded-2xl py-4 text-lg font-semibold disabled:opacity-50 active:bg-blue-700"
+              className="w-full bg-primary text-white rounded-2xl py-4 text-lg font-semibold disabled:opacity-50 active:bg-primary/90"
             >
               미리보기 →
             </button>
@@ -421,7 +424,7 @@ export function MessageWizard({ workers, sites, customers }: Props) {
           </div>
 
           {error && (
-            <div className="mb-4 bg-red-50 border border-red-200 rounded-xl px-4 py-3 text-red-700">
+            <div className="mb-4 bg-red-50 border border-loss/30 rounded-xl px-4 py-3 text-loss">
               {error}
             </div>
           )}
@@ -430,7 +433,7 @@ export function MessageWizard({ workers, sites, customers }: Props) {
             <button
               onClick={handleSend}
               disabled={isPending}
-              className="flex items-center justify-center gap-2 w-full bg-green-600 text-white rounded-2xl py-5 text-xl font-bold disabled:opacity-50"
+              className="flex items-center justify-center gap-2 w-full bg-profit text-white rounded-2xl py-5 text-xl font-bold disabled:opacity-50"
             >
               <SendIcon size={22} />
               {isPending ? "발송 중..." : `${preview.targetName}님에게 보내기`}

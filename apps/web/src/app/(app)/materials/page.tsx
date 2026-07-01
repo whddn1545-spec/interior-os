@@ -85,7 +85,7 @@ export default function MaterialsPage() {
       </header>
 
       <div className="max-w-lg mx-auto px-4 pt-6 space-y-5">
-        <div className="bg-blue-50 border border-blue-200 rounded-2xl p-4 text-sm text-blue-800">
+        <div className="bg-primary/10 border border-primary/30 rounded-2xl p-4 text-sm text-blue-800">
           공종과 면적을 입력하면 필요한 자재 수량을 자동으로 계산해드려요
         </div>
 
@@ -99,7 +99,7 @@ export default function MaterialsPage() {
                 onClick={() => { setSelectedTrade(trade); setCalculated(false); }}
                 className={`py-4 rounded-xl text-base font-semibold transition-colors ${
                   selectedTrade === trade
-                    ? "bg-blue-600 text-white"
+                    ? "bg-primary text-white"
                     : "bg-white border border-gray-300 text-gray-700"
                 }`}
               >
@@ -135,7 +135,7 @@ export default function MaterialsPage() {
         <button
           onClick={handleCalculate}
           disabled={!areaPyeong}
-          className="w-full flex items-center justify-center gap-2 py-4 bg-blue-600 text-white rounded-xl text-lg font-bold disabled:opacity-50"
+          className="w-full flex items-center justify-center gap-2 py-4 bg-primary text-white rounded-xl text-lg font-bold disabled:opacity-50"
         >
           <CalculatorIcon size={22} />
           {selectedLabel} 자재 계산
@@ -155,7 +155,7 @@ export default function MaterialsPage() {
                     <p className="text-sm text-gray-500">{r.formulaText}</p>
                   </div>
                   <div className="text-right">
-                    <p className="text-2xl font-black text-blue-700">{r.qty}</p>
+                    <p className="text-2xl font-black text-primary/90">{r.qty}</p>
                     <p className="text-sm text-gray-500">{r.unit}</p>
                   </div>
                 </div>

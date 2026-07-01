@@ -116,10 +116,10 @@ export function Step4Review({ siteId, siteName, items, distanceFactor, difficult
       <p className="text-lg text-gray-500 mb-6">금액을 확인하고 확정하세요</p>
 
       {/* AI 검토 패널 */}
-      <div className="bg-blue-50 border border-blue-200 rounded-xl p-4 mb-4">
+      <div className="bg-primary/10 border border-primary/30 rounded-xl p-4 mb-4">
         <div className="flex items-center gap-2 mb-2">
-          <SparklesIcon size={16} className="text-blue-600" />
-          <span className="text-sm font-semibold text-blue-700">AI 견적 검토</span>
+          <SparklesIcon size={16} className="text-primary" />
+          <span className="text-sm font-semibold text-primary/90">AI 견적 검토</span>
         </div>
         {aiLoading ? (
           <p className="text-sm text-blue-500 animate-pulse">AI가 견적을 검토 중이에요...</p>
@@ -134,7 +134,7 @@ export function Step4Review({ siteId, siteName, items, distanceFactor, difficult
             ))}
           </ul>
         ) : (
-          <p className="text-sm text-blue-600">✅ 특이사항 없음 — 견적이 적정해 보여요</p>
+          <p className="text-sm text-primary">✅ 특이사항 없음 — 견적이 적정해 보여요</p>
         )}
       </div>
 
@@ -177,12 +177,12 @@ export function Step4Review({ siteId, siteName, items, distanceFactor, difficult
         </div>
         <div className="flex justify-between items-baseline border-t border-gray-300 pt-3">
           <span className="text-xl font-bold text-gray-900">합계</span>
-          <span className="text-3xl font-black text-blue-700">{formatKRW(result.total)}</span>
+          <span className="text-3xl font-black text-primary/90">{formatKRW(result.total)}</span>
         </div>
       </div>
 
       {error && (
-        <div className="bg-red-50 border border-red-200 rounded-xl p-3 mb-4 text-base text-red-600">
+        <div className="bg-red-50 border border-loss/30 rounded-xl p-3 mb-4 text-base text-loss">
           {error}
         </div>
       )}
@@ -203,7 +203,7 @@ export function Step4Review({ siteId, siteName, items, distanceFactor, difficult
         </button>
         <button
           onClick={() => setShowConfirmDialog(true)}
-          className="flex-1 py-4 text-lg bg-blue-600 text-white rounded-xl font-bold active:bg-blue-700"
+          className="flex-1 py-4 text-lg bg-primary text-white rounded-xl font-bold active:bg-primary/90"
         >
           이 금액으로 확정
         </button>
@@ -219,7 +219,7 @@ export function Step4Review({ siteId, siteName, items, distanceFactor, difficult
             <p className="text-lg text-gray-600 mb-2">
               확정 후에는 수정이 불가합니다.
             </p>
-            <p className="text-2xl font-black text-blue-700 mb-6">
+            <p className="text-2xl font-black text-primary/90 mb-6">
               {formatKRW(result.total)}
             </p>
             <div className="flex gap-3">
@@ -233,7 +233,7 @@ export function Step4Review({ siteId, siteName, items, distanceFactor, difficult
               <button
                 onClick={handleConfirm}
                 disabled={isPending}
-                className="flex-1 py-4 text-lg bg-blue-600 text-white rounded-xl font-bold disabled:opacity-50 active:bg-blue-700"
+                className="flex-1 py-4 text-lg bg-primary text-white rounded-xl font-bold disabled:opacity-50 active:bg-primary/90"
               >
                 {isPending ? "확정 중..." : "네, 확정"}
               </button>

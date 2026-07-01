@@ -1,5 +1,5 @@
 import Link from "next/link";
-import { ArrowLeftIcon } from "lucide-react";
+import { ArrowLeftIcon, ShieldAlertIcon, CheckCircleIcon } from "lucide-react";
 import { getPaymentBoard, getQuotesMissingSchedule } from "./actions";
 import { PaymentCard } from "./payment-card";
 import { MissingScheduleBanner } from "./missing-schedule-banner";
@@ -51,11 +51,11 @@ export default async function PaymentsPage({
       <header className="mb-6">
         <h1 className="text-2xl font-black text-gray-900">💰 받을 돈</h1>
         <p className="mt-2 text-sm text-gray-500">총 미수금</p>
-        <p className="text-4xl font-black text-blue-700">
+        <p className="text-4xl font-black text-primary/90">
           {totalOutstanding.toLocaleString("ko-KR")}원
         </p>
         {overdueCount > 0 && (
-          <p className="mt-1 text-base font-bold text-red-600">
+          <p className="mt-1 text-base font-bold text-loss">
             ⚠️ 연체 {overdueCount}건
           </p>
         )}
@@ -71,7 +71,7 @@ export default async function PaymentsPage({
               href={f.key === "all" ? "/payments" : `/payments?filter=${f.key}`}
               className={`flex h-14 min-w-[80px] flex-1 items-center justify-center rounded-xl px-4 text-base font-bold transition-colors ${
                 isActive
-                  ? "bg-blue-700 text-white"
+                  ? "bg-primary/90 text-white"
                   : "bg-gray-100 text-gray-700 active:bg-gray-200"
               }`}
             >
@@ -82,7 +82,7 @@ export default async function PaymentsPage({
       </nav>
 
       {error && (
-        <div className="mb-4 rounded-xl bg-red-50 p-4 text-base text-red-700">
+        <div className="mb-4 rounded-xl bg-red-50 p-4 text-base text-loss">
           데이터를 불러오지 못했습니다: {error}
         </div>
       )}
@@ -97,12 +97,12 @@ export default async function PaymentsPage({
           <p className="mt-3 text-base text-gray-500">
             확정된 견적이 있는데 안 보이나요?
           </p>
-          <a
+          <Link
             href="/quotes"
-            className="mt-4 inline-flex min-h-[56px] items-center justify-center rounded-xl bg-blue-700 px-6 py-4 text-base font-bold text-white active:bg-blue-800"
+            className="mt-4 inline-flex min-h-[56px] items-center justify-center rounded-xl bg-primary/90 px-6 py-4 text-base font-bold text-white active:bg-blue-800"
           >
             견적 보기 →
-          </a>
+          </Link>
         </div>
       ) : (
         <div className="flex flex-col gap-4">

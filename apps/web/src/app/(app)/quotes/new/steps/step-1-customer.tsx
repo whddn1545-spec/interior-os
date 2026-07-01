@@ -89,9 +89,9 @@ export function Step1Customer({ onNext, initialCustomer }: Props) {
         <h2 className="text-2xl font-bold text-gray-900 mb-2">누구 집인가요?</h2>
         <p className="text-lg text-gray-500 mb-6">선택된 고객이에요</p>
 
-        <div className="flex items-center gap-4 bg-white border border-blue-200 rounded-xl px-4 py-4 mb-4">
+        <div className="flex items-center gap-4 bg-white border border-primary/30 rounded-xl px-4 py-4 mb-4">
           <div className="w-12 h-12 bg-blue-100 rounded-full flex items-center justify-center shrink-0">
-            <UserIcon size={22} className="text-blue-600" />
+            <UserIcon size={22} className="text-primary" />
           </div>
           <div className="flex-1 min-w-0">
             <p className="text-lg font-semibold text-gray-900">{selected.name}</p>
@@ -99,7 +99,7 @@ export function Step1Customer({ onNext, initialCustomer }: Props) {
           </div>
           <button
             onClick={() => setSelected(undefined)}
-            className="px-4 py-3 text-base font-medium text-blue-600 border border-blue-200 rounded-xl"
+            className="px-4 py-3 text-base font-medium text-primary border border-primary/30 rounded-xl"
           >
             변경
           </button>
@@ -107,7 +107,7 @@ export function Step1Customer({ onNext, initialCustomer }: Props) {
 
         <button
           onClick={() => onNext(selected)}
-          className="w-full py-4 text-lg bg-blue-600 text-white rounded-xl font-semibold"
+          className="w-full py-4 text-lg bg-primary text-white rounded-xl font-semibold"
         >
           다음
         </button>
@@ -139,10 +139,10 @@ export function Step1Customer({ onNext, initialCustomer }: Props) {
             <li key={c.id}>
               <button
                 onClick={() => onNext(c)}
-                className="w-full flex items-center gap-4 bg-white border border-gray-200 rounded-xl px-4 py-4 text-left active:border-blue-400 active:bg-blue-50"
+                className="w-full flex items-center gap-4 bg-white border border-gray-200 rounded-xl px-4 py-4 text-left active:border-blue-400 active:bg-primary/10"
               >
                 <div className="w-12 h-12 bg-blue-100 rounded-full flex items-center justify-center shrink-0">
-                  <UserIcon size={22} className="text-blue-600" />
+                  <UserIcon size={22} className="text-primary" />
                 </div>
                 <div>
                   <p className="text-lg font-semibold text-gray-900">{c.name}</p>
@@ -158,7 +158,7 @@ export function Step1Customer({ onNext, initialCustomer }: Props) {
       {!showNewForm && (
         <button
           onClick={() => setShowNewForm(true)}
-          className="w-full flex items-center gap-3 border-2 border-dashed border-gray-300 rounded-xl px-4 py-4 text-lg text-gray-500 active:border-blue-400 active:text-blue-600"
+          className="w-full flex items-center gap-3 border-2 border-dashed border-gray-300 rounded-xl px-4 py-4 text-lg text-gray-500 active:border-blue-400 active:text-primary"
         >
           <PlusIcon size={24} />
           새 고객 추가
@@ -200,7 +200,7 @@ export function Step1Customer({ onNext, initialCustomer }: Props) {
             <button
               onClick={handleCreateNew}
               disabled={isPending}
-              className="flex-1 py-3 text-lg bg-blue-600 text-white rounded-xl font-semibold disabled:opacity-50"
+              className="flex-1 py-3 text-lg bg-primary text-white rounded-xl font-semibold disabled:opacity-50"
             >
               {isPending ? "저장 중..." : "저장"}
             </button>

@@ -74,7 +74,7 @@ export function WorkerAssign({ siteId, tasks, workers, assignments }: Props) {
     <>
       <button
         onClick={() => setOpen(true)}
-        className="flex items-center gap-1.5 bg-green-600 text-white px-3 py-2.5 rounded-xl text-base font-semibold active:bg-green-700"
+        className="flex items-center gap-1.5 bg-profit text-white px-3 py-2.5 rounded-xl text-base font-semibold active:bg-green-700"
       >
         <UserPlusIcon size={18} />
         작업자 배정
@@ -96,24 +96,24 @@ export function WorkerAssign({ siteId, tasks, workers, assignments }: Props) {
                 <h3 className="text-base font-semibold text-gray-700 mb-2">현재 배정</h3>
                 <div className="space-y-2">
                   {assignments.map((a, i) => (
-                    <div key={i} className="bg-green-50 border border-green-200 rounded-xl px-4 py-3">
+                    <div key={i} className="bg-profit/10 border border-profit/20 rounded-xl px-4 py-3">
                       <div className="flex items-center justify-between gap-2">
                         <div>
                           <p className="text-base font-semibold text-gray-900">{a.workerName}</p>
-                          <p className="text-sm text-green-700 font-medium">{STATUS_LABEL[a.status] ?? a.status}</p>
+                          <p className="text-sm text-profit font-medium">{STATUS_LABEL[a.status] ?? a.status}</p>
                         </div>
                         <div className="flex items-center gap-2 shrink-0">
                           {a.workerPhone && (
                             <a
                               href={`tel:${a.workerPhone}`}
-                              className="flex items-center gap-1 bg-white border border-green-300 text-green-700 px-3 py-2.5 rounded-xl text-base font-semibold active:bg-green-50"
+                              className="flex items-center gap-1 bg-white border border-green-300 text-profit px-3 py-2.5 rounded-xl text-base font-semibold active:bg-profit/10"
                             >
                               📞 전화
                             </a>
                           )}
                           <a
                             href={`/messages?workerId=${a.workerId}`}
-                            className="flex items-center gap-1 bg-green-600 text-white px-3 py-2.5 rounded-xl text-base font-semibold active:bg-green-700"
+                            className="flex items-center gap-1 bg-profit text-white px-3 py-2.5 rounded-xl text-base font-semibold active:bg-green-700"
                           >
                             <MessageSquareIcon size={15} />
                             문자
@@ -139,7 +139,7 @@ export function WorkerAssign({ siteId, tasks, workers, assignments }: Props) {
                     onClick={() => { setSelectedTask(task); setSelectedWorker(""); }}
                     className={`w-full text-left px-4 py-3 rounded-xl border-2 transition-colors ${
                       selectedTask?.id === task.id
-                        ? "border-blue-500 bg-blue-50"
+                        ? "border-blue-500 bg-primary/10"
                         : "border-gray-200 bg-white"
                     }`}
                   >
@@ -168,14 +168,14 @@ export function WorkerAssign({ siteId, tasks, workers, assignments }: Props) {
                         key={w.id}
                         onClick={() => setSelectedWorker(w.id)}
                         className={`w-full flex items-center justify-between px-4 py-3 rounded-xl border-2 ${
-                          selectedWorker === w.id ? "border-green-500 bg-green-50" : "border-gray-200 bg-white"
+                          selectedWorker === w.id ? "border-green-500 bg-profit/10" : "border-gray-200 bg-white"
                         }`}
                       >
                         <div className="text-left">
                           <p className="text-base font-semibold text-gray-900">{w.name}</p>
                           <p className="text-sm text-gray-500">{w.phone}</p>
                         </div>
-                        {selectedWorker === w.id && <CheckIcon size={20} className="text-green-600 shrink-0" />}
+                        {selectedWorker === w.id && <CheckIcon size={20} className="text-profit shrink-0" />}
                       </button>
                     ))}
                   </div>
@@ -184,7 +184,7 @@ export function WorkerAssign({ siteId, tasks, workers, assignments }: Props) {
             )}
 
             {error && (
-              <div className="bg-red-50 border border-red-200 rounded-xl px-4 py-3 text-red-700 text-base mb-4">
+              <div className="bg-red-50 border border-loss/30 rounded-xl px-4 py-3 text-loss text-base mb-4">
                 {error}
               </div>
             )}
@@ -192,7 +192,7 @@ export function WorkerAssign({ siteId, tasks, workers, assignments }: Props) {
             <button
               onClick={handleAssign}
               disabled={isPending || !selectedTask || !selectedWorker}
-              className="w-full py-4 bg-green-600 text-white rounded-xl text-lg font-bold disabled:opacity-50"
+              className="w-full py-4 bg-profit text-white rounded-xl text-lg font-bold disabled:opacity-50"
             >
               {isPending ? "배정 중..." : "배정 완료"}
             </button>

@@ -111,7 +111,7 @@ export function PaymentCard({ schedule }: { schedule: PaymentBoardItem }) {
     <div className={`relative rounded-2xl bg-white p-5 shadow-sm ${borderCls}`}>
       {/* 긴급도 배지 */}
       {schedule.urgency === "overdue" && (
-        <span className="absolute right-4 top-4 rounded-full bg-red-600 px-3 py-1 text-sm font-bold text-white">
+        <span className="absolute right-4 top-4 rounded-full bg-loss px-3 py-1 text-sm font-bold text-white">
           ⚠️ 연체
         </span>
       )}
@@ -124,10 +124,10 @@ export function PaymentCard({ schedule }: { schedule: PaymentBoardItem }) {
       {/* 고객 / 현장 */}
       <Link
         href={`/sites/${schedule.siteId}?from=/payments`}
-        className="block group -mx-1 px-1 py-2 rounded-xl active:bg-blue-50"
+        className="block group -mx-1 px-1 py-2 rounded-xl active:bg-primary/10"
       >
         <p className="text-xl font-bold text-gray-900">{schedule.customerName}</p>
-        <p className="text-base text-blue-600 underline decoration-blue-200">{schedule.siteName} →</p>
+        <p className="text-base text-primary underline decoration-blue-200">{schedule.siteName} →</p>
       </Link>
 
       {/* 단계 배지 */}
@@ -136,7 +136,7 @@ export function PaymentCard({ schedule }: { schedule: PaymentBoardItem }) {
       </span>
 
       {/* 금액 */}
-      <p className="mt-2 text-3xl font-black text-blue-700">
+      <p className="mt-2 text-3xl font-black text-primary/90">
         {schedule.amount.toLocaleString("ko-KR")}원
       </p>
 
@@ -165,7 +165,7 @@ export function PaymentCard({ schedule }: { schedule: PaymentBoardItem }) {
               type="button"
               onClick={handleMarkPaid}
               disabled={isPending}
-              className="flex h-14 flex-1 items-center justify-center rounded-xl bg-green-600 text-lg font-bold text-white disabled:opacity-50"
+              className="flex h-14 flex-1 items-center justify-center rounded-xl bg-profit text-lg font-bold text-white disabled:opacity-50"
             >
               {isPending ? "처리 중..." : "확인"}
             </button>
@@ -204,7 +204,7 @@ export function PaymentCard({ schedule }: { schedule: PaymentBoardItem }) {
 
       {/* 생성된 문자 초안 — 실제 발송이 아니라 사용자가 문자 앱에서 직접 보냄 */}
       {draft && (
-        <div className="mt-4 rounded-xl border-2 border-blue-200 bg-blue-50 p-4">
+        <div className="mt-4 rounded-xl border-2 border-primary/30 bg-primary/10 p-4">
           <p className="text-base font-bold text-blue-900">
             문자 내용을 만들었어요 — 문자 앱에서 보내주세요
           </p>
@@ -215,7 +215,7 @@ export function PaymentCard({ schedule }: { schedule: PaymentBoardItem }) {
             {smsHref && (
               <a
                 href={smsHref}
-                className="flex items-center justify-center rounded-xl bg-blue-600 py-4 text-lg font-bold text-white"
+                className="flex items-center justify-center rounded-xl bg-primary py-4 text-lg font-bold text-white"
               >
                 📱 문자 앱으로 보내기
               </a>
@@ -247,7 +247,7 @@ export function PaymentCard({ schedule }: { schedule: PaymentBoardItem }) {
               setShowReminders(false);
               setShowPaidForm(true);
             }}
-            className="flex flex-1 items-center justify-center rounded-xl bg-green-600 py-4 text-lg font-bold text-white"
+            className="flex flex-1 items-center justify-center rounded-xl bg-profit py-4 text-lg font-bold text-white"
           >
             ✅ 받았어요
           </button>
@@ -259,7 +259,7 @@ export function PaymentCard({ schedule }: { schedule: PaymentBoardItem }) {
                 return !v;
               })
             }
-            className="flex flex-1 items-center justify-center rounded-xl bg-blue-600 py-4 text-lg font-bold text-white"
+            className="flex flex-1 items-center justify-center rounded-xl bg-primary py-4 text-lg font-bold text-white"
           >
             📱 독촉 문자 만들기
           </button>

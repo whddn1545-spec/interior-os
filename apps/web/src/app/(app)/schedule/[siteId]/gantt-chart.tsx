@@ -1,8 +1,9 @@
 "use client";
 
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import { useRouter } from "next/navigation";
-import { updateTaskStatus } from "./actions";
+import { updateTaskStatus, updateTaskDates } from "./actions";
+import { AlertCircleIcon } from "lucide-react";
 
 interface TaskRow {
   id: string;
@@ -13,6 +14,8 @@ interface TaskRow {
   durationDays: number;
   kind: "work" | "reserve" | "contingency";
   status: string;
+  dependsOn?: string[];
+  tradeId?: string;
 }
 
 interface Props {
@@ -22,7 +25,7 @@ interface Props {
 }
 
 const KIND_COLOR: Record<string, string> = {
-  work: "bg-blue-500",
+  work: "bg-primary/100",
   reserve: "bg-amber-400",
   contingency: "bg-orange-400",
 };
@@ -38,6 +41,13 @@ export function GanttChart({ tasks, siteId, siteName }: Props) {
   const router = useRouter();
   const [selectedTask, setSelectedTask] = useState<TaskRow | null>(null);
   const [updating, setUpdating] = useState(false);
+
+  const [localTasks, setLocalTasks] = useState(tasks);
+  useEffect(() => {
+    setLocalTasks(tasks);
+  }, [tasks]);
+
+  const [dragging, setDragging] = useState<{ id: string; startLeft: number; startX: number } | null>(null);
 
   if (tasks.length === 0) return null;
 
@@ -68,6 +78,80 @@ export function GanttChart({ tasks, siteId, siteName }: Props) {
   }
 
   const dayWidth = Math.max(24, Math.floor(320 / Math.min(totalDays, 30)));
+
+  function checkViolation(task: TaskRow) {
+    if (!task.dependsOn || task.dependsOn.length === 0) return false;
+    for (const depId of task.dependsOn) {
+      const parent = localTasks.find((t) => t.tradeId === depId);
+      if (parent) {
+        if (new Date(task.startDate).getTime() <= new Date(parent.endDate).getTime()) {
+          return true;
+        }
+      }
+    }
+    return false;
+  }
+
+  const handlePointerDown = (e: React.PointerEvent, task: TaskRow) => {
+    if (e.button !== 0 || task.status === "done" || task.status === "canceled") return;
+    setDragging({
+      id: task.id,
+      startLeft: dayOffset(task.startDate),
+      startX: e.clientX,
+    });
+    e.currentTarget.setPointerCapture(e.pointerId);
+  };
+
+  const handlePointerMove = (e: React.PointerEvent) => {
+    if (!dragging) return;
+    const deltaX = e.clientX - dragging.startX;
+    const offsetDays = Math.round(deltaX / dayWidth);
+    
+    setLocalTasks((prev) =>
+      prev.map((t) => {
+        if (t.id === dragging.id) {
+          const newLeft = dragging.startLeft + offsetDays;
+          
+          const newStart = new Date(minDate);
+          newStart.setDate(newStart.getDate() + newLeft);
+          
+          const newEnd = new Date(newStart);
+          newEnd.setDate(newEnd.getDate() + t.durationDays - 1);
+
+          return {
+            ...t,
+            startDate: newStart.toISOString().split("T")[0],
+            endDate: newEnd.toISOString().split("T")[0],
+          };
+        }
+        return t;
+      })
+    );
+  };
+
+  const handlePointerUp = async (e: React.PointerEvent) => {
+    if (!dragging) return;
+    const deltaX = e.clientX - dragging.startX;
+    const task = localTasks.find((t) => t.id === dragging.id);
+    setDragging(null);
+    e.currentTarget.releasePointerCapture(e.pointerId);
+
+    if (Math.abs(deltaX) < 5) {
+      // Treat as click
+      setSelectedTask(selectedTask?.id === task?.id ? null : (task ?? null));
+      return;
+    }
+
+    if (task) {
+      const original = tasks.find((t) => t.id === task.id);
+      if (original && (original.startDate !== task.startDate || original.endDate !== task.endDate)) {
+        setUpdating(true);
+        await updateTaskDates(task.id, task.startDate, task.endDate);
+        setUpdating(false);
+        router.refresh();
+      }
+    }
+  };
 
   async function handleStatusChange(task: TaskRow, newStatus: string) {
     setUpdating(true);
@@ -124,25 +208,31 @@ export function GanttChart({ tasks, siteId, siteName }: Props) {
           </div>
 
           {/* 작업 행 */}
-          {tasks.map((task) => {
+          {localTasks.map((task) => {
             const left = dayOffset(task.startDate);
             const width = dayOffset(task.endDate) - left + 1;
-            const barColor = KIND_COLOR[task.kind] ?? "bg-blue-500";
+            const barColor = KIND_COLOR[task.kind] ?? "bg-primary/100";
             const isDone = task.status === "done";
             const isActive = task.status === "active";
+            const hasViolation = checkViolation(task);
 
             return (
               <div key={task.id} className="flex items-center mb-3">
                 {/* 작업명 */}
-                <div className="w-[120px] shrink-0 pr-2">
-                  <p className="text-base font-semibold text-gray-800 truncate">{task.title}</p>
-                  <p className="text-sm text-gray-500">{task.durationDays}일</p>
+                <div className="w-[120px] shrink-0 pr-2 flex items-center justify-between">
+                  <div className="truncate">
+                    <p className="text-base font-semibold text-gray-800 truncate">{task.title}</p>
+                    <p className="text-sm text-gray-500">{task.durationDays}일</p>
+                  </div>
+                  {hasViolation && (
+                    <AlertCircleIcon size={16} className="text-red-500 shrink-0 ml-1" />
+                  )}
                 </div>
 
                 {/* 바 */}
                 <div className="relative flex-1" style={{ height: 44 }}>
                   {/* 배경 그리드 */}
-                  <div className="absolute inset-0 flex">
+                  <div className="absolute inset-0 flex pointer-events-none">
                     {Array.from({ length: totalDays }).map((_, i) => (
                       <div
                         key={i}
@@ -153,16 +243,24 @@ export function GanttChart({ tasks, siteId, siteName }: Props) {
                   </div>
 
                   {/* 간트 바 */}
-                  <button
-                    onClick={() => setSelectedTask(selectedTask?.id === task.id ? null : task)}
-                    className={`absolute top-1 h-9 rounded-lg text-white text-sm font-semibold flex items-center justify-center shadow-sm active:opacity-80 ${barColor} ${isDone ? "opacity-60" : ""} ${isActive ? "ring-2 ring-offset-1 ring-blue-400" : ""}`}
+                  <div
+                    onPointerDown={(e) => handlePointerDown(e, task)}
+                    onPointerMove={handlePointerMove}
+                    onPointerUp={handlePointerUp}
+                    onPointerCancel={handlePointerUp}
+                    className={`absolute top-1 h-9 rounded-lg text-white text-sm font-semibold flex items-center justify-center shadow-sm ${
+                      isDone || task.status === "canceled" ? "cursor-default opacity-60" : "cursor-ew-resize active:opacity-80"
+                    } ${barColor} ${isActive ? "ring-2 ring-offset-1 ring-blue-400" : ""} ${
+                      hasViolation ? "ring-2 ring-offset-1 ring-red-500" : ""
+                    }`}
                     style={{
                       left: left * dayWidth,
                       width: Math.max(width * dayWidth - 2, 24),
+                      touchAction: "none",
                     }}
                   >
                     {width > 2 ? STATUS_LABEL[task.status] ?? "" : ""}
-                  </button>
+                  </div>
                 </div>
               </div>
             );
@@ -188,7 +286,7 @@ export function GanttChart({ tasks, siteId, siteName }: Props) {
                   disabled={updating || selectedTask.status === s}
                   className={`py-3 rounded-xl text-base font-medium disabled:opacity-40 ${
                     selectedTask.status === s
-                      ? "bg-blue-600 text-white"
+                      ? "bg-primary text-white"
                       : "bg-gray-100 text-gray-700"
                   }`}
                 >

@@ -89,7 +89,7 @@ export function GradeClassifier() {
                   VIP/골드/일반/휴면 등급을 추천해드려요.
                 </p>
                 {error && (
-                  <div className="bg-red-50 border border-red-200 rounded-xl px-4 py-3 text-red-700 text-base mb-4">
+                  <div className="bg-red-50 border border-loss/30 rounded-xl px-4 py-3 text-loss text-base mb-4">
                     {error}
                   </div>
                 )}
@@ -132,7 +132,7 @@ export function GradeClassifier() {
                 </div>
 
                 {error && (
-                  <div className="bg-red-50 border border-red-200 rounded-xl px-4 py-3 text-red-700 text-base mb-4">
+                  <div className="bg-red-50 border border-loss/30 rounded-xl px-4 py-3 text-loss text-base mb-4">
                     {error}
                   </div>
                 )}
@@ -140,7 +140,7 @@ export function GradeClassifier() {
                 <button
                   onClick={handleApply}
                   disabled={isApplying || selected.size === 0}
-                  className="w-full flex items-center justify-center gap-2 py-4 bg-blue-600 text-white rounded-xl text-lg font-bold disabled:opacity-50"
+                  className="w-full flex items-center justify-center gap-2 py-4 bg-primary text-white rounded-xl text-lg font-bold disabled:opacity-50"
                 >
                   <CheckIcon size={22} />
                   {isApplying ? "적용 중..." : `선택한 ${selected.size}명 등급 확정`}

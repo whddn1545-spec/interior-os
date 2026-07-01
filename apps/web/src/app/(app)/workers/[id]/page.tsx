@@ -41,7 +41,7 @@ export default async function WorkerDetailPage({ params }: { params: Promise<{ i
         <h1 className="text-xl font-bold text-gray-900 flex-1">{w.name as string}</h1>
         <a
           href={`tel:${w.phone as string}`}
-          className="flex items-center gap-1 bg-green-100 text-green-700 px-3 py-2.5 rounded-xl text-base font-semibold"
+          className="flex items-center gap-1 bg-green-100 text-profit px-3 py-2.5 rounded-xl text-base font-semibold"
         >
           <PhoneIcon size={16} />
           전화

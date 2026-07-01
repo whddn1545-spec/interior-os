@@ -97,7 +97,7 @@ export default async function PhotosPage() {
                 {/* 현장 종합 허브로 이동 — 견적·일정·받을돈까지 한눈에 */}
                 <Link
                   href={`/sites/${sAny.id as string}?from=/photos`}
-                  className="flex items-center gap-2 border-t border-gray-100 px-4 py-4 text-blue-700 active:bg-blue-50"
+                  className="flex items-center gap-2 border-t border-gray-100 px-4 py-4 text-primary/90 active:bg-primary/10"
                 >
                   <LayoutGridIcon size={18} className="shrink-0" />
                   <span className="flex-1 text-base font-semibold">현장 종합 보기</span>

@@ -234,7 +234,7 @@ export function QuoteActions({ quoteId, status, siteId, customerId, totalAmount 
   return (
     <div className="space-y-3">
       {error && (
-        <div className="bg-red-50 border border-red-200 rounded-xl px-4 py-3 text-red-700 text-base">
+        <div className="bg-red-50 border border-loss/30 rounded-xl px-4 py-3 text-loss text-base">
           {error}
         </div>
       )}
@@ -245,7 +245,7 @@ export function QuoteActions({ quoteId, status, siteId, customerId, totalAmount 
           <button
             onClick={() => setShowConfirmDialog(true)}
             disabled={isPending}
-            className="w-full bg-blue-600 text-white rounded-2xl py-5 text-xl font-bold disabled:opacity-50"
+            className="w-full bg-primary text-white rounded-2xl py-5 text-xl font-bold disabled:opacity-50"
           >
             ✅ 이 금액으로 확정하기
           </button>
@@ -290,7 +290,7 @@ export function QuoteActions({ quoteId, status, siteId, customerId, totalAmount 
           <button
             onClick={() => setShowDeleteDialog(true)}
             disabled={isPending}
-            className="flex items-center justify-center gap-2 w-full bg-red-50 text-red-600 border border-red-200 rounded-2xl py-4 text-lg font-semibold disabled:opacity-50"
+            className="flex items-center justify-center gap-2 w-full bg-red-50 text-loss border border-loss/30 rounded-2xl py-4 text-lg font-semibold disabled:opacity-50"
           >
             <Trash2Icon size={20} />
             이 견적 삭제
@@ -304,7 +304,7 @@ export function QuoteActions({ quoteId, status, siteId, customerId, totalAmount 
           <button
             onClick={() => handleGeneratePdf("customer")}
             disabled={generatingPdf !== null}
-            className="flex items-center justify-center gap-2 w-full bg-blue-600 text-white rounded-2xl py-5 text-xl font-bold disabled:opacity-50"
+            className="flex items-center justify-center gap-2 w-full bg-primary text-white rounded-2xl py-5 text-xl font-bold disabled:opacity-50"
           >
             <FileTextIcon size={22} />
             {generatingPdf === "customer" ? "PDF 생성 중..." : "고객용 견적서 PDF"}
@@ -312,7 +312,7 @@ export function QuoteActions({ quoteId, status, siteId, customerId, totalAmount 
           {pdfUrl && (
             <button
               onClick={handleShare}
-              className="flex items-center justify-center gap-2 w-full bg-blue-50 text-blue-700 border border-blue-200 rounded-2xl py-4 text-lg font-semibold"
+              className="flex items-center justify-center gap-2 w-full bg-primary/10 text-primary/90 border border-primary/30 rounded-2xl py-4 text-lg font-semibold"
             >
               <Share2Icon size={20} />
               PDF 링크 공유하기
@@ -328,7 +328,7 @@ export function QuoteActions({ quoteId, status, siteId, customerId, totalAmount 
           </button>
           <button
             onClick={() => router.push(`/messages?siteId=${siteId}&quoteId=${quoteId}`)}
-            className="flex items-center justify-center gap-2 w-full bg-green-600 text-white rounded-2xl py-4 text-lg font-semibold"
+            className="flex items-center justify-center gap-2 w-full bg-profit text-white rounded-2xl py-4 text-lg font-semibold"
           >
             <MessageSquareIcon size={20} />
             고객에게 문자 보내기
@@ -367,9 +367,9 @@ export function QuoteActions({ quoteId, status, siteId, customerId, totalAmount 
         <div className="fixed inset-0 bg-black/50 z-50 flex items-end">
           <div className="bg-white w-full rounded-t-3xl p-6 pb-8">
             <div className="text-center mb-6">
-              <CheckCircleIcon size={48} className="mx-auto text-blue-600 mb-3" />
+              <CheckCircleIcon size={48} className="mx-auto text-primary mb-3" />
               <h3 className="text-2xl font-bold text-gray-900">이 금액으로 확정할까요?</h3>
-              <p className="text-3xl font-black text-blue-700 mt-2">{formatKRW(totalAmount)}</p>
+              <p className="text-3xl font-black text-primary/90 mt-2">{formatKRW(totalAmount)}</p>
               <p className="text-base text-gray-500 mt-2">
                 확정 후에는 고객용 PDF를 만들거나 계약서를 작성할 수 있어요
               </p>
@@ -378,7 +378,7 @@ export function QuoteActions({ quoteId, status, siteId, customerId, totalAmount 
               <button
                 onClick={handleConfirm}
                 disabled={isPending}
-                className="w-full bg-blue-600 text-white rounded-2xl py-5 text-xl font-bold disabled:opacity-50"
+                className="w-full bg-primary text-white rounded-2xl py-5 text-xl font-bold disabled:opacity-50"
               >
                 {isPending ? "처리 중..." : "네, 확정합니다"}
               </button>
@@ -408,7 +408,7 @@ export function QuoteActions({ quoteId, status, siteId, customerId, totalAmount 
               <button
                 onClick={handleDelete}
                 disabled={isPending}
-                className="w-full bg-red-600 text-white rounded-2xl py-5 text-xl font-bold disabled:opacity-50"
+                className="w-full bg-loss text-white rounded-2xl py-5 text-xl font-bold disabled:opacity-50"
               >
                 {isPending ? "삭제 중..." : "네, 삭제합니다"}
               </button>
@@ -449,7 +449,7 @@ export function QuoteActions({ quoteId, status, siteId, customerId, totalAmount 
                         type="button"
                         onClick={() => { setDepositRate(d); setInterimRate(i); }}
                         className={`py-3 rounded-xl border-2 text-base font-semibold transition-colors ${
-                          isActive ? "border-blue-500 bg-blue-50 text-blue-700" : "border-gray-200 bg-white text-gray-700"
+                          isActive ? "border-blue-500 bg-primary/10 text-primary/90" : "border-gray-200 bg-white text-gray-700"
                         }`}
                       >
                         {label}
@@ -477,7 +477,7 @@ export function QuoteActions({ quoteId, status, siteId, customerId, totalAmount 
                         >
                           −
                         </button>
-                        <span className="text-xl font-black text-blue-700 w-16 text-center">{value}%</span>
+                        <span className="text-xl font-black text-primary/90 w-16 text-center">{value}%</span>
                         <button
                           type="button"
                           onClick={() => set(Math.min(80, value + 5))}
@@ -539,7 +539,7 @@ export function QuoteActions({ quoteId, status, siteId, customerId, totalAmount 
             </p>
 
             {error && (
-              <div className="bg-red-50 border border-red-200 rounded-xl px-4 py-3 mb-4 text-red-700 text-base">
+              <div className="bg-red-50 border border-loss/30 rounded-xl px-4 py-3 mb-4 text-loss text-base">
                 {error}
               </div>
             )}
@@ -594,7 +594,7 @@ export function QuoteActions({ quoteId, status, siteId, customerId, totalAmount 
                 </div>
                 <div className="flex justify-between items-baseline border-t border-gray-300 pt-2 mt-2">
                   <span className="text-lg font-bold text-gray-900">새 합계</span>
-                  <span className="text-2xl font-black text-blue-700">{formatKRW(editPreview.total)}</span>
+                  <span className="text-2xl font-black text-primary/90">{formatKRW(editPreview.total)}</span>
                 </div>
               </div>
             )}
@@ -603,7 +603,7 @@ export function QuoteActions({ quoteId, status, siteId, customerId, totalAmount 
               <button
                 onClick={handleSaveEdit}
                 disabled={isPending || editItems.filter((it) => it.quantity > 0).length === 0}
-                className="w-full bg-blue-600 text-white rounded-2xl py-5 text-xl font-bold disabled:opacity-50"
+                className="w-full bg-primary text-white rounded-2xl py-5 text-xl font-bold disabled:opacity-50"
               >
                 {isPending ? "저장 중..." : "수정 내용 저장하기"}
               </button>

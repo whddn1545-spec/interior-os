@@ -139,7 +139,7 @@ export default function MoodboardPage() {
           <button
             onClick={() => setMode("photo")}
             className={`py-3 rounded-xl text-base font-bold transition-colors active:opacity-70 ${
-              mode === "photo" ? "bg-white text-blue-600 shadow-sm" : "text-gray-500"
+              mode === "photo" ? "bg-white text-primary shadow-sm" : "text-gray-500"
             }`}
           >
             📸 완공 시각화
@@ -147,7 +147,7 @@ export default function MoodboardPage() {
           <button
             onClick={() => setMode("text")}
             className={`py-3 rounded-xl text-base font-bold transition-colors active:opacity-70 ${
-              mode === "text" ? "bg-white text-blue-600 shadow-sm" : "text-gray-500"
+              mode === "text" ? "bg-white text-primary shadow-sm" : "text-gray-500"
             }`}
           >
             ✨ 아이디어 생성
@@ -157,7 +157,7 @@ export default function MoodboardPage() {
         {/* ===== 완공 시각화 모드 ===== */}
         {mode === "photo" && (
           <>
-            <div className="bg-blue-50 border border-blue-200 rounded-2xl p-4 text-sm text-blue-800">
+            <div className="bg-primary/10 border border-primary/30 rounded-2xl p-4 text-sm text-blue-800">
               <strong>공사 전 사진 또는 도면</strong>을 올리고 사용할 자재를 입력하면<br />
               AI가 실제 완공 모습을 시각화해드려요.
             </div>
@@ -188,7 +188,7 @@ export default function MoodboardPage() {
                 <div className="grid grid-cols-2 gap-3">
                   <button
                     onClick={() => cameraRef.current?.click()}
-                    className="flex flex-col items-center gap-2 bg-blue-50 border-2 border-dashed border-blue-300 rounded-2xl py-6 text-blue-600 font-semibold active:bg-blue-100"
+                    className="flex flex-col items-center gap-2 bg-primary/10 border-2 border-dashed border-blue-300 rounded-2xl py-6 text-primary font-semibold active:bg-blue-100"
                   >
                     <CameraIcon size={28} />
                     <span className="text-base">현장 촬영</span>
@@ -210,7 +210,7 @@ export default function MoodboardPage() {
               <div className="grid grid-cols-3 gap-2">
                 {SPACE_TYPES.map(({ value, label }) => (
                   <button key={value} onClick={() => setSpaceType(value)}
-                    className={`py-4 rounded-xl text-base font-semibold transition-colors active:opacity-80 ${spaceType === value ? "bg-blue-600 text-white" : "bg-white border border-gray-300 text-gray-700"}`}>
+                    className={`py-4 rounded-xl text-base font-semibold transition-colors active:opacity-80 ${spaceType === value ? "bg-primary text-white" : "bg-white border border-gray-300 text-gray-700"}`}>
                     {label}
                   </button>
                 ))}
@@ -248,7 +248,7 @@ export default function MoodboardPage() {
               <div className="grid grid-cols-3 gap-2">
                 {STYLES.map(({ value, label }) => (
                   <button key={value} onClick={() => setStyle(value)}
-                    className={`py-4 rounded-xl text-base font-semibold transition-colors active:opacity-80 ${style === value ? "bg-blue-600 text-white" : "bg-white border border-gray-300 text-gray-700"}`}>
+                    className={`py-4 rounded-xl text-base font-semibold transition-colors active:opacity-80 ${style === value ? "bg-primary text-white" : "bg-white border border-gray-300 text-gray-700"}`}>
                     {label}
                   </button>
                 ))}
@@ -263,7 +263,7 @@ export default function MoodboardPage() {
               <div className="grid grid-cols-2 gap-2">
                 {COLOR_OPTIONS.map(({ value, label }) => (
                   <button key={value} onClick={() => toggleColor(value)}
-                    className={`py-4 rounded-xl text-base font-semibold transition-colors active:opacity-80 ${selectedColors.includes(value) ? "bg-blue-600 text-white" : "bg-white border border-gray-300 text-gray-700"}`}>
+                    className={`py-4 rounded-xl text-base font-semibold transition-colors active:opacity-80 ${selectedColors.includes(value) ? "bg-primary text-white" : "bg-white border border-gray-300 text-gray-700"}`}>
                     {label}
                   </button>
                 ))}
@@ -285,13 +285,13 @@ export default function MoodboardPage() {
             </div>
 
             {error && (
-              <div className="bg-red-50 border border-red-200 rounded-xl px-4 py-3 text-red-700 text-sm">{error}</div>
+              <div className="bg-red-50 border border-loss/30 rounded-xl px-4 py-3 text-loss text-sm">{error}</div>
             )}
 
             <button
               onClick={handleGenerateVisualization}
               disabled={isPending || !beforeFile}
-              className="w-full flex items-center justify-center gap-2 py-4 bg-blue-600 text-white rounded-2xl text-lg font-bold disabled:opacity-50"
+              className="w-full flex items-center justify-center gap-2 py-4 bg-primary text-white rounded-2xl text-lg font-bold disabled:opacity-50"
             >
               <SparklesIcon size={22} />
               {isPending ? "AI가 완공 모습 생성 중... (30-60초)" : "AI 완공 시각화"}
@@ -367,7 +367,7 @@ export default function MoodboardPage() {
             </div>
 
             {error && (
-              <div className="bg-red-50 border border-red-200 rounded-xl px-4 py-3 text-red-700 text-sm">{error}</div>
+              <div className="bg-red-50 border border-loss/30 rounded-xl px-4 py-3 text-loss text-sm">{error}</div>
             )}
 
             <button
@@ -403,7 +403,7 @@ function ResultCard({ beforeUrl, afterUrl, label }: { beforeUrl?: string | null;
       )}
 
       <div>
-        {beforeUrl && <p className="text-sm font-semibold text-blue-600 mb-1">AI 완공 시각화</p>}
+        {beforeUrl && <p className="text-sm font-semibold text-primary mb-1">AI 완공 시각화</p>}
         <div className="relative rounded-2xl overflow-hidden border border-gray-200">
           {/* eslint-disable-next-line @next/next/no-img-element */}
           <img src={afterUrl} alt={label} className="w-full" />

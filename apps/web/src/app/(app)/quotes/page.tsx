@@ -56,10 +56,10 @@ export default async function QuotesPage({
 
   const statusColor: Record<string, string> = {
     draft: "bg-gray-100 text-gray-600",
-    confirmed: "bg-blue-100 text-blue-700",
-    sent: "bg-green-100 text-green-700",
+    confirmed: "bg-blue-100 text-primary/90",
+    sent: "bg-green-100 text-profit",
     accepted: "bg-purple-100 text-purple-700",
-    rejected: "bg-red-100 text-red-600",
+    rejected: "bg-red-100 text-loss",
   };
 
   return (
@@ -68,7 +68,7 @@ export default async function QuotesPage({
         <h1 className="text-2xl font-bold text-gray-900">견적</h1>
         <Link
           href="/quotes/new"
-          className="flex items-center gap-1.5 bg-blue-600 text-white px-4 py-2.5 rounded-xl text-base font-semibold"
+          className="flex items-center gap-1.5 bg-primary text-white px-4 py-2.5 rounded-xl text-base font-semibold"
         >
           <PlusIcon size={18} />
           새 견적
@@ -77,12 +77,12 @@ export default async function QuotesPage({
 
       {/* 이번달 요약 */}
       <div className="grid grid-cols-2 gap-3 mb-6">
-        <div className="bg-blue-50 border border-blue-100 rounded-2xl p-4 text-center">
-          <p className="text-2xl font-black text-blue-700">{monthConfirmed.length}건</p>
+        <div className="bg-primary/10 border border-blue-100 rounded-2xl p-4 text-center">
+          <p className="text-2xl font-black text-primary/90">{monthConfirmed.length}건</p>
           <p className="text-sm text-gray-500">이번달 확정 견적</p>
         </div>
-        <div className="bg-green-50 border border-green-100 rounded-2xl p-4 text-center">
-          <p className="text-lg font-black text-green-700">{monthTotal.toLocaleString("ko-KR")}원</p>
+        <div className="bg-profit/10 border border-green-100 rounded-2xl p-4 text-center">
+          <p className="text-lg font-black text-profit">{monthTotal.toLocaleString("ko-KR")}원</p>
           <p className="text-sm text-gray-500">이번달 견적 총액</p>
         </div>
       </div>
@@ -97,7 +97,7 @@ export default async function QuotesPage({
               href={f.key === "all" ? "/quotes" : `/quotes?status=${f.key}`}
               className={`flex h-14 min-w-[88px] flex-1 items-center justify-center rounded-xl px-4 text-base font-bold transition-colors ${
                 isActive
-                  ? "bg-blue-700 text-white"
+                  ? "bg-primary/90 text-white"
                   : "bg-gray-100 text-gray-700 active:bg-gray-200"
               }`}
             >
@@ -110,7 +110,7 @@ export default async function QuotesPage({
       {allQuotes.length === 0 ? (
         <div className="text-center py-16 text-gray-400">
           <p className="text-xl mb-2">아직 견적이 없어요</p>
-          <p className="text-base">위의 "새 견적" 버튼을 눌러 시작하세요</p>
+          <p className="text-base">위의 &quot;새 견적&quot; 버튼을 눌러 시작하세요</p>
         </div>
       ) : visibleQuotes.length === 0 ? (
         <div className="text-center py-16 text-gray-400">

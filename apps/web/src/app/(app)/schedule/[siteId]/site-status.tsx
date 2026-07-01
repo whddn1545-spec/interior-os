@@ -27,11 +27,11 @@ const NEXT_STATUS: Record<
   contracted: {
     next: "in_progress",
     label: "공사 시작",
-    color: "bg-green-600 text-white",
+    color: "bg-profit text-white",
     confirmTitle: "이 현장을 공사 시작으로 바꿀까요?",
     confirmDesc: "공사 시작으로 바꾸면 현장 상태가 '공사중'으로 표시돼요.",
     confirmCta: "네, 공사 시작합니다",
-    confirmColor: "bg-green-600",
+    confirmColor: "bg-profit",
   },
   in_progress: {
     next: "done",
@@ -89,7 +89,7 @@ export function SiteStatusButton({ siteId, currentStatus, variant = "header" }: 
               {isDone ? (
                 <CheckCircleIcon size={48} className="mx-auto text-gray-700 mb-3" />
               ) : (
-                <AlertTriangleIcon size={48} className="mx-auto text-green-600 mb-3" />
+                <AlertTriangleIcon size={48} className="mx-auto text-profit mb-3" />
               )}
               <h3 className="text-2xl font-bold text-gray-900">{next.confirmTitle}</h3>
               <p className="text-base text-gray-500 mt-2">{next.confirmDesc}</p>

@@ -68,6 +68,7 @@ export function QuoteWizard({ initialCustomer }: QuoteWizardProps) {
       // 저장된 draft가 같은 고객이면 그대로 이어쓰기
       const sameCustomer = savedState.customer?.id === initialCustomer.id;
       if (sameCustomer) {
+        // eslint-disable-next-line react-hooks/set-state-in-effect
         setStep(savedStep);
         setState(savedState);
       } else {
@@ -119,9 +120,9 @@ export function QuoteWizard({ initialCustomer }: QuoteWizardProps) {
                   <div
                     className={`w-7 h-7 rounded-full flex items-center justify-center text-sm font-bold shrink-0 ${
                       isActive
-                        ? "bg-blue-600 text-white"
+                        ? "bg-primary text-white"
                         : isDone
-                        ? "bg-green-500 text-white"
+                        ? "bg-profit/100 text-white"
                         : "bg-gray-200 text-gray-400"
                     }`}
                   >
@@ -129,7 +130,7 @@ export function QuoteWizard({ initialCustomer }: QuoteWizardProps) {
                   </div>
                   <span
                     className={`text-xs ${
-                      isActive ? "text-blue-600 font-semibold" : "text-gray-400"
+                      isActive ? "text-primary font-semibold" : "text-gray-400"
                     }`}
                   >
                     {label}

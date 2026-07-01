@@ -67,7 +67,7 @@ export function PhotoUploader({ siteId }: PhotoUploaderProps) {
       />
 
       {isPending ? (
-        <div className="w-full flex items-center justify-center gap-3 bg-blue-50 border-2 border-dashed border-blue-300 rounded-2xl py-8 text-blue-600 font-semibold text-lg">
+        <div className="w-full flex items-center justify-center gap-3 bg-primary/10 border-2 border-dashed border-blue-300 rounded-2xl py-8 text-primary font-semibold text-lg">
           <UploadIcon size={28} className="animate-bounce" />
           {status ?? "업로드 중..."}
         </div>
@@ -75,7 +75,7 @@ export function PhotoUploader({ siteId }: PhotoUploaderProps) {
         <div className="grid grid-cols-2 gap-3">
           <button
             onClick={() => cameraInputRef.current?.click()}
-            className="flex flex-col items-center gap-2 bg-blue-50 border-2 border-dashed border-blue-300 rounded-2xl py-6 text-blue-600 font-semibold active:bg-blue-100"
+            className="flex flex-col items-center gap-2 bg-primary/10 border-2 border-dashed border-blue-300 rounded-2xl py-6 text-primary font-semibold active:bg-blue-100"
           >
             <CameraIcon size={28} />
             <span className="text-base">카메라 촬영</span>
@@ -91,13 +91,13 @@ export function PhotoUploader({ siteId }: PhotoUploaderProps) {
       )}
 
       {error && (
-        <div className="mt-2 bg-red-50 border border-red-200 rounded-xl px-4 py-2 text-red-700 text-sm">
+        <div className="mt-2 bg-red-50 border border-loss/30 rounded-xl px-4 py-2 text-loss text-sm">
           {error}
         </div>
       )}
 
       {!isPending && status && (
-        <div className="mt-2 bg-green-50 border border-green-200 rounded-xl px-4 py-2 text-green-700 text-sm">
+        <div className="mt-2 bg-profit/10 border border-profit/20 rounded-xl px-4 py-2 text-profit text-sm">
           {status}
         </div>
       )}

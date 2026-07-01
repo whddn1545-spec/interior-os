@@ -110,10 +110,10 @@ export function PriceEditor({ trades, prices, showSeedButton }: Props) {
   return (
     <div>
       {error && (
-        <div className="bg-red-50 border border-red-200 rounded-xl px-4 py-3 text-red-700 mb-4">{error}</div>
+        <div className="bg-red-50 border border-loss/30 rounded-xl px-4 py-3 text-loss mb-4">{error}</div>
       )}
       {success && (
-        <div className="bg-green-50 border border-green-200 rounded-xl px-4 py-3 text-green-700 mb-4 flex items-center gap-2">
+        <div className="bg-profit/10 border border-profit/20 rounded-xl px-4 py-3 text-profit mb-4 flex items-center gap-2">
           <CheckIcon size={18} /> {success}
         </div>
       )}
@@ -122,7 +122,7 @@ export function PriceEditor({ trades, prices, showSeedButton }: Props) {
         <button
           onClick={handleSeedDefaults}
           disabled={isPending}
-          className="w-full bg-blue-600 text-white rounded-2xl py-4 text-lg font-bold mb-6 disabled:opacity-50"
+          className="w-full bg-primary text-white rounded-2xl py-4 text-lg font-bold mb-6 disabled:opacity-50"
         >
           {isPending ? "불러오는 중..." : "📥 업계 기본 단가 불러오기"}
         </button>
@@ -198,7 +198,7 @@ export function PriceEditor({ trades, prices, showSeedButton }: Props) {
                 {addingTradeId !== trade.id && (
                   <button
                     onClick={() => startAdd(trade.id)}
-                    className="flex items-center gap-2 text-blue-600 font-semibold text-base mt-1 py-3 px-1 active:opacity-70"
+                    className="flex items-center gap-2 text-primary font-semibold text-base mt-1 py-3 px-1 active:opacity-70"
                   >
                     <PlusIcon size={18} />
                     단가 추가
@@ -252,7 +252,7 @@ function PriceForm({
       : null;
 
   return (
-    <div className="bg-blue-50 rounded-xl p-3 mb-3 space-y-3">
+    <div className="bg-primary/10 rounded-xl p-3 mb-3 space-y-3">
       <div>
         <label className="text-base font-semibold text-gray-700 mb-1 block">자재명</label>
         <p className="text-sm text-gray-500 mb-1.5">어떤 자재인지 적어주세요. 예) 강마루, 실크벽지</p>
@@ -318,7 +318,7 @@ function PriceForm({
         <button
           onClick={onSave}
           disabled={isPending || !form.itemName}
-          className="flex-1 bg-blue-600 text-white rounded-lg py-4 text-base font-semibold disabled:opacity-50"
+          className="flex-1 bg-primary text-white rounded-lg py-4 text-base font-semibold disabled:opacity-50"
         >
           {isPending ? "저장 중..." : "저장"}
         </button>

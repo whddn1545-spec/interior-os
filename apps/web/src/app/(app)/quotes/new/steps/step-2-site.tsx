@@ -136,7 +136,7 @@ export function Step2Site({ customerId, onNext, onBack }: Props) {
                   onClick={() => setSelectedZoneId(zone.id)}
                   className={`py-3 px-4 rounded-xl border-2 text-base font-medium text-left ${
                     selectedZoneId === zone.id
-                      ? "border-blue-500 bg-blue-50 text-blue-700"
+                      ? "border-blue-500 bg-primary/10 text-primary/90"
                       : "border-gray-200 bg-white text-gray-700"
                   }`}
                 >
@@ -158,7 +158,7 @@ export function Step2Site({ customerId, onNext, onBack }: Props) {
                 onClick={() => setDifficulty(key)}
                 className={`py-3 px-2 rounded-xl border-2 text-sm font-medium ${
                   difficulty === key
-                    ? "border-blue-500 bg-blue-50 text-blue-700"
+                    ? "border-blue-500 bg-primary/10 text-primary/90"
                     : "border-gray-200 bg-white text-gray-700"
                 }`}
               >
@@ -218,7 +218,7 @@ export function Step2Site({ customerId, onNext, onBack }: Props) {
         <button
           onClick={handleNext}
           disabled={isPending}
-          className="flex-1 py-4 text-lg bg-blue-600 text-white rounded-xl font-semibold disabled:opacity-50"
+          className="flex-1 py-4 text-lg bg-primary text-white rounded-xl font-semibold disabled:opacity-50"
         >
           {isPending ? "저장 중..." : "다음 ▶"}
         </button>

@@ -156,7 +156,7 @@ export function WorkerEditForm({ worker }: { worker: Worker }) {
       </div>
 
       {error && (
-        <div className="bg-red-50 border border-red-200 rounded-xl px-4 py-3 text-red-700 text-base">
+        <div className="bg-red-50 border border-loss/30 rounded-xl px-4 py-3 text-loss text-base">
           {error}
         </div>
       )}
@@ -164,18 +164,18 @@ export function WorkerEditForm({ worker }: { worker: Worker }) {
       <button
         type="submit"
         disabled={isPending}
-        className="w-full bg-blue-600 text-white py-4 rounded-xl text-lg font-bold disabled:opacity-50"
+        className="w-full bg-primary text-white py-4 rounded-xl text-lg font-bold disabled:opacity-50"
       >
         {isPending ? "저장 중..." : "저장하기"}
       </button>
 
       {showDeactivateConfirm ? (
-        <div className="bg-red-50 border border-red-200 rounded-2xl p-4">
+        <div className="bg-red-50 border border-loss/30 rounded-2xl p-4">
           <p className="text-base font-semibold text-red-900 mb-1">작업자를 숨길까요?</p>
-          <p className="text-sm text-red-700 mb-3">목록에서 사라지며 복구할 수 없어요.</p>
+          <p className="text-sm text-loss mb-3">목록에서 사라지며 복구할 수 없어요.</p>
           <div className="flex gap-2">
             <button type="button" onClick={() => setShowDeactivateConfirm(false)} className="flex-1 py-3 rounded-xl border border-gray-300 text-gray-700 text-base font-medium">아니요</button>
-            <button type="button" onClick={confirmDeactivate} disabled={isDeactivating} className="flex-1 py-3 rounded-xl bg-red-600 text-white text-base font-bold disabled:opacity-50">네, 숨기기</button>
+            <button type="button" onClick={confirmDeactivate} disabled={isDeactivating} className="flex-1 py-3 rounded-xl bg-loss text-white text-base font-bold disabled:opacity-50">네, 숨기기</button>
           </div>
         </div>
       ) : (
@@ -183,7 +183,7 @@ export function WorkerEditForm({ worker }: { worker: Worker }) {
           type="button"
           onClick={handleDeactivate}
           disabled={isDeactivating}
-          className="w-full py-3 border-2 border-red-300 text-red-600 rounded-xl text-base font-semibold disabled:opacity-50"
+          className="w-full py-3 border-2 border-red-300 text-loss rounded-xl text-base font-semibold disabled:opacity-50"
         >
           {isDeactivating ? "처리 중..." : "작업자 숨기기"}
         </button>

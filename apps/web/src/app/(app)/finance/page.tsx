@@ -89,19 +89,19 @@ export default async function FinancePage() {
 
       {/* 이번 달 요약 */}
       <div className="grid grid-cols-3 gap-3 mb-4">
-        <div className="bg-green-50 border border-green-100 rounded-2xl p-4 text-center">
-          <TrendingUpIcon size={20} className="mx-auto text-green-600 mb-1" />
-          <p className="text-lg font-black text-green-700">{totalIn.toLocaleString("ko-KR")}원</p>
+        <div className="bg-profit/10 border border-green-100 rounded-2xl p-4 text-center">
+          <TrendingUpIcon size={20} className="mx-auto text-profit mb-1" />
+          <p className="text-lg font-black text-profit">{totalIn.toLocaleString("ko-KR")}원</p>
           <p className="text-xs text-gray-500">이번 달 수입</p>
         </div>
         <div className="bg-red-50 border border-red-100 rounded-2xl p-4 text-center">
           <TrendingDownIcon size={20} className="mx-auto text-red-500 mb-1" />
-          <p className="text-lg font-black text-red-600">{totalOut.toLocaleString("ko-KR")}원</p>
+          <p className="text-lg font-black text-loss">{totalOut.toLocaleString("ko-KR")}원</p>
           <p className="text-xs text-gray-500">이번 달 지출</p>
         </div>
-        <div className="bg-blue-50 border border-blue-100 rounded-2xl p-4 text-center">
+        <div className="bg-primary/10 border border-blue-100 rounded-2xl p-4 text-center">
           <p className="text-xs text-gray-500 mb-1">순이익</p>
-          <p className={`text-lg font-black ${totalIn - totalOut >= 0 ? "text-blue-700" : "text-red-600"}`}>
+          <p className={`text-lg font-black ${totalIn - totalOut >= 0 ? "text-primary/90" : "text-loss"}`}>
             {(totalIn - totalOut).toLocaleString("ko-KR")}원
           </p>
         </div>
@@ -111,9 +111,9 @@ export default async function FinancePage() {
       <div className="bg-white border border-gray-200 rounded-2xl px-4 py-3 mb-6">
         <p className="text-sm text-gray-500 mb-2">{now.getFullYear()}년 누적</p>
         <div className="flex justify-between text-base">
-          <span className="text-green-600 font-semibold">수입 {yearIn.toLocaleString("ko-KR")}원</span>
+          <span className="text-profit font-semibold">수입 {yearIn.toLocaleString("ko-KR")}원</span>
           <span className="text-red-500 font-semibold">지출 {yearOut.toLocaleString("ko-KR")}원</span>
-          <span className={`font-bold ${yearIn - yearOut >= 0 ? "text-blue-700" : "text-red-600"}`}>
+          <span className={`font-bold ${yearIn - yearOut >= 0 ? "text-primary/90" : "text-loss"}`}>
             순이익 {(yearIn - yearOut).toLocaleString("ko-KR")}원
           </span>
         </div>
@@ -157,7 +157,7 @@ export default async function FinancePage() {
       {!entries || entries.length === 0 ? (
         <div className="text-center py-12 text-gray-400 bg-white rounded-2xl border border-gray-100">
           <p className="text-lg">이번 달 내역이 없어요</p>
-          <p className="text-base mt-1">위의 "입출금 추가" 버튼을 눌러 기록하세요</p>
+          <p className="text-base mt-1">위의 &quot;입출금 추가&quot; 버튼을 눌러 기록하세요</p>
         </div>
       ) : (
         <div className="space-y-2">

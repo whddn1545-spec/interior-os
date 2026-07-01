@@ -26,6 +26,7 @@ export default function PwaGuidePage() {
   const [installed, setInstalled] = useState(false);
 
   useEffect(() => {
+    // eslint-disable-next-line react-hooks/set-state-in-effect
     setOs(detectOS());
     setInstalled(isStandalone());
   }, []);
@@ -57,9 +58,9 @@ export default function PwaGuidePage() {
         <h1 className="text-2xl font-bold text-gray-900">홈 화면에 추가</h1>
       </div>
 
-      <div className="bg-blue-50 border border-blue-100 rounded-2xl px-4 py-4 mb-6">
+      <div className="bg-primary/10 border border-blue-100 rounded-2xl px-4 py-4 mb-6">
         <p className="text-base font-semibold text-blue-800 mb-1">앱처럼 사용하는 방법</p>
-        <p className="text-sm text-blue-600">
+        <p className="text-sm text-primary">
           홈 화면에 추가하면 앱처럼 전체화면으로 열려요.<br />
           인터넷 없이도 일부 기능을 사용할 수 있어요.
         </p>
@@ -76,7 +77,7 @@ export default function PwaGuidePage() {
               { step: 4, icon: "✅", text: "오른쪽 위 '추가'를 누르면 완료!" },
             ].map(({ step, icon, text }) => (
               <li key={step} className="flex items-start gap-4 bg-white border border-gray-200 rounded-2xl px-4 py-4">
-                <span className="w-8 h-8 bg-blue-600 text-white rounded-full flex items-center justify-center text-base font-bold shrink-0">
+                <span className="w-8 h-8 bg-primary text-white rounded-full flex items-center justify-center text-base font-bold shrink-0">
                   {step}
                 </span>
                 <div>
@@ -88,7 +89,7 @@ export default function PwaGuidePage() {
           </ol>
           <div className="bg-amber-50 border border-amber-200 rounded-xl px-4 py-3 mt-4">
             <p className="text-sm text-amber-700">
-              ⚠️ Safari가 아닌 다른 브라우저(크롬 등)에서는 '홈 화면에 추가'가 안 보일 수 있어요.
+              ⚠️ Safari가 아닌 다른 브라우저(크롬 등)에서는 &apos;홈 화면에 추가&apos;가 안 보일 수 있어요.
               반드시 Safari로 접속해주세요.
             </p>
           </div>
@@ -106,7 +107,7 @@ export default function PwaGuidePage() {
               { step: 4, icon: "✅", text: "'추가' 또는 '설치'를 눌러 완료!" },
             ].map(({ step, icon, text }) => (
               <li key={step} className="flex items-start gap-4 bg-white border border-gray-200 rounded-2xl px-4 py-4">
-                <span className="w-8 h-8 bg-blue-600 text-white rounded-full flex items-center justify-center text-base font-bold shrink-0">
+                <span className="w-8 h-8 bg-primary text-white rounded-full flex items-center justify-center text-base font-bold shrink-0">
                   {step}
                 </span>
                 <div>
@@ -129,7 +130,7 @@ export default function PwaGuidePage() {
               { step: 3, icon: "✅", text: "'설치'를 눌러 완료!" },
             ].map(({ step, icon, text }) => (
               <li key={step} className="flex items-start gap-4 bg-white border border-gray-200 rounded-2xl px-4 py-4">
-                <span className="w-8 h-8 bg-blue-600 text-white rounded-full flex items-center justify-center text-base font-bold shrink-0">
+                <span className="w-8 h-8 bg-primary text-white rounded-full flex items-center justify-center text-base font-bold shrink-0">
                   {step}
                 </span>
                 <div>

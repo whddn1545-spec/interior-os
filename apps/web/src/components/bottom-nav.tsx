@@ -21,7 +21,7 @@ export function BottomNav() {
   }
 
   return (
-    <nav className="fixed bottom-0 left-0 right-0 bg-white border-t border-gray-200 z-50">
+    <nav className="fixed bottom-0 inset-x-0 z-50 bg-card/95 backdrop-blur border-t border-border pb-[env(safe-area-inset-bottom)]">
       <ul className="flex">
         {tabs.map(({ href, label, icon: Icon, exact, also }) => {
           const active = isActive(href, exact, also);
@@ -29,15 +29,16 @@ export function BottomNav() {
             <li key={href} className="flex-1">
               <Link
                 href={href}
-                className={`relative flex flex-col items-center gap-1 py-3 transition-colors active:opacity-70 ${
-                  active ? "text-blue-600" : "text-gray-400"
+                aria-current={active ? "page" : undefined}
+                className={`relative flex flex-col items-center justify-center gap-1 min-h-16 py-2.5 transition-colors motion-safe:active:scale-[0.96] ${
+                  active ? "text-primary" : "text-muted-foreground"
                 }`}
               >
                 {active && (
-                  <span className="absolute top-0 left-1/2 -translate-x-1/2 w-10 h-0.5 bg-blue-600 rounded-b-full" />
+                  <span className="absolute top-0 left-1/2 -translate-x-1/2 w-10 h-1 bg-primary rounded-b-full" />
                 )}
-                <Icon size={26} strokeWidth={active ? 2.5 : 1.5} />
-                <span className={`text-xs ${active ? "font-bold" : "font-medium"}`}>
+                <Icon size={26} strokeWidth={active ? 2.5 : 1.75} />
+                <span className={`text-[13px] ${active ? "font-bold" : "font-medium"}`}>
                   {label}
                 </span>
               </Link>

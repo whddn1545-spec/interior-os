@@ -32,7 +32,7 @@ export function FinanceEntryItem({ id, direction, amount, paidAt, siteName, memo
       <div className="flex items-center justify-between gap-2">
         <div className="flex-1 min-w-0">
           <div className="flex items-center gap-2">
-            <span className={`text-xs px-2 py-0.5 rounded-full font-medium ${isIn ? "bg-green-100 text-green-700" : "bg-red-100 text-red-600"}`}>
+            <span className={`text-xs px-2 py-0.5 rounded-full font-medium ${isIn ? "bg-green-100 text-profit" : "bg-red-100 text-loss"}`}>
               {isIn ? "수입" : "지출"}
             </span>
             <p className="text-base font-semibold text-gray-900 truncate">{categoryLabel}</p>
@@ -43,7 +43,7 @@ export function FinanceEntryItem({ id, direction, amount, paidAt, siteName, memo
           {memo && <p className="text-sm text-gray-400">{memo}</p>}
         </div>
         <div className="flex items-center gap-2 shrink-0">
-          <p className={`text-xl font-bold ${isIn ? "text-green-600" : "text-red-500"}`}>
+          <p className={`text-xl font-bold ${isIn ? "text-profit" : "text-red-500"}`}>
             {isIn ? "+" : "-"}{amount.toLocaleString("ko-KR")}원
           </p>
           <button
@@ -57,13 +57,13 @@ export function FinanceEntryItem({ id, direction, amount, paidAt, siteName, memo
       </div>
 
       {confirmDelete && (
-        <div className="mt-3 bg-red-50 border border-red-200 rounded-xl p-3">
-          <p className="text-base font-semibold text-red-700 mb-2">이 내역을 삭제할까요?</p>
+        <div className="mt-3 bg-red-50 border border-loss/30 rounded-xl p-3">
+          <p className="text-base font-semibold text-loss mb-2">이 내역을 삭제할까요?</p>
           <div className="flex gap-2">
             <button
               onClick={handleDelete}
               disabled={isPending}
-              className="flex-1 bg-red-500 text-white py-2.5 rounded-xl text-base font-semibold disabled:opacity-50 active:bg-red-600"
+              className="flex-1 bg-loss text-white py-2.5 rounded-xl text-base font-semibold disabled:opacity-50 active:bg-loss"
             >
               {isPending ? "삭제 중..." : "삭제"}
             </button>

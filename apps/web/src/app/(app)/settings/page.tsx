@@ -49,8 +49,8 @@ export default async function SettingsPage() {
               i < MENU.length - 1 ? "border-b border-gray-100" : ""
             }`}
           >
-            <div className="w-10 h-10 bg-blue-50 rounded-xl flex items-center justify-center shrink-0">
-              <Icon size={20} className="text-blue-600" />
+            <div className="w-10 h-10 bg-primary/10 rounded-xl flex items-center justify-center shrink-0">
+              <Icon size={20} className="text-primary" />
             </div>
             <div className="flex-1 min-w-0">
               <p className="text-base font-semibold text-gray-900">{label}</p>
@@ -66,7 +66,7 @@ export default async function SettingsPage() {
         <form action="/api/auth/signout" method="POST">
           <button
             type="submit"
-            className="w-full flex items-center gap-4 px-4 py-4 text-red-600 active:bg-red-50"
+            className="w-full flex items-center gap-4 px-4 py-4 text-loss active:bg-loss/10"
           >
             <div className="w-10 h-10 bg-red-50 rounded-xl flex items-center justify-center shrink-0">
               <LogOutIcon size={20} className="text-red-500" />

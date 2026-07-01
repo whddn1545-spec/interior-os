@@ -52,7 +52,7 @@ export default async function WorkersPage({
           </Link>
           <Link
             href="/workers/new"
-            className="flex items-center gap-1.5 bg-blue-600 text-white px-4 py-3 rounded-xl text-base font-semibold"
+            className="flex items-center gap-1.5 bg-primary text-white px-4 py-3 rounded-xl text-base font-semibold"
           >
             <PlusIcon size={18} />
             추가
@@ -91,7 +91,7 @@ export default async function WorkersPage({
           </div>
           <button
             type="submit"
-            className="rounded-xl bg-blue-600 px-5 py-4 text-base font-semibold text-white active:bg-blue-700"
+            className="rounded-xl bg-primary px-5 py-4 text-base font-semibold text-white active:bg-primary/90"
           >
             검색
           </button>
@@ -101,7 +101,7 @@ export default async function WorkersPage({
       {query && (
         <Link
           href="/workers"
-          className="mb-4 inline-block text-base font-medium text-blue-600"
+          className="mb-4 inline-block text-base font-medium text-primary"
         >
           검색 초기화 ✕
         </Link>
@@ -118,7 +118,7 @@ export default async function WorkersPage({
           {!query && (
             <Link
               href="/workers/new"
-              className="inline-flex items-center gap-2 bg-blue-600 text-white rounded-2xl px-8 py-4 text-lg font-bold active:bg-blue-700"
+              className="inline-flex items-center gap-2 bg-primary text-white rounded-2xl px-8 py-4 text-lg font-bold active:bg-primary/90"
             >
               <PlusIcon size={20} />
               작업자 추가하기
@@ -155,7 +155,7 @@ export default async function WorkersPage({
                   <a
                     href={`tel:${wAny.phone as string}`}
                     onClick={(e) => e.stopPropagation()}
-                    className="flex items-center gap-1 bg-green-100 text-green-700 px-3 py-2.5 rounded-xl text-base font-semibold shrink-0"
+                    className="flex items-center gap-1 bg-green-100 text-profit px-3 py-2.5 rounded-xl text-base font-semibold shrink-0"
                   >
                     <PhoneIcon size={16} />
                     전화

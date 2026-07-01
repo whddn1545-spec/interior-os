@@ -46,7 +46,7 @@ export function MissingScheduleBanner({ quotes }: { quotes: MissingScheduleQuote
       </div>
 
       {error && (
-        <p className="mb-3 rounded-xl bg-red-50 px-3 py-2 text-base text-red-700">{error}</p>
+        <p className="mb-3 rounded-xl bg-red-50 px-3 py-2 text-base text-loss">{error}</p>
       )}
 
       <div className="flex flex-col gap-3">
@@ -57,7 +57,7 @@ export function MissingScheduleBanner({ quotes }: { quotes: MissingScheduleQuote
           >
             <p className="text-lg font-bold text-gray-900">{q.customerName}</p>
             <p className="text-base text-gray-600">{q.siteName}</p>
-            <p className="mt-1 text-xl font-black text-blue-700">
+            <p className="mt-1 text-xl font-black text-primary/90">
               {q.totalAmount.toLocaleString("ko-KR")}원
             </p>
             <button

@@ -39,7 +39,7 @@ export default async function CustomerDetailPage({ params }: { params: Promise<{
         <div className="flex items-center gap-2">
           <a
             href={`tel:${c.phone as string}`}
-            className="flex items-center gap-1 bg-green-100 text-green-700 px-3 py-2.5 rounded-xl text-base font-semibold shrink-0"
+            className="flex items-center gap-1 bg-green-100 text-profit px-3 py-2.5 rounded-xl text-base font-semibold shrink-0"
           >
             <PhoneIcon size={16} />
             전화
@@ -56,7 +56,7 @@ export default async function CustomerDetailPage({ params }: { params: Promise<{
           />
           <Link
             href={`/quotes/new?customerId=${id}`}
-            className="flex items-center gap-1 bg-blue-100 text-blue-700 px-3 py-2.5 rounded-xl text-base font-semibold"
+            className="flex items-center gap-1 bg-blue-100 text-primary/90 px-3 py-2.5 rounded-xl text-base font-semibold"
           >
             <FileTextIcon size={16} />
             새 견적
@@ -68,7 +68,7 @@ export default async function CustomerDetailPage({ params }: { params: Promise<{
         {/* 고객 정보 */}
         <div className="bg-white rounded-2xl p-4 border border-gray-100">
           <div className="flex items-center gap-4 mb-4">
-            <div className="w-16 h-16 bg-blue-100 rounded-full flex items-center justify-center text-3xl font-bold text-blue-700">
+            <div className="w-16 h-16 bg-blue-100 rounded-full flex items-center justify-center text-3xl font-bold text-primary/90">
               {(c.name as string).charAt(0)}
             </div>
             <div>
@@ -79,7 +79,7 @@ export default async function CustomerDetailPage({ params }: { params: Promise<{
           <div className="space-y-2 text-base">
             <div className="flex justify-between">
               <span className="text-gray-500">연락처</span>
-              <a href={`tel:${c.phone as string}`} className="font-medium text-blue-600">{c.phone as string}</a>
+              <a href={`tel:${c.phone as string}`} className="font-medium text-primary">{c.phone as string}</a>
             </div>
             {(c.address as string | null) && (
               <div className="flex justify-between">
@@ -112,7 +112,7 @@ export default async function CustomerDetailPage({ params }: { params: Promise<{
           {!sites || sites.length === 0 ? (
             <div className="bg-white rounded-2xl p-6 text-center text-gray-400 border border-gray-100">
               <p className="text-lg">아직 현장이 없어요</p>
-              <Link href={`/quotes/new?customerId=${id}`} className="mt-2 inline-block text-base text-blue-600">새 견적 만들기 →</Link>
+              <Link href={`/quotes/new?customerId=${id}`} className="mt-2 inline-block text-base text-primary">새 견적 만들기 →</Link>
             </div>
           ) : (
             <div className="space-y-2">
@@ -132,7 +132,7 @@ export default async function CustomerDetailPage({ params }: { params: Promise<{
                         {STATUS_LABEL[sAny.status as string] ?? sAny.status as string}
                         {totalRevenue > 0 ? ` · ${totalRevenue.toLocaleString("ko-KR")}원` : ""}
                       </p>
-                      <p className="text-sm text-blue-600 mt-0.5">현장 정보 · 견적 · 사진 보기</p>
+                      <p className="text-sm text-primary mt-0.5">현장 정보 · 견적 · 사진 보기</p>
                     </div>
                     <ChevronRightIcon size={18} className="text-gray-300 shrink-0" />
                   </Link>

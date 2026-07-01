@@ -91,7 +91,7 @@ export default async function CustomersPage({
           </Link>
           <Link
             href="/customers/new"
-            className="flex items-center gap-1.5 bg-blue-600 text-white px-4 py-2.5 rounded-xl text-base font-semibold"
+            className="flex items-center gap-1.5 bg-primary text-white px-4 py-2.5 rounded-xl text-base font-semibold"
           >
             <PlusIcon size={18} />
             추가
@@ -128,7 +128,7 @@ export default async function CustomersPage({
           </div>
           <button
             type="submit"
-            className="rounded-xl bg-blue-600 px-5 py-4 text-base font-semibold text-white active:bg-blue-700"
+            className="rounded-xl bg-primary px-5 py-4 text-base font-semibold text-white active:bg-primary/90"
           >
             검색
           </button>
@@ -138,7 +138,7 @@ export default async function CustomersPage({
       {query && (
         <Link
           href={activeGrade === "all" ? "/customers" : `/customers?grade=${activeGrade}`}
-          className="mb-3 inline-block text-base font-medium text-blue-600"
+          className="mb-3 inline-block text-base font-medium text-primary"
         >
           검색 초기화 ✕
         </Link>
@@ -158,7 +158,7 @@ export default async function CustomersPage({
               href={qs ? `/customers?${qs}` : "/customers"}
               className={`flex h-14 min-w-[72px] flex-1 items-center justify-center rounded-xl px-4 text-base font-bold transition-colors ${
                 isActive
-                  ? "bg-blue-700 text-white"
+                  ? "bg-primary/90 text-white"
                   : "bg-gray-100 text-gray-700 active:bg-gray-200"
               }`}
             >
@@ -182,7 +182,7 @@ export default async function CustomersPage({
           {!query && activeGrade === "all" && (
             <Link
               href="/customers/new"
-              className="inline-flex items-center gap-2 bg-blue-600 text-white rounded-2xl px-8 py-4 text-lg font-bold active:bg-blue-700"
+              className="inline-flex items-center gap-2 bg-primary text-white rounded-2xl px-8 py-4 text-lg font-bold active:bg-primary/90"
             >
               <PlusIcon size={20} />
               고객 추가하기
@@ -201,7 +201,7 @@ export default async function CustomersPage({
                   href={`/customers/${cAny.id as string}`}
                   className="flex items-center gap-3 bg-white border border-gray-200 rounded-2xl px-4 py-4 active:bg-gray-50"
                 >
-                  <div className="w-12 h-12 bg-blue-100 rounded-full flex items-center justify-center text-xl font-bold text-blue-700 shrink-0">
+                  <div className="w-12 h-12 bg-blue-100 rounded-full flex items-center justify-center text-xl font-bold text-primary/90 shrink-0">
                     {(cAny.name as string).charAt(0)}
                   </div>
                   <div className="flex-1 min-w-0">
@@ -216,7 +216,7 @@ export default async function CustomersPage({
                   <a
                     href={`tel:${cAny.phone as string}`}
                     onClick={(e) => e.stopPropagation()}
-                    className="flex items-center gap-1 bg-green-100 text-green-700 px-3 py-2.5 rounded-xl text-base font-semibold shrink-0"
+                    className="flex items-center gap-1 bg-green-100 text-profit px-3 py-2.5 rounded-xl text-base font-semibold shrink-0"
                   >
                     <PhoneIcon size={16} />
                     전화

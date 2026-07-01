@@ -99,7 +99,7 @@ export default function HelpCenterPage() {
                   {pageLink && pageLinkLabel && (
                     <Link
                       href={pageLink}
-                      className="flex items-center justify-center gap-2 bg-blue-600 text-white rounded-2xl py-4 text-lg font-bold mt-2 active:bg-blue-700"
+                      className="flex items-center justify-center gap-2 bg-primary text-white rounded-2xl py-4 text-lg font-bold mt-2 active:bg-primary/90"
                     >
                       {pageLinkLabel}
                       <ChevronRightIcon size={20} />
