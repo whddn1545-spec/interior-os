@@ -95,26 +95,42 @@ export default async function HomePage() {
 
   // 3. 이번달 KPI
   const startOfMonth = new Date(now.getFullYear(), now.getMonth(), 1).toISOString().split("T")[0];
+  const startOfLastMonth = new Date(now.getFullYear(), now.getMonth() - 1, 1).toISOString().split("T")[0];
+  const endOfLastMonth = new Date(now.getFullYear(), now.getMonth(), 0).toISOString().split("T")[0];
   let monthIncome = 0;
+  let lastMonthIncome = 0;
   let activeCount = 0;
   try {
-    const [incomeRes, activeSitesRes] = await Promise.all([
+    const [incomeRes, lastMonthRes, activeSitesRes] = await Promise.all([
       supabase
         .from("finance_entries")
         .select("amount")
         .eq("direction", "in")
         .gte("paid_at", startOfMonth),
       supabase
+        .from("finance_entries")
+        .select("amount")
+        .eq("direction", "in")
+        .gte("paid_at", startOfLastMonth)
+        .lte("paid_at", endOfLastMonth),
+      supabase
         .from("sites")
         .select("id", { count: "exact", head: true })
         .in("status", ["contracted", "in_progress"]),
     ]);
     monthIncome = (incomeRes.data ?? []).reduce((s, e) => s + Number((e as { amount: number }).amount), 0);
+    lastMonthIncome = (lastMonthRes.data ?? []).reduce((s, e) => s + Number((e as { amount: number }).amount), 0);
     activeCount = activeSitesRes.count ?? 0;
   } catch {
     monthIncome = 0;
+    lastMonthIncome = 0;
     activeCount = 0;
   }
+
+  // 전월 대비 성장률
+  const momGrowth = lastMonthIncome > 0
+    ? Math.round(((monthIncome - lastMonthIncome) / lastMonthIncome) * 100)
+    : null;
 
   // 4. 미처리 A/S 건수
   let openAsCount = 0;
@@ -238,15 +254,28 @@ export default async function HomePage() {
             href="/finance"
             className="bg-card border border-border rounded-2xl p-4 active:bg-muted"
           >
-            <p className="text-xl font-black text-primary tabular-nums truncate">
-              {monthIncome > 0
-                ? monthIncome >= 100000000
-                  ? `${(monthIncome / 100000000).toFixed(1)}억`
-                  : monthIncome >= 10000000
-                    ? `${Math.round(monthIncome / 1000000)}백만`
-                    : `${Math.round(monthIncome / 10000)}만`
-                : "—"}
-            </p>
+            <div className="flex items-start justify-between gap-1">
+              <p className="text-xl font-black text-primary tabular-nums truncate">
+                {monthIncome > 0
+                  ? monthIncome >= 100000000
+                    ? `${(monthIncome / 100000000).toFixed(1)}억`
+                    : monthIncome >= 10000000
+                      ? `${Math.round(monthIncome / 1000000)}백만`
+                      : `${Math.round(monthIncome / 10000)}만`
+                  : "—"}
+              </p>
+              {momGrowth !== null && (
+                <span className={`text-xs font-bold px-1.5 py-0.5 rounded-full shrink-0 mt-0.5 ${
+                  momGrowth > 0
+                    ? "bg-profit/15 text-profit"
+                    : momGrowth < 0
+                      ? "bg-loss/15 text-loss"
+                      : "bg-muted text-muted-foreground"
+                }`}>
+                  {momGrowth > 0 ? "↑" : momGrowth < 0 ? "↓" : "→"}{Math.abs(momGrowth)}%
+                </span>
+              )}
+            </div>
             <p className="text-sm text-muted-foreground mt-0.5">이번달 입금</p>
           </Link>
         </div>
