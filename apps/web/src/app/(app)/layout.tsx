@@ -6,10 +6,46 @@ import { Toaster } from "@/components/ui/sonner";
 import { createClient } from "@/lib/supabase/server";
 import { OfflineBanner } from "@/components/offline-banner";
 
+async function getHomeBadgeCount(supabase: Awaited<ReturnType<typeof createClient>>) {
+  const now = new Date();
+  const sevenDaysAgo = new Date(now.getTime() - 7 * 24 * 60 * 60 * 1000).toISOString();
+  const today = now.toISOString().split("T")[0];
+
+  const [acceptedRes, signedRes, overdueRes, asRes] = await Promise.allSettled([
+    supabase
+      .from("quotes")
+      .select("id", { count: "exact", head: true })
+      .eq("status", "accepted")
+      .gte("updated_at", sevenDaysAgo),
+    supabase
+      .from("contracts")
+      .select("id", { count: "exact", head: true })
+      .eq("status", "signed")
+      .gte("updated_at", sevenDaysAgo),
+    supabase
+      .from("payment_schedules")
+      .select("id", { count: "exact", head: true })
+      .is("paid_at", null)
+      .lt("due_date", today),
+    supabase
+      .from("as_requests")
+      .select("id", { count: "exact", head: true })
+      .neq("status", "closed"),
+  ]);
+
+  const n = (r: PromiseSettledResult<{ count: number | null }>) =>
+    r.status === "fulfilled" ? (r.value.count ?? 0) : 0;
+
+  return n(acceptedRes) + n(signedRes) + n(overdueRes) + n(asRes);
+}
+
 export default async function AppLayout({ children }: { children: React.ReactNode }) {
   const supabase = await createClient();
   const { data: { user } } = await supabase.auth.getUser();
   if (!user) redirect("/login");
+
+  const homeBadge = await getHomeBadgeCount(supabase).catch(() => 0);
+
   return (
     <div className="flex flex-col min-h-screen bg-background">
       <OfflineBanner />
@@ -29,7 +65,7 @@ export default async function AppLayout({ children }: { children: React.ReactNod
 
       <main className="flex-1 pb-24">{children}</main>
 
-      <BottomNav />
+      <BottomNav homeBadge={homeBadge} />
 
       <Toaster position="top-center" richColors toastOptions={{ style: { fontSize: "18px" } }} />
     </div>

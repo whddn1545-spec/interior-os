@@ -12,7 +12,11 @@ const tabs = [
   { href: "/customers", label: "고객", icon: UsersIcon, exact: false, also: [] as string[] },
 ];
 
-export function BottomNav() {
+interface BottomNavProps {
+  homeBadge?: number;
+}
+
+export function BottomNav({ homeBadge = 0 }: BottomNavProps) {
   const pathname = usePathname();
 
   function isActive(href: string, exact: boolean, also: string[]) {
@@ -25,6 +29,7 @@ export function BottomNav() {
       <ul className="flex">
         {tabs.map(({ href, label, icon: Icon, exact, also }) => {
           const active = isActive(href, exact, also);
+          const badge = href === "/" && homeBadge > 0 ? homeBadge : 0;
           return (
             <li key={href} className="flex-1">
               <Link
@@ -37,7 +42,14 @@ export function BottomNav() {
                 {active && (
                   <span className="absolute top-0 left-1/2 -translate-x-1/2 w-10 h-1 bg-primary rounded-b-full" />
                 )}
-                <Icon size={26} strokeWidth={active ? 2.5 : 1.75} />
+                <span className="relative inline-flex">
+                  <Icon size={26} strokeWidth={active ? 2.5 : 1.75} />
+                  {badge > 0 && (
+                    <span className="absolute -top-1.5 -right-2 min-w-[18px] h-[18px] bg-loss text-white text-[11px] font-black rounded-full flex items-center justify-center px-1 leading-none">
+                      {badge > 99 ? "99+" : badge}
+                    </span>
+                  )}
+                </span>
                 <span className={`text-[13px] ${active ? "font-bold" : "font-medium"}`}>
                   {label}
                 </span>
