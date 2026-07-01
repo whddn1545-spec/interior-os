@@ -132,7 +132,24 @@ export default async function HomePage() {
     ? Math.round(((monthIncome - lastMonthIncome) / lastMonthIncome) * 100)
     : null;
 
-  // 4. 미처리 A/S 건수
+  // 4. 고객이 수락한 미확인 견적 (최근 7일 이내 accepted 상태)
+  const sevenDaysAgo = new Date(now.getTime() - 7 * 24 * 60 * 60 * 1000).toISOString();
+  type AcceptedQuote = { id: string; total_amount: number; sites: { name: string; id: string } | null };
+  let acceptedQuotes: AcceptedQuote[] = [];
+  try {
+    const { data } = await supabase
+      .from("quotes")
+      .select("id, total_amount, sites(id, name)")
+      .eq("status", "accepted")
+      .gte("updated_at", sevenDaysAgo)
+      .order("updated_at", { ascending: false })
+      .limit(5);
+    acceptedQuotes = (data as unknown as AcceptedQuote[]) ?? [];
+  } catch {
+    acceptedQuotes = [];
+  }
+
+  // 5. 미처리 A/S 건수
   let openAsCount = 0;
   try {
     const { count } = await supabase
@@ -406,6 +423,39 @@ export default async function HomePage() {
           받을 돈 전체 보기
         </Link>
       </section>
+
+      {/* 고객 수락 알림 */}
+      {acceptedQuotes.length > 0 && (
+        <section>
+          <h2 className="text-xl font-bold text-foreground mb-3">🎉 고객이 수락한 견적</h2>
+          <div className="space-y-2">
+            {acceptedQuotes.map((q) => {
+              const site = first(q.sites);
+              return (
+                <Link
+                  key={q.id}
+                  href={`/quotes/${q.id}?from=/`}
+                  className="flex items-center gap-3 bg-profit/10 border border-profit/30 rounded-2xl px-5 py-4 active:opacity-80"
+                >
+                  <span className="text-2xl shrink-0">✅</span>
+                  <div className="flex-1 min-w-0">
+                    <p className="text-base font-bold text-foreground truncate">
+                      {site?.name ?? "현장"}
+                    </p>
+                    <p className="text-sm text-profit font-semibold">고객이 견적을 수락했어요!</p>
+                  </div>
+                  <p className="text-base font-black text-foreground tabular-nums shrink-0">
+                    {Number(q.total_amount).toLocaleString("ko-KR")}원
+                  </p>
+                </Link>
+              );
+            })}
+          </div>
+          <p className="text-sm text-muted-foreground mt-2 text-center">
+            계약서를 만들거나 공사 일정을 잡아보세요
+          </p>
+        </section>
+      )}
 
       {/* A/S 처리 알림 */}
       {openAsCount > 0 && (

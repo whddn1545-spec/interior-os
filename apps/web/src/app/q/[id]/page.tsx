@@ -2,6 +2,7 @@ import { notFound } from "next/navigation";
 import { createAdminClient } from "@/lib/supabase/admin";
 import { formatKRW } from "@interior-os/core/pricing";
 import type { Metadata } from "next";
+import { AcceptButton } from "./accept-button";
 
 export const dynamic = "force-dynamic";
 
@@ -177,6 +178,16 @@ export default async function PublicQuotePage({ params }: { params: Promise<{ id
             </div>
           </div>
         </div>
+
+        {/* 고객 수락 버튼 — confirmed / sent / accepted 상태에서 표시 */}
+        {(q.status === "confirmed" || q.status === "sent" || q.status === "accepted") && (
+          <AcceptButton
+            quoteId={q.id}
+            totalAmount={q.total_amount}
+            siteName={s.name}
+            isAlreadyAccepted={q.status === "accepted"}
+          />
+        )}
 
         {/* 업체 연락처 CTA */}
         {t && (
