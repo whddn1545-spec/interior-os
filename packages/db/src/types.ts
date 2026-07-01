@@ -155,6 +155,14 @@ export type WorkerAttendanceRow = {
   work_date: string; day_rate: number; note: string | null;
   paid_at: string | null; created_at: string;
 };
+export type ConsultationNoteRow = {
+  id: string; tenant_id: string; customer_id: string;
+  raw_transcript: string; summary: string;
+  requirements: string[]; action_items: string[];
+  quote_hints: Json;
+  audio_duration_seconds: number | null;
+  created_at: string;
+};
 
 // Nullable 필드를 optional로 변환 (Supabase CLI 생성 타입과 동일한 패턴)
 type NullableToOptional<T> =
@@ -193,8 +201,9 @@ export type Database = {
       ai_invocations:   T<AiInvocationRow, InsertBase<AiInvocationRow>, never>;
       audit_logs:       T<AuditLogRow,     InsertBase<AuditLogRow>,     never>;
       payment_records:  T<PaymentRecordRow>;
-      payment_schedules: T<PaymentScheduleRow>;
-      worker_attendance: T<WorkerAttendanceRow>;
+      payment_schedules:   T<PaymentScheduleRow>;
+      worker_attendance:   T<WorkerAttendanceRow>;
+      consultation_notes:  T<ConsultationNoteRow, InsertBase<ConsultationNoteRow>, never>;
     };
     Views: { [_ in never]: never };
     Functions: { [_ in never]: never };
@@ -227,4 +236,5 @@ export type InstagramPost = InstagramPostRow;
 export type AiInvocation = AiInvocationRow;
 export type AuditLog = AuditLogRow;
 export type PaymentSchedule = PaymentScheduleRow;
+export type ConsultationNote = ConsultationNoteRow;
 export type WorkerAttendance = WorkerAttendanceRow;
