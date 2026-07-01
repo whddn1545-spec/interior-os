@@ -171,6 +171,11 @@ export type AsRequestRow = {
   resolved_at: string | null;
   created_at: string; updated_at: string;
 };
+export type SiteChecklistItemRow = {
+  id: string; tenant_id: string; site_id: string;
+  phase_key: string; done_at: string | null;
+  created_at: string;
+};
 
 // Nullable 필드를 optional로 변환 (Supabase CLI 생성 타입과 동일한 패턴)
 type NullableToOptional<T> =
@@ -213,6 +218,7 @@ export type Database = {
       worker_attendance:   T<WorkerAttendanceRow>;
       consultation_notes:  T<ConsultationNoteRow, InsertBase<ConsultationNoteRow>, never>;
       as_requests:         T<AsRequestRow>;
+      site_checklist_items: T<SiteChecklistItemRow>;
     };
     Views: { [_ in never]: never };
     Functions: { [_ in never]: never };

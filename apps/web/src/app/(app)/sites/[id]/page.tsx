@@ -17,6 +17,7 @@ import {
 import { createClient } from "@/lib/supabase/server";
 import { formatKRW } from "@interior-os/core/pricing";
 import { SiteEditForm } from "./site-edit-form";
+import { ChecklistTab, type PhaseKey } from "./checklist-tab";
 
 export const dynamic = "force-dynamic";
 
@@ -48,6 +49,7 @@ const TABS = [
   { key: "quotes", label: "견적" },
   { key: "photos", label: "사진" },
   { key: "finance", label: "받을돈" },
+  { key: "checklist", label: "공정" },
 ] as const;
 
 type TabKey = (typeof TABS)[number]["key"];
@@ -91,7 +93,7 @@ export default async function SiteHubPage({
   };
   const customer = siteAny.customers;
 
-  // 현장 1건에 묶인 견적·계약·사진수·일정수·결제스케줄·지출내역·A/S를 한 번에 조회
+  // 현장 1건에 묶인 견적·계약·사진수·일정수·결제스케줄·지출내역·A/S·체크리스트를 한 번에 조회
   const [
     { data: quotes },
     { data: contract },
@@ -100,6 +102,7 @@ export default async function SiteHubPage({
     { data: payments },
     { data: financeEntries },
     { count: openAsCount },
+    { data: checklistItems },
   ] = await Promise.all([
     supabase
       .from("quotes")
@@ -129,10 +132,18 @@ export default async function SiteHubPage({
       .select("id", { count: "exact", head: true })
       .eq("site_id", id)
       .neq("status", "closed"),
+    supabase
+      .from("site_checklist_items")
+      .select("phase_key, done_at")
+      .eq("site_id", id)
+      .not("done_at", "is", null),
   ]);
 
   const quoteList =
     (quotes as { id: string; version: number; status: string; total_amount: number; created_at: string }[] | null) ?? [];
+  const donePhaseKeys = ((checklistItems ?? []) as { phase_key: string; done_at: string | null }[])
+    .filter((c) => c.done_at)
+    .map((c) => c.phase_key as PhaseKey);
   const latestQuote = quoteList[0] ?? null;
   const contractAny = contract as { id: string; status: string } | null;
   const photoTotal = photoCount ?? 0;
@@ -208,7 +219,9 @@ export default async function SiteHubPage({
                 ? photoTotal
                 : t.key === "finance"
                   ? paymentList.filter((p) => !p.paid_at).length
-                  : 0;
+                  : t.key === "checklist"
+                    ? donePhaseKeys.length
+                    : 0;
           return (
             <Link
               key={t.key}
@@ -538,6 +551,16 @@ export default async function SiteHubPage({
             </div>
             <ChevronRightIcon size={20} className="text-muted-foreground/50 shrink-0" />
           </Link>
+        )}
+
+        {/* 공정 탭 */}
+        {activeTab === "checklist" && (
+          <ChecklistTab
+            siteId={id}
+            siteName={siteAny.name}
+            customerName={customer?.name ?? null}
+            doneKeys={donePhaseKeys}
+          />
         )}
 
         {/* 받을돈 탭 */}
