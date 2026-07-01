@@ -2,7 +2,7 @@
 
 import { useState, useTransition } from "react";
 import { useRouter } from "next/navigation";
-import { FileTextIcon, CheckCircleIcon, MessageSquareIcon, CalendarPlusIcon, Share2Icon } from "lucide-react";
+import { FileTextIcon, CheckCircleIcon, MessageSquareIcon, CalendarPlusIcon, Share2Icon, LinkIcon } from "lucide-react";
 import { toast } from "sonner";
 
 interface Props {
@@ -107,6 +107,21 @@ export function ContractActions({ contractId, status, siteId }: Props) {
           >
             <CalendarPlusIcon size={22} />
             공사 일정 만들기
+          </button>
+          <button
+            onClick={async () => {
+              const url = `${window.location.origin}/c/${contractId}`;
+              if (navigator.share) {
+                await navigator.share({ title: "계약서 서명 요청", text: "인테리어 계약서를 확인하고 서명해주세요", url }).catch(() => {});
+              } else {
+                await navigator.clipboard.writeText(url);
+                toast.success("서명 링크가 복사되었어요", { description: "고객에게 보내주세요" });
+              }
+            }}
+            className="flex items-center justify-center gap-2 w-full bg-profit text-white rounded-2xl py-4 text-lg font-bold active:bg-green-700"
+          >
+            <LinkIcon size={20} />
+            고객 서명 링크 공유하기
           </button>
           <button
             onClick={handleGeneratePdf}
