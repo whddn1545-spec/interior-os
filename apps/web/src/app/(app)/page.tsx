@@ -3,6 +3,8 @@ import { createClient } from "@/lib/supabase/server";
 import { HelpButton } from "@/components/tutorial/HelpButton";
 import { PwaInstallBanner } from "@/components/pwa-install-banner";
 import { HomePaymentCard } from "./home-payment-card";
+import { HomeWorkerReminders } from "./home-worker-reminders";
+import { getTomorrowWorkerReminders, type TomorrowReminder } from "./reminder-actions";
 
 export const dynamic = "force-dynamic";
 
@@ -149,6 +151,15 @@ export default async function HomePage() {
     acceptedQuotes = (data as unknown as AcceptedQuote[]) ?? [];
   } catch {
     acceptedQuotes = [];
+  }
+
+  // 3b. 내일 공사 작업자 리마인드 (노쇼 방지)
+  let tomorrowReminders: TomorrowReminder[] = [];
+  try {
+    const res = await getTomorrowWorkerReminders();
+    if (res.ok) tomorrowReminders = res.data;
+  } catch {
+    tomorrowReminders = [];
   }
 
   // 4a. 무응답 견적 — 보낸 지 3일 넘게 수락/거절이 없는 견적 (팔로업 대상)
@@ -455,6 +466,9 @@ export default async function HomePage() {
           받을 돈 전체 보기
         </Link>
       </section>
+
+      {/* 내일 공사 — 작업자 리마인드 (노쇼 방지) */}
+      <HomeWorkerReminders reminders={tomorrowReminders} />
 
       {/* 무응답 견적 팔로업 */}
       {staleQuotes.length > 0 && (

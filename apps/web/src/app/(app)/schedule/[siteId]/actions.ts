@@ -3,7 +3,7 @@
 import { createClient } from "@/lib/supabase/server";
 import { getTenantId } from "@/lib/supabase/get-tenant";
 import { revalidatePath } from "next/cache";
-import { calcSchedule, offsetToDate } from "@interior-os/core/pricing";
+import { calcSchedule, offsetToDate, planDelayShift } from "@interior-os/core/pricing";
 import type { ScheduleItemInput } from "@interior-os/core/pricing";
 import type { ActionResult } from "../../quotes/new/actions";
 
@@ -175,24 +175,50 @@ export async function assignWorker(
   // trade_id가 없으면 배정 불가 (assignments.trade_id NOT NULL)
   if (!tradeId) return { ok: false, error: "공종 정보가 없어 배정할 수 없어요" };
 
-  // 같은 현장에 동일 작업자가 이미 배정된 경우 교체
-  await supabase.from("assignments").delete().eq("site_id", siteId).eq("worker_id", workerId);
+  // 같은 현장에 동일 작업자가 이미 배정된 경우 교체.
+  // 삭제 전에 이 배정을 참조하는 작업의 assignment_id를 먼저 끊는다 (FK 잔존 방지).
+  const { data: oldAssignments } = await supabase
+    .from("assignments")
+    .select("id")
+    .eq("site_id", siteId)
+    .eq("worker_id", workerId);
+  const oldIds = ((oldAssignments ?? []) as { id: string }[]).map((a) => a.id);
+  if (oldIds.length > 0) {
+    await supabase
+      .from("schedule_tasks")
+      .update({ assignment_id: null })
+      .in("assignment_id", oldIds);
+    await supabase.from("assignments").delete().in("id", oldIds);
+  }
 
   // eslint-disable-next-line @typescript-eslint/no-explicit-any
-  const { error } = await (supabase.from("assignments") as any).insert({
-    tenant_id: tenantId,
-    site_id: siteId,
-    worker_id: workerId,
-    trade_id: tradeId,
-    start_date: startDate,
-    end_date: endDate,
-    status: "proposed",
-  });
+  const { data: newAssignment, error } = await (supabase.from("assignments") as any)
+    .insert({
+      tenant_id: tenantId,
+      site_id: siteId,
+      worker_id: workerId,
+      trade_id: tradeId,
+      start_date: startDate,
+      end_date: endDate,
+      status: "proposed",
+    })
+    .select("id")
+    .single();
 
   if (error) return { ok: false, error: error.message };
 
-  // schedule_task에 assignment_id 업데이트는 조회 후 처리 (단순화)
+  // 작업에 배정을 연결 — 이게 있어야 홈 카드/아침 브리핑/리마인드에 작업자가 표시된다
+  const newAssignmentId = (newAssignment as { id: string } | null)?.id;
+  if (newAssignmentId) {
+    const { error: linkError } = await supabase
+      .from("schedule_tasks")
+      .update({ assignment_id: newAssignmentId })
+      .eq("id", taskId);
+    if (linkError) return { ok: false, error: linkError.message };
+  }
+
   revalidatePath(`/schedule/${siteId}`);
+  revalidatePath("/");
   return { ok: true, data: undefined };
 }
 
@@ -211,6 +237,53 @@ export async function updateSiteStatus(
   revalidatePath(`/schedule/${siteId}`);
   revalidatePath("/");
   return { ok: true, data: undefined };
+}
+
+/**
+ * 밀린 일정 일괄 재계산 — 계산은 @interior-os/core의 순수 함수(planDelayShift)가 담당.
+ * 가장 밀린 미완료 작업의 종료를 오늘로 늘리고, 그 뒤에 시작하는 작업들을 같은 날수만큼 민다.
+ */
+export async function applyDelayShift(siteId: string): Promise<ActionResult<{ delayDays: number; movedCount: number }>> {
+  const supabase = await createClient();
+  const { data: { user } } = await supabase.auth.getUser();
+  if (!user) return { ok: false, error: "로그인이 필요합니다" };
+
+  const { data: tasks, error } = await supabase
+    .from("schedule_tasks")
+    .select("id, start_date, end_date, status")
+    .eq("site_id", siteId);
+  if (error) return { ok: false, error: error.message };
+
+  const kstNow = new Date(Date.now() + 9 * 60 * 60 * 1000);
+  const todayStr = new Date(
+    Date.UTC(kstNow.getUTCFullYear(), kstNow.getUTCMonth(), kstNow.getUTCDate())
+  ).toISOString().split("T")[0];
+
+  const plan = planDelayShift(
+    ((tasks ?? []) as { id: string; start_date: string | null; end_date: string | null; status: string }[])
+      .filter((t) => t.start_date && t.end_date)
+      .map((t) => ({
+        id: t.id,
+        startDate: t.start_date!,
+        endDate: t.end_date!,
+        status: t.status,
+      })),
+    todayStr
+  );
+
+  if (!plan) return { ok: false, error: "밀린 일정이 없어요" };
+
+  for (const u of plan.updates) {
+    const { error: updateError } = await supabase
+      .from("schedule_tasks")
+      .update({ start_date: u.startDate, end_date: u.endDate })
+      .eq("id", u.id);
+    if (updateError) return { ok: false, error: updateError.message };
+  }
+
+  revalidatePath(`/schedule/${siteId}`);
+  revalidatePath("/");
+  return { ok: true, data: { delayDays: plan.delayDays, movedCount: plan.updates.length } };
 }
 
 /** 작업 상태 변경 */

@@ -96,7 +96,7 @@ async function loadTenantInfo(
   const tenantId = await getTenantId(supabase, user);
   const { data: tenant } = await supabase
     .from("tenants")
-    .select("business_name, owner_name, default_settings")
+    .select("business_name, owner_name, default_settings, owner_phone, bank_account")
     .eq("id", tenantId)
     .maybeSingle();
   if (!tenant) return empty;
@@ -105,12 +105,15 @@ async function loadTenantInfo(
     business_name: string | null;
     owner_name: string | null;
     default_settings: unknown;
+    owner_phone: string | null;
+    bank_account: string | null;
   };
+  // 전용 컬럼(설정 화면에서 입력) 우선, 과거 default_settings(jsonb) 값은 폴백
   return {
     businessName: t.business_name?.trim() || null,
     ownerName: t.owner_name?.trim() || null,
-    contactPhone: extractContactPhone(t.default_settings),
-    bankAccount: extractBankAccount(t.default_settings),
+    contactPhone: t.owner_phone?.trim() || extractContactPhone(t.default_settings),
+    bankAccount: t.bank_account?.trim() || extractBankAccount(t.default_settings),
   };
 }
 

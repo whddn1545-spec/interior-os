@@ -11,10 +11,12 @@ import {
   UserIcon,
 } from "lucide-react";
 import { createClient } from "@/lib/supabase/server";
+import { planDelayShift } from "@interior-os/core/pricing";
 import { GanttChart } from "./gantt-chart";
 import { ScheduleSetup } from "./schedule-setup";
 import { WorkerAssign } from "./worker-assign";
 import { SiteStatusButton } from "./site-status";
+import { DelayBanner } from "./delay-banner";
 
 const SITE_STATUS_LABEL: Record<string, string> = {
   lead: "상담중",
@@ -126,6 +128,30 @@ export default async function SchedulePage({ params, searchParams }: { params: P
       endDate: tAny.end_date as string,
     };
   }).filter((t) => t.tradeCode !== null);
+
+  // 밀린 일정 감지 — 진행 중 현장에서만 (완료/취소된 현장은 과거 데이터)
+  const delayPlan =
+    siteStatus === "in_progress" || siteStatus === "contracted"
+      ? planDelayShift(
+          (tasks ?? [])
+            .map((t) => {
+              const tAny = t as unknown as Record<string, unknown>;
+              return {
+                id: tAny.id as string,
+                startDate: (tAny.start_date as string | null) ?? "",
+                endDate: (tAny.end_date as string | null) ?? "",
+                status: tAny.status as string,
+              };
+            })
+            .filter((t) => t.startDate && t.endDate),
+          todayStr
+        )
+      : null;
+  const overdueTaskTitle = delayPlan
+    ? (((tasks ?? []).find(
+        (t) => (t as unknown as Record<string, unknown>).id === delayPlan.overdueTaskId
+      ) as unknown as Record<string, unknown> | undefined)?.title as string | undefined) ?? "작업"
+    : null;
 
   const assignmentList = (assignments ?? []).map((a) => {
     const aAny = a as unknown as Record<string, unknown>;
@@ -248,6 +274,15 @@ export default async function SchedulePage({ params, searchParams }: { params: P
       </div>
 
       <div className="px-4 pt-6">
+        {/* 밀린 일정 경고 + 원탭 재계산 */}
+        {delayPlan && overdueTaskTitle && (
+          <DelayBanner
+            siteId={siteId}
+            overdueTitle={overdueTaskTitle}
+            delayDays={delayPlan.delayDays}
+            followingCount={delayPlan.updates.length - 1}
+          />
+        )}
         {hasTasks ? (
           <GanttChart
             tasks={(tasks ?? []).map((t) => {
