@@ -461,6 +461,29 @@ export async function duplicateQuote(
   return { ok: true, data: { quoteId: newQuote.id } };
 }
 
+/**
+ * 견적을 '보냄' 상태로 전이 (confirmed → sent).
+ * 사장님이 고객에게 견적을 공유(PDF 링크·문자·AI 문자 복사)하는 순간 호출.
+ * 이 시점부터 '답 없는 견적' 팔로업 대상이 된다. 이미 sent/accepted면 조용히 성공 처리.
+ */
+export async function markQuoteSent(quoteId: string): Promise<ActionResult<void>> {
+  const supabase = await createClient();
+  const { data: { user } } = await supabase.auth.getUser();
+  if (!user) return { ok: false, error: "로그인이 필요합니다" };
+
+  // confirmed일 때만 sent로 — 다른 상태면 no-op (공유는 부수 신호라 실패로 막지 않음)
+  const { error } = await supabase
+    .from("quotes")
+    .update({ status: "sent" as const })
+    .eq("id", quoteId)
+    .eq("status", "confirmed" as const);
+
+  if (error) return { ok: false, error: error.message };
+  revalidatePath(`/quotes/${quoteId}`);
+  revalidatePath("/");
+  return { ok: true, data: undefined };
+}
+
 /** 견적 상태 되돌리기 (confirmed → draft) */
 export async function revertQuoteToDraft(quoteId: string): Promise<ActionResult<void>> {
   const supabase = await createClient();

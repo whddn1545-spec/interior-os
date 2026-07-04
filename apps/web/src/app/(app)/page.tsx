@@ -150,6 +150,28 @@ export default async function HomePage() {
     acceptedQuotes = [];
   }
 
+  // 4a. 무응답 견적 — 보낸 지 3일 넘게 수락/거절이 없는 견적 (팔로업 대상)
+  const staleBefore = new Date(now.getTime() - 3 * 24 * 60 * 60 * 1000).toISOString();
+  type StaleQuote = {
+    id: string;
+    total_amount: number;
+    updated_at: string;
+    sites: { name: string; customers: { name: string; phone: string | null } | { name: string; phone: string | null }[] | null } | null;
+  };
+  let staleQuotes: StaleQuote[] = [];
+  try {
+    const { data } = await supabase
+      .from("quotes")
+      .select("id, total_amount, updated_at, sites(name, customers(name, phone))")
+      .eq("status", "sent")
+      .lt("updated_at", staleBefore)
+      .order("updated_at", { ascending: true })
+      .limit(5);
+    staleQuotes = (data as unknown as StaleQuote[]) ?? [];
+  } catch {
+    staleQuotes = [];
+  }
+
   // 4b. 고객이 서명한 계약 (최근 7일)
   type SignedContract = { id: string; sites: { id: string; name: string } | null };
   let signedContracts: SignedContract[] = [];
@@ -444,6 +466,57 @@ export default async function HomePage() {
           받을 돈 전체 보기
         </Link>
       </section>
+
+      {/* 무응답 견적 팔로업 */}
+      {staleQuotes.length > 0 && (
+        <section>
+          <h2 className="text-xl font-bold text-foreground mb-3">⏰ 답이 없는 견적</h2>
+          <div className="space-y-2">
+            {staleQuotes.map((q) => {
+              const site = first(q.sites);
+              const customer = first(site?.customers ?? null);
+              const daysAgo = Math.max(
+                1,
+                Math.floor((now.getTime() - new Date(q.updated_at).getTime()) / (24 * 60 * 60 * 1000))
+              );
+              const followUpBody = `${customer?.name ?? "고객"}님, 안녕하세요. 지난번 보내드린 ${site?.name ?? ""} 견적 검토는 어떠셨나요? 궁금한 점 있으시면 편하게 말씀 주세요 🙂`;
+              return (
+                <div
+                  key={q.id}
+                  className="bg-card border border-warning/40 rounded-2xl px-5 py-4"
+                >
+                  <Link href={`/quotes/${q.id}?from=/`} className="block active:opacity-80">
+                    <div className="flex items-center justify-between gap-3">
+                      <div className="min-w-0">
+                        <p className="text-xl font-bold text-foreground truncate">
+                          {customer?.name ?? site?.name ?? "고객"}
+                        </p>
+                        <p className="text-base text-muted-foreground truncate">
+                          {site?.name ?? "현장"} · 보낸 지 {daysAgo}일째
+                        </p>
+                      </div>
+                      <p className="text-xl font-black text-foreground tabular-nums shrink-0">
+                        {Number(q.total_amount).toLocaleString("ko-KR")}원
+                      </p>
+                    </div>
+                  </Link>
+                  {customer?.phone && (
+                    <a
+                      href={`sms:${customer.phone}?body=${encodeURIComponent(followUpBody)}`}
+                      className="mt-3 flex items-center justify-center gap-2 min-h-12 bg-warning/15 text-warning-foreground rounded-xl text-[17px] font-bold active:bg-warning/25"
+                    >
+                      ✉️ 한 번 더 물어보기
+                    </a>
+                  )}
+                </div>
+              );
+            })}
+          </div>
+          <p className="text-sm text-muted-foreground mt-2 text-center">
+            견적 보낸 지 3일이 지나면 여기에 떠요. 한 번 더 연락하면 계약 확률이 올라가요.
+          </p>
+        </section>
+      )}
 
       {/* 고객 수락 알림 */}
       {acceptedQuotes.length > 0 && (

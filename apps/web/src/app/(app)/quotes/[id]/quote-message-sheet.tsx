@@ -2,7 +2,7 @@
 
 import { useState, useTransition } from "react";
 import { SparklesIcon, CopyIcon, ShareIcon, XIcon, RefreshCwIcon } from "lucide-react";
-import { generateQuoteMessage } from "./actions";
+import { generateQuoteMessage, markQuoteSent } from "./actions";
 import { ProGate } from "@/components/pro-gate";
 import { toast } from "sonner";
 
@@ -44,12 +44,14 @@ export function QuoteMessageSheet({ quoteId, isPro }: Props) {
     if (!message) return;
     await navigator.clipboard.writeText(message);
     toast.success("문자 내용이 복사됐어요", { description: "카카오톡·문자앱에 붙여넣기 하세요" });
+    markQuoteSent(quoteId).catch(() => {});
   }
 
   async function handleShare() {
     if (!message) return;
     if (navigator.share) {
       await navigator.share({ text: message }).catch(() => {});
+      markQuoteSent(quoteId).catch(() => {});
     } else {
       await handleCopy();
     }

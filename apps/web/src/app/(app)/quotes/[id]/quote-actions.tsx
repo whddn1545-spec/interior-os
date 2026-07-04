@@ -4,7 +4,7 @@ import { useState, useTransition } from "react";
 import { useRouter } from "next/navigation";
 import { CheckCircleIcon, RotateCcwIcon, FileTextIcon, MessageSquareIcon, FileSignatureIcon, Share2Icon, CopyIcon, Trash2Icon, AlertTriangleIcon, PencilIcon, MinusCircleIcon, LinkIcon } from "lucide-react";
 import { confirmQuote } from "../new/actions";
-import { revertQuoteToDraft, generateQuotePdf, createContractFromQuote, deleteQuote, duplicateQuote, getQuoteForEdit, updateQuoteItems } from "./actions";
+import { revertQuoteToDraft, generateQuotePdf, createContractFromQuote, deleteQuote, duplicateQuote, getQuoteForEdit, updateQuoteItems, markQuoteSent } from "./actions";
 import type { EditableQuoteItem } from "./actions";
 import { calcQuote, formatKRW } from "@interior-os/core/pricing";
 import { toast } from "sonner";
@@ -193,6 +193,15 @@ export function QuoteActions({ quoteId, status, siteId, customerId, totalAmount 
     }
   }
 
+  /** 고객에게 견적이 나간 시점 기록 (confirmed → sent). 공유 UX를 막지 않도록 백그라운드 처리 */
+  function recordSent() {
+    markQuoteSent(quoteId)
+      .then((r) => {
+        if (r.ok) router.refresh();
+      })
+      .catch(() => {});
+  }
+
   async function handleSharePublicLink() {
     const url = `${window.location.origin}/q/${quoteId}`;
     try {
@@ -202,9 +211,11 @@ export function QuoteActions({ quoteId, status, siteId, customerId, totalAmount 
         await navigator.clipboard.writeText(url);
         toast.success("고객 링크가 복사됐어요", { description: "카카오톡·문자로 바로 보내세요" });
       }
+      recordSent();
     } catch {
       await navigator.clipboard.writeText(url);
       toast.success("링크가 복사됐어요");
+      recordSent();
     }
   }
 
@@ -217,6 +228,7 @@ export function QuoteActions({ quoteId, status, siteId, customerId, totalAmount 
         await navigator.clipboard.writeText(pdfUrl);
         toast.success("링크가 복사되었어요");
       }
+      recordSent();
     } catch {
       // 사용자가 공유 취소한 경우 무시
     }
@@ -313,8 +325,8 @@ export function QuoteActions({ quoteId, status, siteId, customerId, totalAmount 
         </>
       )}
 
-      {/* confirmed 상태: PDF, 계약서, 문자 */}
-      {status === "confirmed" && (
+      {/* confirmed/sent 상태: PDF, 계약서, 문자 — sent 후에도 재공유 가능해야 한다 */}
+      {(status === "confirmed" || status === "sent") && (
         <>
           <button
             onClick={() => handleGeneratePdf("customer")}
@@ -352,7 +364,10 @@ export function QuoteActions({ quoteId, status, siteId, customerId, totalAmount 
             {generatingPdf === "internal" ? "생성 중..." : "내부용(원가 포함) PDF"}
           </button>
           <button
-            onClick={() => router.push(`/messages?siteId=${siteId}&quoteId=${quoteId}`)}
+            onClick={() => {
+              markQuoteSent(quoteId).catch(() => {});
+              router.push(`/messages?siteId=${siteId}&quoteId=${quoteId}`);
+            }}
             className="flex items-center justify-center gap-2 w-full bg-profit text-white rounded-2xl py-4 text-lg font-semibold"
           >
             <MessageSquareIcon size={20} />
@@ -365,19 +380,21 @@ export function QuoteActions({ quoteId, status, siteId, customerId, totalAmount 
             <FileSignatureIcon size={20} />
             계약서 만들기
           </button>
-          <button
-            onClick={handleRevert}
-            disabled={isPending}
-            className="flex items-center justify-center gap-2 w-full bg-muted text-muted-foreground rounded-2xl py-3 text-base font-medium disabled:opacity-50"
-          >
-            <RotateCcwIcon size={16} />
-            임시저장으로 되돌리기
-          </button>
+          {status === "confirmed" && (
+            <button
+              onClick={handleRevert}
+              disabled={isPending}
+              className="flex items-center justify-center gap-2 w-full bg-muted text-muted-foreground rounded-2xl py-3 text-base font-medium disabled:opacity-50"
+            >
+              <RotateCcwIcon size={16} />
+              임시저장으로 되돌리기
+            </button>
+          )}
         </>
       )}
 
-      {/* sent/accepted 상태: 계약서로 이동 */}
-      {(status === "sent" || status === "accepted") && (
+      {/* accepted 상태: 계약서로 이동 */}
+      {status === "accepted" && (
         <button
           onClick={() => setShowContractDialog(true)}
           className="flex items-center justify-center gap-2 w-full bg-purple-600 text-white rounded-2xl py-4 text-lg font-semibold"

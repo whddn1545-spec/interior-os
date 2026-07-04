@@ -9,9 +9,11 @@ interface Props {
   businessName: string;
   ownerName: string;
   plan: string;
+  ownerPhone: string;
+  briefingEnabled: boolean;
 }
 
-export function BusinessInfoCard({ businessName, ownerName, plan }: Props) {
+export function BusinessInfoCard({ businessName, ownerName, plan, ownerPhone, briefingEnabled }: Props) {
   const router = useRouter();
   const [open, setOpen] = useState(false);
   const [isPending, startTransition] = useTransition();
@@ -116,6 +118,33 @@ export function BusinessInfoCard({ businessName, ownerName, plan }: Props) {
                       className="w-full border border-border rounded-2xl px-4 py-4 text-lg focus:outline-none focus:border-primary"
                     />
                   </div>
+
+                  <div>
+                    <label htmlFor="owner_phone" className="block text-base font-semibold text-foreground mb-2">
+                      사장님 휴대폰 번호
+                    </label>
+                    <input
+                      id="owner_phone"
+                      name="owner_phone"
+                      type="tel"
+                      defaultValue={ownerPhone}
+                      placeholder="예) 010-1234-5678"
+                      className="w-full border border-border rounded-2xl px-4 py-4 text-lg focus:outline-none focus:border-primary"
+                    />
+                    <p className="text-sm text-muted-foreground mt-2">
+                      매일 아침 7시 반, 오늘 공사·받을 돈을 문자로 알려드려요.
+                    </p>
+                  </div>
+
+                  <label className="flex items-center justify-between gap-3 border border-border rounded-2xl px-4 py-4">
+                    <span className="text-base font-semibold text-foreground">아침 브리핑 문자 받기</span>
+                    <input
+                      type="checkbox"
+                      name="briefing_enabled"
+                      defaultChecked={briefingEnabled}
+                      className="w-6 h-6 accent-primary"
+                    />
+                  </label>
 
                   {error && (
                     <div className="bg-red-50 border border-loss/30 rounded-xl px-4 py-3 text-loss text-base">

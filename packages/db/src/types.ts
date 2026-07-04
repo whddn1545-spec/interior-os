@@ -6,6 +6,8 @@ export type Json = string | number | boolean | null | { [key: string]: Json } | 
 export type TenantRow = {
   id: string; business_name: string; owner_name: string;
   plan: "basic" | "pro" | "team"; logo_url: string | null;
+  // briefing_enabled는 DB에서 not null default true — Insert에서 생략 가능하도록 nullable로 선언
+  owner_phone: string | null; briefing_enabled: boolean | null;
   default_settings: Json | null; created_at: string; updated_at: string;
 };
 export type UserRow = {
@@ -107,7 +109,7 @@ export type PhotoRow = {
 };
 export type MessageLogRow = {
   id: string; tenant_id: string;
-  target_type: "customer" | "worker"; target_id: string;
+  target_type: "customer" | "worker" | "owner"; target_id: string;
   site_id: string | null; channel: "alimtalk" | "sms";
   template_code: string | null; body_masked: string;
   status: "queued" | "sent" | "failed";

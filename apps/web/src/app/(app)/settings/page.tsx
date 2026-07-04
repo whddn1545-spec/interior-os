@@ -26,11 +26,17 @@ export default async function SettingsPage({
 
   const { data: tenant } = await supabase
     .from("tenants")
-    .select("business_name, owner_name, plan")
+    .select("business_name, owner_name, plan, owner_phone, briefing_enabled")
     .eq("id", user?.user_metadata?.tenant_id ?? user?.id ?? "")
     .maybeSingle();
 
-  const t = tenant as { business_name: string; owner_name: string; plan: string } | null;
+  const t = tenant as {
+    business_name: string;
+    owner_name: string;
+    plan: string;
+    owner_phone: string | null;
+    briefing_enabled: boolean | null;
+  } | null;
 
   return (
     <div className="px-4 pt-6 pb-24">
@@ -53,6 +59,8 @@ export default async function SettingsPage({
           businessName={t.business_name}
           ownerName={t.owner_name}
           plan={t.plan}
+          ownerPhone={t.owner_phone ?? ""}
+          briefingEnabled={t.briefing_enabled !== false}
         />
       )}
 

@@ -5,7 +5,8 @@
   "exports": {
     "./pricing": "./src/pricing/index.ts",
     "./state": "./src/state/index.ts",
-    "./validation": "./src/validation/index.ts"
+    "./validation": "./src/validation/index.ts",
+    "./briefing": "./src/briefing/index.ts"
   },
   "scripts": {
     "typecheck": "tsc --noEmit",
