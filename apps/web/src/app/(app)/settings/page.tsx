@@ -26,7 +26,7 @@ export default async function SettingsPage({
 
   const { data: tenant } = await supabase
     .from("tenants")
-    .select("business_name, owner_name, plan, owner_phone, briefing_enabled")
+    .select("business_name, owner_name, plan, owner_phone, briefing_enabled, bank_account")
     .eq("id", user?.user_metadata?.tenant_id ?? user?.id ?? "")
     .maybeSingle();
 
@@ -36,6 +36,7 @@ export default async function SettingsPage({
     plan: string;
     owner_phone: string | null;
     briefing_enabled: boolean | null;
+    bank_account: string | null;
   } | null;
 
   return (
@@ -61,6 +62,7 @@ export default async function SettingsPage({
           plan={t.plan}
           ownerPhone={t.owner_phone ?? ""}
           briefingEnabled={t.briefing_enabled !== false}
+          bankAccount={t.bank_account ?? ""}
         />
       )}
 

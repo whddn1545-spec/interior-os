@@ -26,6 +26,14 @@ function daysUntil(dueDate: string | null): number | null {
   return Math.round((due - today) / (24 * 60 * 60 * 1000));
 }
 
+function reminderAgoLabel(iso: string): string {
+  const diffMs = Date.now() - new Date(iso).getTime();
+  const days = Math.floor(diffMs / (24 * 60 * 60 * 1000));
+  if (days <= 0) return "오늘";
+  if (days === 1) return "어제";
+  return `${days}일 전`;
+}
+
 export function PaymentCard({ schedule }: { schedule: PaymentBoardItem }) {
   const router = useRouter();
   const [isPending, startTransition] = useTransition();
@@ -142,6 +150,13 @@ export function PaymentCard({ schedule }: { schedule: PaymentBoardItem }) {
 
       {/* 약정일 */}
       <p className="mt-1 text-base text-muted-foreground">약정일: {dueDateStr}</p>
+
+      {/* 독촉 이력 — 언제 마지막으로 말했는지 기억할 필요가 없게 */}
+      {schedule.lastReminderAt && (
+        <p className="mt-1 text-sm font-semibold text-orange-600">
+          📱 {reminderAgoLabel(schedule.lastReminderAt)} 입금 요청 문자를 만들었어요
+        </p>
+      )}
 
       {feedback && (
         <p className="mt-3 rounded-lg bg-muted px-3 py-2 text-sm font-medium text-foreground/90">

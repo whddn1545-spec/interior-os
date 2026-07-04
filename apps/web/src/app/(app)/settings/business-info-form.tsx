@@ -11,9 +11,10 @@ interface Props {
   plan: string;
   ownerPhone: string;
   briefingEnabled: boolean;
+  bankAccount: string;
 }
 
-export function BusinessInfoCard({ businessName, ownerName, plan, ownerPhone, briefingEnabled }: Props) {
+export function BusinessInfoCard({ businessName, ownerName, plan, ownerPhone, briefingEnabled, bankAccount }: Props) {
   const router = useRouter();
   const [open, setOpen] = useState(false);
   const [isPending, startTransition] = useTransition();
@@ -145,6 +146,23 @@ export function BusinessInfoCard({ businessName, ownerName, plan, ownerPhone, br
                       className="w-6 h-6 accent-primary"
                     />
                   </label>
+
+                  <div>
+                    <label htmlFor="bank_account" className="block text-base font-semibold text-foreground mb-2">
+                      입금 계좌
+                    </label>
+                    <input
+                      id="bank_account"
+                      name="bank_account"
+                      type="text"
+                      defaultValue={bankAccount}
+                      placeholder="예) 국민 123-45-678900 홍길동"
+                      className="w-full border border-border rounded-2xl px-4 py-4 text-lg focus:outline-none focus:border-primary"
+                    />
+                    <p className="text-sm text-muted-foreground mt-2">
+                      입금 요청 문자에 계좌가 자동으로 들어가요. 고객이 다시 물어볼 필요가 없어요.
+                    </p>
+                  </div>
 
                   {error && (
                     <div className="bg-red-50 border border-loss/30 rounded-xl px-4 py-3 text-loss text-base">

@@ -2,6 +2,7 @@ import Link from "next/link";
 import { createClient } from "@/lib/supabase/server";
 import { HelpButton } from "@/components/tutorial/HelpButton";
 import { PwaInstallBanner } from "@/components/pwa-install-banner";
+import { HomePaymentCard } from "./home-payment-card";
 
 export const dynamic = "force-dynamic";
 
@@ -434,27 +435,15 @@ export default async function HomePage() {
               const customer = first(site?.customers);
               const isOverdue = p.due_date ? p.due_date < today : false;
               return (
-                <Link
+                <HomePaymentCard
                   key={p.id}
-                  href="/payments"
-                  className={`block bg-card rounded-2xl px-5 py-4 flex items-center justify-between active:bg-muted active:scale-[0.98] transition-all duration-200 ${isOverdue ? "border-2 border-loss" : "border border-loss/30"}`}
-                >
-                  <div className="min-w-0">
-                    <div className="flex items-center gap-2 mb-0.5">
-                      {isOverdue && <span className="text-xs font-bold text-loss-foreground bg-loss px-2 py-0.5 rounded-full shrink-0">연체</span>}
-                      <p className="text-xl font-bold text-foreground truncate">
-                        {customer?.name ?? site?.name ?? "고객"}
-                      </p>
-                    </div>
-                    <p className="text-base text-muted-foreground">
-                      {p.stage_label}
-                      {p.due_date ? ` · 약정일 ${p.due_date}` : ""}
-                    </p>
-                  </div>
-                  <p className="text-2xl font-black text-loss tabular-nums shrink-0 ml-3">
-                    {Number(p.amount).toLocaleString("ko-KR")}원
-                  </p>
-                </Link>
+                  scheduleId={p.id}
+                  customerName={customer?.name ?? site?.name ?? "고객"}
+                  stageLabel={p.stage_label}
+                  amount={Number(p.amount)}
+                  dueDate={p.due_date}
+                  isOverdue={isOverdue}
+                />
               );
             })}
           </div>

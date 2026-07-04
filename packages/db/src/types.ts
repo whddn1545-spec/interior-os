@@ -8,6 +8,7 @@ export type TenantRow = {
   plan: "basic" | "pro" | "team"; logo_url: string | null;
   // briefing_enabled는 DB에서 not null default true — Insert에서 생략 가능하도록 nullable로 선언
   owner_phone: string | null; briefing_enabled: boolean | null;
+  bank_account: string | null;
   default_settings: Json | null; created_at: string; updated_at: string;
 };
 export type UserRow = {

@@ -24,6 +24,8 @@ export interface PaymentBoardItem {
   customerName: string;
   customerPhone: string;
   urgency: Urgency;
+  /** 마지막 독촉 문자 초안 생성 시각 (ISO). 없으면 null */
+  lastReminderAt: string | null;
 }
 
 function startOfTodayUTC(): Date {
@@ -50,15 +52,33 @@ export async function getPaymentBoard(): Promise<ActionResult<PaymentBoardItem[]
   if (!user) return { ok: false, error: "로그인이 필요합니다" };
 
   // payment_schedules는 Database 타입에 보강됨 → select 컬럼명이 컴파일 타임 검증됨
-  const { data, error } = await supabase
-    .from("payment_schedules")
-    .select(
-      "id, site_id, quote_id, stage, stage_label, amount, due_date, memo, sites(name, customer_id, customers(name, phone))"
-    )
-    .is("paid_at", null)
-    .order("due_date", { ascending: true });
+  const [{ data, error }, { data: reminderLogs }] = await Promise.all([
+    supabase
+      .from("payment_schedules")
+      .select(
+        "id, site_id, quote_id, stage, stage_label, amount, due_date, memo, sites(name, customer_id, customers(name, phone))"
+      )
+      .is("paid_at", null)
+      .order("due_date", { ascending: true }),
+    // 독촉 이력 — idempotency_key가 `payment-reminder-{scheduleId}-...` 형식
+    supabase
+      .from("message_logs")
+      .select("idempotency_key, created_at")
+      .like("idempotency_key", "payment-reminder-%")
+      .order("created_at", { ascending: false })
+      .limit(200),
+  ]);
 
   if (error) return { ok: false, error: error.message };
+
+  // scheduleId(UUID 36자) → 가장 최근 독촉 시각
+  const lastReminderBySchedule = new Map<string, string>();
+  for (const log of (reminderLogs ?? []) as { idempotency_key: string; created_at: string }[]) {
+    const scheduleId = log.idempotency_key.slice("payment-reminder-".length, "payment-reminder-".length + 36);
+    if (scheduleId && !lastReminderBySchedule.has(scheduleId)) {
+      lastReminderBySchedule.set(scheduleId, log.created_at);
+    }
+  }
 
   const items: PaymentBoardItem[] = ((data ?? []) as unknown[]).map((row) => {
     const r = row as unknown as Record<string, unknown>;
@@ -80,6 +100,7 @@ export async function getPaymentBoard(): Promise<ActionResult<PaymentBoardItem[]
       customerName: customer?.name ?? "고객",
       customerPhone: customer?.phone ?? "",
       urgency: computeUrgency(dueDate),
+      lastReminderAt: lastReminderBySchedule.get(r.id as string) ?? null,
     };
   });
 
@@ -232,6 +253,7 @@ export async function markPaid(
   if (error) return { ok: false, error: error.message };
 
   revalidatePath("/payments");
+  revalidatePath("/");
   return { ok: true, data: undefined };
 }
 
@@ -267,13 +289,16 @@ export async function sendPaymentReminder(
 
   const tenantId = await getTenantId(supabase, user);
 
-  const { data: schedule } = await supabase
-    .from("payment_schedules")
-    .select(
-      "id, site_id, stage_label, amount, sites(name, customer_id, customers(id, name, phone))"
-    )
-    .eq("id", scheduleId)
-    .single();
+  const [{ data: schedule }, { data: tenant }] = await Promise.all([
+    supabase
+      .from("payment_schedules")
+      .select(
+        "id, site_id, stage_label, amount, sites(name, customer_id, customers(id, name, phone))"
+      )
+      .eq("id", scheduleId)
+      .single(),
+    supabase.from("tenants").select("bank_account").eq("id", tenantId).maybeSingle(),
+  ]);
 
   if (!schedule) return { ok: false, error: "결제 스케줄을 찾을 수 없습니다" };
 
@@ -296,13 +321,17 @@ export async function sendPaymentReminder(
   const amount = Number(s.amount ?? 0);
   const amountStr = amount.toLocaleString("ko-KR");
 
+  // 계좌가 설정돼 있으면 문자에 자동 포함 — 고객이 계좌를 되묻는 왕복을 없앤다
+  const bankAccount = (tenant as { bank_account?: string | null } | null)?.bank_account ?? null;
+  const accountLine = bankAccount ? `\n입금 계좌: ${bankAccount}` : "";
+
   let body = "";
   if (tone === "polite") {
-    body = `${customerName}님, 안녕하세요. ${siteName} 관련 ${stageLabel} ${amountStr}원 입금 부탁드립니다 🙏 계좌번호는 말씀드리면 바로 알려드릴게요.`;
+    body = `${customerName}님, 안녕하세요. ${siteName} 관련 ${stageLabel} ${amountStr}원 입금 부탁드립니다 🙏${accountLine || " 계좌번호는 말씀드리면 바로 알려드릴게요."}`;
   } else if (tone === "firm") {
-    body = `${customerName}님, ${siteName} ${stageLabel} ${amountStr}원이 미입금 상태입니다. 빠른 처리 부탁드립니다.`;
+    body = `${customerName}님, ${siteName} ${stageLabel} ${amountStr}원이 미입금 상태입니다. 빠른 처리 부탁드립니다.${accountLine}`;
   } else {
-    body = `${customerName}님, ${siteName} 미수금 ${amountStr}원 관련 연락 주시기 바랍니다. 미입금 지속 시 법적 조치가 필요할 수 있습니다.`;
+    body = `${customerName}님, ${siteName} 미수금 ${amountStr}원 관련 연락 주시기 바랍니다. 미입금 지속 시 법적 조치가 필요할 수 있습니다.${accountLine}`;
   }
 
   const insertData: Database["public"]["Tables"]["message_logs"]["Insert"] = {

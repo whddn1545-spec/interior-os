@@ -14,6 +14,7 @@ export async function updateBusinessInfo(formData: FormData): Promise<{ ok: bool
   const ownerName = (formData.get("owner_name") as string | null)?.trim() ?? "";
   const ownerPhoneRaw = (formData.get("owner_phone") as string | null)?.trim() ?? "";
   const briefingEnabled = formData.get("briefing_enabled") === "on";
+  const bankAccount = (formData.get("bank_account") as string | null)?.trim() ?? "";
 
   if (!businessName || !ownerName) {
     return { ok: false, error: "상호와 대표자명을 모두 입력해주세요" };
@@ -31,6 +32,7 @@ export async function updateBusinessInfo(formData: FormData): Promise<{ ok: bool
       owner_name: ownerName,
       owner_phone: phoneDigits || null,
       briefing_enabled: briefingEnabled,
+      bank_account: bankAccount || null,
     })
     .eq("id", tenantId);
 
