@@ -1,6 +1,6 @@
 import Link from "next/link";
 import { createClient } from "@/lib/supabase/server";
-import { TrendingUpIcon, TrendingDownIcon, ArrowLeftIcon } from "lucide-react";
+import { TrendingUpIcon, TrendingDownIcon, ArrowLeftIcon, DownloadIcon } from "lucide-react";
 import { FinanceForm } from "./finance-form";
 import { FinanceEntryItem } from "./finance-entry-item";
 import { RevenueChart } from "./revenue-chart";
@@ -22,6 +22,11 @@ export default async function FinancePage() {
 
   // 6개월 시작일 계산
   const sixMonthsAgo = new Date(now.getFullYear(), now.getMonth() - 5, 1).toISOString().split("T")[0];
+
+  // 내보내기용 월 키 (이번 달 / 지난달)
+  const thisMonthKey = `${now.getFullYear()}-${String(now.getMonth() + 1).padStart(2, "0")}`;
+  const lastMonthDate = new Date(now.getFullYear(), now.getMonth() - 1, 1);
+  const lastMonthKey = `${lastMonthDate.getFullYear()}-${String(lastMonthDate.getMonth() + 1).padStart(2, "0")}`;
 
   const [{ data: entries }, { data: sites }, { data: chartEntries }] = await Promise.all([
     supabase
@@ -152,6 +157,31 @@ export default async function FinancePage() {
                 ? `${Math.round(Math.abs(totalIn - totalOut) / 10_000)}만`
                 : `${(totalIn - totalOut).toLocaleString()}원`}
           </p>
+        </div>
+      </div>
+
+      {/* 세무사 전달용 내보내기 — 매달 자료 정리하는 반복 고통을 클릭 한 번으로 */}
+      <div className="bg-card border border-border rounded-2xl px-4 py-4 mb-5">
+        <div className="flex items-center gap-2 mb-1">
+          <DownloadIcon size={18} className="text-primary" />
+          <p className="text-base font-semibold text-foreground">세무사님께 보낼 자료</p>
+        </div>
+        <p className="text-sm text-muted-foreground mb-3">
+          이 달 입금·지출 내역을 엑셀 파일로 내려받아 그대로 전달하세요
+        </p>
+        <div className="grid grid-cols-2 gap-2">
+          <a
+            href={`/api/export/finance?month=${thisMonthKey}`}
+            className="flex items-center justify-center min-h-12 rounded-xl bg-primary/10 text-primary text-base font-bold active:bg-primary/20"
+          >
+            이번 달 내려받기
+          </a>
+          <a
+            href={`/api/export/finance?month=${lastMonthKey}`}
+            className="flex items-center justify-center min-h-12 rounded-xl bg-muted text-foreground/90 text-base font-bold active:bg-muted/70"
+          >
+            지난달 내려받기
+          </a>
         </div>
       </div>
 
