@@ -123,14 +123,14 @@ export function Step4Review({ siteId, siteName, items, distanceFactor, difficult
           <span className="text-sm font-semibold text-primary/90">AI 견적 검토</span>
         </div>
         {aiLoading ? (
-          <p className="text-sm text-blue-500 animate-pulse">AI가 견적을 검토 중이에요...</p>
+          <p className="text-sm text-primary animate-pulse">AI가 견적을 검토 중이에요...</p>
         ) : aiError ? (
           <p className="text-sm text-muted-foreground/70">AI 검토를 일시적으로 이용할 수 없어요. 견적 확정은 정상 진행됩니다.</p>
         ) : aiBullets && aiBullets.length > 0 ? (
           <ul className="space-y-1">
             {aiBullets.map((b, i) => (
-              <li key={i} className="text-sm text-blue-800 flex gap-1.5">
-                <span className="text-blue-400 shrink-0">·</span>{b}
+              <li key={i} className="text-sm text-foreground/90 flex gap-1.5">
+                <span className="text-primary/60 shrink-0">·</span>{b}
               </li>
             ))}
           </ul>
@@ -183,7 +183,7 @@ export function Step4Review({ siteId, siteName, items, distanceFactor, difficult
       </div>
 
       {error && (
-        <div className="bg-red-50 border border-loss/30 rounded-xl p-3 mb-4 text-base text-loss">
+        <div className="bg-loss/10 border border-loss/30 rounded-xl p-3 mb-4 text-base text-loss">
           {error}
         </div>
       )}

@@ -49,7 +49,7 @@ export function LoginForm() {
 
   if (sent) {
     return (
-      <div className="min-h-screen flex flex-col items-center justify-center px-6 bg-gradient-to-b from-blue-50 to-white">
+      <div className="min-h-screen flex flex-col items-center justify-center px-6 bg-gradient-to-b from-primary/10 to-background">
         <div className="text-center">
           <div className="text-6xl mb-6">📧</div>
           <h1 className="text-3xl font-black text-foreground mb-3">이메일을 확인해주세요</h1>
@@ -63,10 +63,10 @@ export function LoginForm() {
   }
 
   return (
-    <div className="min-h-screen flex flex-col justify-center px-6 bg-gradient-to-b from-blue-50 to-white">
+    <div className="min-h-screen flex flex-col justify-center px-6 bg-gradient-to-b from-primary/10 to-background">
       <div className="max-w-md mx-auto w-full">
         <div className="text-center mb-10">
-          <p className="text-5xl font-black text-blue-600 mb-2">InteriorOS</p>
+          <p className="text-5xl font-black text-primary mb-2">InteriorOS</p>
           <p className="text-lg text-muted-foreground">인테리어 업무 자동화</p>
         </div>
 
@@ -116,13 +116,13 @@ export function LoginForm() {
           </div>
 
           {error && (
-            <div className="bg-red-50 border border-red-200 rounded-xl px-4 py-3 text-red-700 text-base">{error}</div>
+            <div className="bg-loss/10 border border-loss/30 rounded-xl px-4 py-3 text-loss text-base">{error}</div>
           )}
 
           <button
             onClick={handleSubmit}
             disabled={isPending}
-            className="w-full bg-blue-600 text-white rounded-2xl py-5 text-xl font-bold disabled:opacity-50 mt-2"
+            className="w-full bg-primary text-primary-foreground rounded-2xl py-5 text-xl font-bold disabled:opacity-50 mt-2"
           >
             {isPending
               ? mode === "login" ? "로그인 중..." : "가입 중..."

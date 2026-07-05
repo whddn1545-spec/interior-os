@@ -65,7 +65,7 @@ export default function OnboardingPage() {
   }
 
   return (
-    <div className="min-h-screen bg-gradient-to-b from-blue-50 to-white px-4 pt-16 pb-8">
+    <div className="min-h-screen bg-gradient-to-b from-primary/10 to-background px-4 pt-16 pb-8">
       <div className="max-w-md mx-auto">
         {/* 진행 표시 */}
         <div className="flex items-center justify-center gap-2 mb-12">
@@ -131,7 +131,7 @@ export default function OnboardingPage() {
             </div>
 
             {error && (
-              <div className="mt-4 bg-red-50 border border-red-200 rounded-xl px-4 py-3 text-red-700">{error}</div>
+              <div className="mt-4 bg-loss/10 border border-loss/30 rounded-xl px-4 py-3 text-loss">{error}</div>
             )}
 
             <button
@@ -180,10 +180,10 @@ export default function OnboardingPage() {
                   </p>
                 </button>
                 {useDefaultPrices === "ai" && (
-                  <div className="mt-4 pt-4 border-t border-blue-200">
+                  <div className="mt-4 pt-4 border-t border-primary/25">
                     <label className="block w-full border-2 border-dashed border-primary/60 bg-card rounded-xl py-8 text-center cursor-pointer hover:bg-primary/10 transition-colors">
                       <span className="text-4xl block mb-2">📸</span>
-                      <span className="text-lg font-bold text-blue-600">사진 찍거나 앨범에서 선택</span>
+                      <span className="text-lg font-bold text-primary">사진 찍거나 앨범에서 선택</span>
                       <span className="text-sm text-muted-foreground block mt-1">JPG, PNG 파일 지원</span>
                       <input
                         type="file"
@@ -232,7 +232,7 @@ export default function OnboardingPage() {
             </div>
 
             {error && (
-              <div className="mb-4 bg-red-50 border border-red-200 rounded-xl px-4 py-3 text-red-700">{error}</div>
+              <div className="mb-4 bg-loss/10 border border-loss/30 rounded-xl px-4 py-3 text-loss">{error}</div>
             )}
 
             {useDefaultPrices !== "ai" && (
@@ -245,7 +245,7 @@ export default function OnboardingPage() {
               </button>
             )}
             {useDefaultPrices === "ai" && isPending && (
-              <div className="w-full bg-blue-100 text-blue-600 rounded-2xl py-5 text-xl font-bold text-center animate-pulse">
+              <div className="w-full bg-primary/15 text-primary rounded-2xl py-5 text-xl font-bold text-center animate-pulse">
                 AI가 단가표를 분석하고 있어요... 🤖
               </div>
             )}
