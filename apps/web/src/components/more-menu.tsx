@@ -12,6 +12,7 @@ import {
   SettingsIcon,
   MoreHorizontalIcon,
   CalculatorIcon,
+  BarChart3Icon,
   SparklesIcon,
   ImageIcon,
   XIcon,
@@ -31,6 +32,7 @@ const primaryItems = [
 
 // 가끔 쓰는 부가 기능은 작은 목록으로 아래에 정리.
 const secondaryItems = [
+  { href: "/report", label: "월간 리포트", icon: BarChart3Icon },
   { href: "/settings", label: "설정·단가표", icon: SettingsIcon },
   { href: "/workers/attendance", label: "출역 장부", icon: ClipboardListIcon },
   { href: "/materials", label: "자재산출", icon: CalculatorIcon },
