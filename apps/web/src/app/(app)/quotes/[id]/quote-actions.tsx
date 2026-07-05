@@ -7,6 +7,7 @@ import { confirmQuote } from "../new/actions";
 import { revertQuoteToDraft, generateQuotePdf, createContractFromQuote, deleteQuote, duplicateQuote, getQuoteForEdit, updateQuoteItems, markQuoteSent } from "./actions";
 import type { EditableQuoteItem } from "./actions";
 import { calcQuote, formatKRW } from "@interior-os/core/pricing";
+import { formatUnit } from "@/lib/utils";
 import { toast } from "sonner";
 
 interface Props {
@@ -616,7 +617,7 @@ export function QuoteActions({ quoteId, status, siteId, customerId, totalAmount 
                       onChange={(e) => handleEditQty(item.id, e.target.value)}
                       className="w-28 px-3 py-3 text-lg border border-border rounded-xl text-right focus:outline-none focus:ring-2 focus:ring-primary/500"
                     />
-                    <span className="text-base text-muted-foreground">{item.unit}</span>
+                    <span className="text-base text-muted-foreground">{formatUnit(item.unit)}</span>
                   </div>
                 </div>
               ))}

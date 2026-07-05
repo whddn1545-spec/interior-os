@@ -1,6 +1,7 @@
 import { notFound } from "next/navigation";
 import { createAdminClient } from "@/lib/supabase/admin";
 import { formatKRW } from "@interior-os/core/pricing";
+import { formatUnit } from "@/lib/utils";
 import type { Metadata } from "next";
 import { AcceptButton } from "./accept-button";
 
@@ -160,7 +161,7 @@ export default async function PublicQuotePage({ params }: { params: Promise<{ id
                       <div className="flex-1 min-w-0">
                         <p className="text-base text-foreground">{item.description}</p>
                         <p className="text-sm text-muted-foreground mt-0.5">
-                          {item.quantity}{item.unit}
+                          {item.quantity}{formatUnit(item.unit)}
                         </p>
                       </div>
                       <p className="text-base font-semibold text-foreground shrink-0">

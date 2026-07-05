@@ -5,6 +5,7 @@ import { createClient } from "@/lib/supabase/server";
 import { QuoteActions } from "./quote-actions";
 import { QuoteMessageSheet } from "./quote-message-sheet";
 import { formatKRW } from "@interior-os/core/pricing";
+import { formatUnit } from "@/lib/utils";
 import { getTenantPlan, isPro } from "@/lib/plan";
 
 export default async function QuoteDetailPage({ params, searchParams }: { params: Promise<{ id: string }>; searchParams: Promise<{ from?: string }> }) {
@@ -135,7 +136,7 @@ export default async function QuoteDetailPage({ params, searchParams }: { params
                       {trade?.name_ko ?? ""} · {itemAny.description as string}
                     </p>
                     <p className="text-sm text-muted-foreground">
-                      {(itemAny.quantity as number).toLocaleString("ko-KR")} {trade?.unit ?? itemAny.unit as string} ·
+                      {(itemAny.quantity as number).toLocaleString("ko-KR")}{formatUnit(trade?.unit ?? (itemAny.unit as string))} ·
                       자재 {formatKRW(itemAny.material_cost as number)} + 인건비 {formatKRW(itemAny.labor_cost as number)}
                     </p>
                   </div>

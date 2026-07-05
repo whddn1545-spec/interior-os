@@ -2,6 +2,7 @@
 
 import { useState, useTransition, useEffect } from "react";
 import { calcQuote, formatKRW } from "@interior-os/core/pricing";
+import { formatUnit } from "@/lib/utils";
 import { saveQuoteDraft, confirmQuote, reviewQuoteDraft } from "../actions";
 import { createPaymentSchedule } from "@/app/(app)/payments/actions";
 import type { QuoteItemDraft } from "../actions";
@@ -146,7 +147,7 @@ export function Step4Review({ siteId, siteName, items, distanceFactor, difficult
               <div className="flex-1 pr-4">
                 <p className="text-base font-medium text-foreground">{item.description}</p>
                 <p className="text-sm text-muted-foreground/70">
-                  {item.quantity}{item.unit} · 자재 {formatKRW(item.materialCost)} · 인건비 {formatKRW(item.laborCost)}
+                  {item.quantity}{formatUnit(item.unit)} · 자재 {formatKRW(item.materialCost)} · 인건비 {formatKRW(item.laborCost)}
                 </p>
               </div>
               <p className="text-base font-semibold text-foreground whitespace-nowrap">

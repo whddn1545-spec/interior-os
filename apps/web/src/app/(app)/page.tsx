@@ -43,9 +43,20 @@ function first<T>(v: T | T[] | null | undefined): T | null {
   return Array.isArray(v) ? v[0] ?? null : v;
 }
 
-function formatKoreanDate(d: Date): string {
-  const days = ["일", "월", "화", "수", "목", "금", "토"];
-  return `${d.getFullYear()}년 ${d.getMonth() + 1}월 ${d.getDate()}일 (${days[d.getDay()]})`;
+// 사장님이 보는 '오늘'은 한국 시간 기준 — 서버(UTC)에서 렌더돼도 날짜가 밀리지 않게
+function kstDateLabel(d: Date): string {
+  return d.toLocaleDateString("ko-KR", {
+    timeZone: "Asia/Seoul",
+    year: "numeric",
+    month: "long",
+    day: "numeric",
+    weekday: "short",
+  });
+}
+
+/** KST 기준 YYYY-MM-DD */
+function kstDateStr(d: Date): string {
+  return new Intl.DateTimeFormat("en-CA", { timeZone: "Asia/Seoul" }).format(d);
 }
 
 function mapHref(address: string | null | undefined, name: string): string {
@@ -58,10 +69,8 @@ export default async function HomePage() {
   await supabase.auth.getUser();
 
   const now = new Date();
-  const today = now.toISOString().split("T")[0];
-  const soon = new Date(now.getTime() + 3 * 24 * 60 * 60 * 1000)
-    .toISOString()
-    .split("T")[0];
+  const today = kstDateStr(now);
+  const soon = kstDateStr(new Date(now.getTime() + 3 * 24 * 60 * 60 * 1000));
 
   // 1. 오늘 진행 현장
   let todayTasks: TodayTask[] = [];
@@ -323,7 +332,7 @@ export default async function HomePage() {
       {/* 날짜 + 이번달 KPI */}
       <div>
         <h1 className="text-[28px] font-black tracking-tight text-foreground">오늘의 업무</h1>
-        <p className="text-base text-muted-foreground mt-0.5 mb-4">{formatKoreanDate(now)}</p>
+        <p className="text-base text-muted-foreground mt-0.5 mb-4">{kstDateLabel(now)}</p>
         <div className="grid grid-cols-2 gap-2">
           <Link
             href="/sites?status=in_progress"
