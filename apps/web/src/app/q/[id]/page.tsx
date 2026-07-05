@@ -22,7 +22,6 @@ interface QuoteData {
   total_amount: number;
   created_at: string;
   site_id: string;
-  notes: string | null;
 }
 
 interface SiteData {
@@ -35,6 +34,7 @@ interface SiteData {
 interface TenantData {
   business_name: string;
   owner_name: string;
+  owner_phone: string | null;
 }
 
 export async function generateMetadata({ params }: { params: Promise<{ id: string }> }): Promise<Metadata> {
@@ -62,7 +62,8 @@ export default async function PublicQuotePage({ params }: { params: Promise<{ id
   const admin = createAdminClient();
 
   const [{ data: quote }, { data: items }] = await Promise.all([
-    admin.from("quotes").select("id, version, status, total_amount, created_at, site_id, notes").eq("id", id).single(),
+    // 주의: quotes에 없는 컬럼을 select하면 PostgREST 에러 → 모든 링크가 404가 된다
+    admin.from("quotes").select("id, version, status, total_amount, created_at, site_id").eq("id", id).single(),
     admin.from("quote_items").select("id, description, quantity, unit, line_total, trades(name_ko)").eq("quote_id", id).order("created_at"),
   ]);
 
@@ -85,7 +86,7 @@ export default async function PublicQuotePage({ params }: { params: Promise<{ id
 
   const { data: tenant } = await admin
     .from("tenants")
-    .select("business_name, owner_name")
+    .select("business_name, owner_name, owner_phone")
     .eq("id", s.tenant_id)
     .single();
 
@@ -103,6 +104,15 @@ export default async function PublicQuotePage({ params }: { params: Promise<{ id
   const quoteDate = new Date(q.created_at).toLocaleDateString("ko-KR", {
     year: "numeric", month: "long", day: "numeric",
   });
+
+  // 견적 유효기간 — 작성일로부터 30일 (자재비 변동 대비 업계 관행)
+  const validUntilDate = new Date(new Date(q.created_at).getTime() + 30 * 24 * 60 * 60 * 1000);
+  const validUntil = validUntilDate.toLocaleDateString("ko-KR", {
+    year: "numeric", month: "long", day: "numeric",
+  });
+  // 서버 컴포넌트(force-dynamic)라 요청 시점 기준 계산이 의도된 동작
+  // eslint-disable-next-line react-hooks/purity
+  const isExpired = validUntilDate.getTime() < Date.now() && q.status !== "accepted";
 
   return (
     <div className="min-h-screen bg-background">
@@ -164,14 +174,6 @@ export default async function PublicQuotePage({ params }: { params: Promise<{ id
           })}
         </div>
 
-        {/* 메모 */}
-        {q.notes && (
-          <div className="bg-card border border-border rounded-2xl p-4">
-            <p className="text-xs font-bold text-muted-foreground uppercase tracking-wide mb-2">특이사항</p>
-            <p className="text-base text-foreground whitespace-pre-line leading-relaxed">{q.notes}</p>
-          </div>
-        )}
-
         {/* 합계 */}
         <div className="bg-primary rounded-2xl p-5 text-primary-foreground">
           <div className="flex items-center justify-between">
@@ -184,10 +186,15 @@ export default async function PublicQuotePage({ params }: { params: Promise<{ id
               <p className="text-sm text-primary-foreground/70">v{q.version}</p>
             </div>
           </div>
+          <p className="text-sm text-primary-foreground/70 mt-3 pt-3 border-t border-primary-foreground/20">
+            {isExpired
+              ? "유효기간이 지난 견적이에요. 시공사에 새 견적을 요청해주세요."
+              : `이 견적은 ${validUntil}까지 유효해요`}
+          </p>
         </div>
 
-        {/* 고객 수락 버튼 — confirmed / sent / accepted 상태에서 표시 */}
-        {(q.status === "confirmed" || q.status === "sent" || q.status === "accepted") && (
+        {/* 고객 수락 버튼 — confirmed / sent / accepted 상태에서 표시 (기간 만료 시 숨김) */}
+        {(q.status === "confirmed" || q.status === "sent" || q.status === "accepted") && !isExpired && (
           <AcceptButton
             quoteId={q.id}
             totalAmount={q.total_amount}
@@ -196,7 +203,7 @@ export default async function PublicQuotePage({ params }: { params: Promise<{ id
           />
         )}
 
-        {/* 업체 연락처 CTA */}
+        {/* 업체 연락처 CTA — 견적을 보다가 바로 전화하는 것이 전환의 핵심 경로 */}
         {t && (
           <div className="bg-muted rounded-2xl p-5 text-center">
             <p className="text-base font-bold text-foreground mb-1">
@@ -205,6 +212,14 @@ export default async function PublicQuotePage({ params }: { params: Promise<{ id
             <p className="text-sm text-muted-foreground mb-4">
               {t.business_name} · {t.owner_name}
             </p>
+            {t.owner_phone && (
+              <a
+                href={`tel:${t.owner_phone}`}
+                className="flex items-center justify-center gap-2 w-full bg-profit text-white rounded-2xl py-4 text-lg font-bold active:opacity-90"
+              >
+                📞 {t.owner_name} 대표에게 전화하기
+              </a>
+            )}
             <p className="text-xs text-muted-foreground/60 mt-4">
               Powered by InteriorOS
             </p>

@@ -33,6 +33,7 @@ interface SiteData {
 interface TenantData {
   business_name: string;
   owner_name: string;
+  owner_phone: string | null;
 }
 
 interface QuoteData {
@@ -92,7 +93,7 @@ export default async function PublicContractPage({ params }: { params: Promise<{
 
   const { data: tenant } = await admin
     .from("tenants")
-    .select("business_name, owner_name")
+    .select("business_name, owner_name, owner_phone")
     .eq("id", s.tenant_id)
     .single();
 
@@ -235,6 +236,14 @@ export default async function PublicContractPage({ params }: { params: Promise<{
             <p className="text-sm text-muted-foreground mb-2">
               {t.business_name} · {t.owner_name}
             </p>
+            {t.owner_phone && (
+              <a
+                href={`tel:${t.owner_phone}`}
+                className="mt-2 flex items-center justify-center gap-2 w-full bg-profit text-white rounded-2xl py-4 text-lg font-bold active:opacity-90"
+              >
+                📞 {t.owner_name} 대표에게 전화하기
+              </a>
+            )}
             <p className="text-xs text-muted-foreground/60 mt-4">
               Powered by InteriorOS
             </p>
