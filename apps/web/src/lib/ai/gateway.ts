@@ -1,6 +1,6 @@
 import "server-only";
 import OpenAI from "openai";
-import { createClient } from "@/lib/supabase/server";
+import { createAdminClient } from "@/lib/supabase/admin";
 
 let _client: OpenAI | null = null;
 
@@ -51,7 +51,8 @@ async function logInvocation(params: {
   errorMessage?: string;
 }): Promise<void> {
   try {
-    const supabase = await createClient();
+    // ai_invocations INSERT는 RLS상 service_role 전용 — 사용자 세션으로는 조용히 실패한다
+    const supabase = createAdminClient();
     await supabase.from("ai_invocations").insert({
       tenant_id: params.tenantId ?? null,
       task: params.task,

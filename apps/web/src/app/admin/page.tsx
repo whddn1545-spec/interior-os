@@ -1,4 +1,5 @@
 import { createClient } from "@/lib/supabase/server";
+import { createAdminClient } from "@/lib/supabase/admin";
 import { redirect } from "next/navigation";
 import Link from "next/link";
 import { ArrowLeftIcon, TrendingUpIcon, UsersIcon, BrainIcon, DollarSignIcon } from "lucide-react";
@@ -24,18 +25,22 @@ export default async function AdminPage() {
     redirect("/");
   }
 
+  // 이메일 게이트 통과 후에는 service_role로 전체 테넌트 조회
+  // (사용자 세션은 RLS 때문에 본인 테넌트 데이터만 보여 통계가 부정확했음)
+  const admin = createAdminClient();
+
   const now = new Date();
   const thirtyDaysAgo = new Date(now.getTime() - 30 * 24 * 60 * 60 * 1000).toISOString();
 
   const [{ data: tenants }, { data: aiLogs }, { data: recentUsers }] = await Promise.all([
-    supabase.from("tenants").select("id, business_name, owner_name, plan, created_at").order("created_at", { ascending: false }),
-    supabase
+    admin.from("tenants").select("id, business_name, owner_name, plan, created_at").order("created_at", { ascending: false }),
+    admin
       .from("ai_invocations")
-      .select("id, task, model, input_tokens, output_tokens, latency_ms, created_at, tenant_id")
+      .select("id, task, model, input_tokens, output_tokens, cost_usd, latency_ms, created_at, tenant_id")
       .gte("created_at", thirtyDaysAgo)
       .order("created_at", { ascending: false })
       .limit(500),
-    supabase
+    admin
       .from("users")
       .select("id, display_name, role, tenant_id, created_at")
       .gte("created_at", thirtyDaysAgo)
@@ -43,19 +48,26 @@ export default async function AdminPage() {
       .limit(20),
   ]);
 
-  // 비용 집계
-  const totalCostUsd = (aiLogs ?? []).reduce((sum, log) => {
-    const l = log as unknown as { model: string; input_tokens: number; output_tokens: number };
-    return sum + estimateCost(l.model, l.input_tokens ?? 0, l.output_tokens ?? 0);
-  }, 0);
+  // 비용 집계 — 게이트웨이가 호출 시점 단가로 기록한 cost_usd를 신뢰, 없으면 추정으로 폴백
+  type AiLogRow = { model: string; input_tokens: number; output_tokens: number; cost_usd: number | null };
+  function logCost(l: AiLogRow): number {
+    return l.cost_usd != null && l.cost_usd > 0
+      ? Number(l.cost_usd)
+      : estimateCost(l.model, l.input_tokens ?? 0, l.output_tokens ?? 0);
+  }
+
+  const totalCostUsd = (aiLogs ?? []).reduce(
+    (sum, log) => sum + logCost(log as unknown as AiLogRow),
+    0
+  );
 
   // 모델별 집계
   const byModel = new Map<string, { calls: number; cost: number }>();
   for (const log of aiLogs ?? []) {
-    const l = log as unknown as { model: string; input_tokens: number; output_tokens: number };
+    const l = log as unknown as AiLogRow;
     const entry = byModel.get(l.model) ?? { calls: 0, cost: 0 };
     entry.calls++;
-    entry.cost += estimateCost(l.model, l.input_tokens ?? 0, l.output_tokens ?? 0);
+    entry.cost += logCost(l);
     byModel.set(l.model, entry);
   }
 

@@ -4,6 +4,7 @@ import { HelpButton } from "@/components/tutorial/HelpButton";
 import { PwaInstallBanner } from "@/components/pwa-install-banner";
 import { HomePaymentCard } from "./home-payment-card";
 import { HomeWorkerReminders } from "./home-worker-reminders";
+import { BriefingSetupBanner } from "./briefing-setup-banner";
 import { getTomorrowWorkerReminders, type TomorrowReminder } from "./reminder-actions";
 
 export const dynamic = "force-dynamic";
@@ -261,6 +262,15 @@ export default async function HomePage() {
     hasQuote = false;
   }
 
+  // 아침 브리핑 설정 여부 — 번호가 없으면 유도 배너 노출
+  let briefingConfigured = true;
+  try {
+    const { data } = await supabase.from("tenants").select("owner_phone").limit(1).maybeSingle();
+    briefingConfigured = Boolean((data as { owner_phone?: string | null } | null)?.owner_phone);
+  } catch {
+    briefingConfigured = true; // 조회 실패 시 배너로 귀찮게 하지 않음
+  }
+
   // 신규(가이드 노출) 판단: 데이터 0건 기준이 아니라 '설정 완성도' 기준.
   // 단가표·견적 중 하나라도 준비되지 않았으면, 현장을 막 만든 초보도 가이드를 계속 본다.
   const setupComplete = hasPriceBook && hasQuote;
@@ -466,6 +476,9 @@ export default async function HomePage() {
           받을 돈 전체 보기
         </Link>
       </section>
+
+      {/* 아침 브리핑 유도 — 번호 미설정 + 기본 셋업이 끝난 사용자에게만 */}
+      {!briefingConfigured && setupComplete && <BriefingSetupBanner />}
 
       {/* 내일 공사 — 작업자 리마인드 (노쇼 방지) */}
       <HomeWorkerReminders reminders={tomorrowReminders} />

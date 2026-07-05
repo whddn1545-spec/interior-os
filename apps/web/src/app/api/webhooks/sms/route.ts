@@ -13,6 +13,16 @@ interface NhnDeliveryCallback {
 }
 
 export async function POST(req: NextRequest) {
+  // 공개 엔드포인트 보호 — SMS_WEBHOOK_TOKEN이 설정돼 있으면 ?token= 일치 필수.
+  // NHN 콘솔의 수신 통보 URL에 https://<domain>/api/webhooks/sms?token=<값> 으로 등록.
+  const expectedToken = process.env.SMS_WEBHOOK_TOKEN;
+  if (expectedToken) {
+    const token = new URL(req.url).searchParams.get("token");
+    if (token !== expectedToken) {
+      return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
+    }
+  }
+
   const body = await req.json() as NhnDeliveryCallback | NhnDeliveryCallback[];
   const items = Array.isArray(body) ? body : [body];
   const supabase = createAdminClient();
