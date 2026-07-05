@@ -15,6 +15,7 @@ export default function OnboardingPage() {
   // Step 0: 사업자 정보
   const [businessName, setBusinessName] = useState("");
   const [ownerName, setOwnerName] = useState("");
+  const [ownerPhone, setOwnerPhone] = useState("");
 
   // Step 1: 단가 선택
   const [useDefaultPrices, setUseDefaultPrices] = useState<"default" | "ai" | "manual">("default");
@@ -28,7 +29,7 @@ export default function OnboardingPage() {
       const res = await fetch("/api/onboarding/setup", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ businessName, ownerName }),
+        body: JSON.stringify({ businessName, ownerName, ownerPhone }),
       });
       if (!res.ok) {
         const body = (await res.json()) as { error?: string };
@@ -40,6 +41,7 @@ export default function OnboardingPage() {
     });
   }
 
+  // "ai" 모드는 파일 업로드 성공 시 바로 다음 단계로 넘어가므로 여기서 다루지 않는다
   async function handleStep1() {
     if (useDefaultPrices === "default") {
       startTransition(async () => {
@@ -49,10 +51,6 @@ export default function OnboardingPage() {
         }
         setStep(2);
       });
-    } else if (useDefaultPrices === "ai") {
-      // AI 스캔 모드 진입
-      alert("종이 단가표 스캔 기능이 시작됩니다! (준비 중)");
-      setStep(2);
     } else {
       setStep(2);
     }
@@ -106,6 +104,21 @@ export default function OnboardingPage() {
                   placeholder="예: 홍길동"
                   className="w-full border border-border rounded-2xl px-4 py-4 text-xl focus:outline-none focus:border-primary/60"
                 />
+              </div>
+              <div>
+                <label className="block text-lg font-semibold text-foreground mb-2">
+                  휴대폰 번호 <span className="text-base font-normal text-muted-foreground">(선택)</span>
+                </label>
+                <input
+                  type="tel"
+                  value={ownerPhone}
+                  onChange={(e) => setOwnerPhone(e.target.value)}
+                  placeholder="예: 010-1234-5678"
+                  className="w-full border border-border rounded-2xl px-4 py-4 text-xl focus:outline-none focus:border-primary/60"
+                />
+                <p className="text-sm text-muted-foreground mt-1.5">
+                  매일 아침 7시 반, 오늘 공사·받을 돈을 문자로 알려드려요
+                </p>
               </div>
             </div>
 
@@ -171,7 +184,8 @@ export default function OnboardingPage() {
                         onChange={async (e) => {
                           const file = e.target.files?.[0];
                           if (!file) return;
-                          
+
+                          setError(null);
                           startTransition(async () => {
                             const formData = new FormData();
                             formData.append("file", file);
@@ -180,8 +194,11 @@ export default function OnboardingPage() {
                               body: formData,
                             });
                             if (!res.ok) {
-                              const body = await res.json();
-                              alert(body.error || "스캔에 실패했습니다.");
+                              const body = (await res.json()) as { error?: string };
+                              setError(
+                                body.error ??
+                                  "사진을 읽지 못했어요. 더 밝은 곳에서 다시 찍거나, 기본 단가로 시작해보세요."
+                              );
                             } else {
                               setStep(2);
                             }
@@ -205,6 +222,10 @@ export default function OnboardingPage() {
                 </p>
               </button>
             </div>
+
+            {error && (
+              <div className="mb-4 bg-red-50 border border-red-200 rounded-xl px-4 py-3 text-red-700">{error}</div>
+            )}
 
             {useDefaultPrices !== "ai" && (
               <button

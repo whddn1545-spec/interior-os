@@ -4,9 +4,10 @@ import { createAdminClient } from "@/lib/supabase/admin";
 
 export async function POST(request: Request) {
   try {
-    const { businessName, ownerName } = (await request.json()) as {
+    const { businessName, ownerName, ownerPhone } = (await request.json()) as {
       businessName?: string;
       ownerName?: string;
+      ownerPhone?: string;
     };
     if (!businessName?.trim() || !ownerName?.trim()) {
       return NextResponse.json(
@@ -61,6 +62,19 @@ export async function POST(request: Request) {
 
     if (userError) {
       return NextResponse.json({ error: userError.message }, { status: 500 });
+    }
+
+    // 2b) 사장님 휴대폰 (선택) — 아침 브리핑 수신용.
+    // 컬럼 미존재(마이그레이션 009 이전) 시 조용히 건너뛰어 온보딩 자체는 막지 않는다.
+    if (ownerPhone) {
+      const digits = ownerPhone.replace(/\D/g, "");
+      if (digits.length >= 10 && digits.length <= 11) {
+        await admin
+          .from("tenants")
+          .update({ owner_phone: digits })
+          .eq("id", tenantId)
+          .then(() => undefined, () => undefined);
+      }
     }
 
     // 3) 기본 거리구역 시드 (이미 있으면 skip)
