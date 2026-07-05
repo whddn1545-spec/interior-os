@@ -2,6 +2,7 @@
 
 import { useState, useTransition } from "react";
 import { useRouter } from "next/navigation";
+import { createBrowserClient } from "@supabase/ssr";
 import { CheckCircleIcon } from "lucide-react";
 
 const STEPS = ["사업자 정보", "단가 초기화", "완료"];
@@ -35,6 +36,13 @@ export default function OnboardingPage() {
         const body = (await res.json()) as { error?: string };
         setError(body.error ?? "오류가 발생했습니다");
       } else {
+        // 중요: users 행이 방금 생겼으므로 세션을 갱신해 새 JWT에 tenant_id claim을 싣는다.
+        // 이게 없으면 RLS가 고객·단가 등 모든 쓰기를 거부한다 (재로그인 전까지).
+        const supabase = createBrowserClient(
+          process.env.NEXT_PUBLIC_SUPABASE_URL!,
+          process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY!
+        );
+        await supabase.auth.refreshSession().catch(() => undefined);
         setError(null);
         setStep(1);
       }

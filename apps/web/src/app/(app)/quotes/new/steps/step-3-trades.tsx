@@ -39,6 +39,8 @@ export function Step3Trades({ distanceFactor, difficultyFactor, defaultAreaPyeon
   const [isPending, startTransition] = useTransition();
   const [hasPrices, setHasPrices] = useState(true);
   const [nextError, setNextError] = useState<string | null>(null);
+  const [seeding, setSeeding] = useState(false);
+  const [seedError, setSeedError] = useState<string | null>(null);
 
   useEffect(() => {
     startTransition(async () => {
@@ -49,6 +51,29 @@ export function Step3Trades({ distanceFactor, difficultyFactor, defaultAreaPyeon
       }
     });
   }, []);
+
+  // 단가표가 비어 있을 때 원탭 복구 — 기본 단가를 채우고 목록을 다시 불러온다
+  async function handleSeedDefaults() {
+    setSeeding(true);
+    setSeedError(null);
+    try {
+      const res = await fetch("/api/onboarding/seed-prices", { method: "POST" });
+      if (!res.ok) {
+        const body = (await res.json()) as { error?: string };
+        setSeedError(body.error ?? "기본 단가를 불러오지 못했어요");
+        return;
+      }
+      const refreshed = await getTradePrices();
+      if (refreshed.ok) {
+        setPrices(refreshed.data);
+        setHasPrices(refreshed.data.length > 0);
+      }
+    } catch {
+      setSeedError("기본 단가를 불러오지 못했어요. 잠시 후 다시 시도해주세요.");
+    } finally {
+      setSeeding(false);
+    }
+  }
 
   function toggle(price: TradePrice) {
     const next = new Map(selected);
@@ -115,12 +140,22 @@ export function Step3Trades({ distanceFactor, difficultyFactor, defaultAreaPyeon
         <h2 className="text-2xl font-bold text-foreground mb-4">단가표가 없어요</h2>
         <div className="bg-amber-50 border border-amber-200 rounded-xl p-5 mb-6">
           <p className="text-lg text-amber-800">
-            견적을 계산하려면 먼저 단가표를 입력해야 합니다.
+            견적을 계산하려면 먼저 단가표가 필요해요.
           </p>
           <p className="text-base text-amber-600 mt-1">
-            설정 → 단가표에서 공종별 자재 단가와 일당을 입력해주세요.
+            업계 평균 단가로 바로 시작하고, 나중에 설정 → 단가표에서 내 단가로 고칠 수 있어요.
           </p>
         </div>
+        {seedError && (
+          <div className="bg-red-50 border border-red-200 rounded-xl px-4 py-3 text-red-700 mb-4">{seedError}</div>
+        )}
+        <button
+          onClick={handleSeedDefaults}
+          disabled={seeding}
+          className="w-full py-4 mb-3 text-lg bg-primary text-primary-foreground rounded-xl font-bold disabled:opacity-50"
+        >
+          {seeding ? "불러오는 중..." : "📥 기본 단가로 바로 시작하기"}
+        </button>
         <button
           onClick={onBack}
           className="w-full py-4 text-lg border border-border rounded-xl text-muted-foreground font-medium"
