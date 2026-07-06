@@ -26,3 +26,14 @@ export const PLAN_LIMITS = {
     sitesTotal: 20,
   },
 } as const;
+
+/**
+ * 플랜별 월 AI 비용 상한 (USD).
+ * gpt-4o-mini 호출당 약 $0.001, gpt-4o 약 $0.01~0.05 기준으로
+ * basic도 일상 사용은 넉넉하고, 폭주(루프·남용)만 차단하는 수준.
+ */
+export const AI_MONTHLY_COST_CAP_USD: Record<Plan, number> = {
+  basic: 2,
+  pro: 20,
+  team: 50,
+};

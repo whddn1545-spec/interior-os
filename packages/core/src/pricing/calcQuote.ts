@@ -54,14 +54,20 @@ export function calcQuote(input: {
   const adjusted = subtotal * input.distanceFactor * input.difficultyFactor;
   const reserve = adjusted * reserveRate;
   const contingency = adjusted * contingencyRate;
-  const total = Math.round(adjusted + reserve + contingency);
+
+  // 표시 정합성: total은 반올림된 구성요소의 합으로 계산한다.
+  // (반올림 전 합을 따로 반올림하면 견적서 내역 합계와 총액이 1~2원 어긋날 수 있음)
+  const adjustedRounded = Math.round(adjusted);
+  const reserveRounded = Math.round(reserve);
+  const contingencyRounded = Math.round(contingency);
+  const total = adjustedRounded + reserveRounded + contingencyRounded;
 
   return {
     items: lineResults,
     subtotal,
-    adjusted: Math.round(adjusted),
-    reserve: Math.round(reserve),
-    contingency: Math.round(contingency),
+    adjusted: adjustedRounded,
+    reserve: reserveRounded,
+    contingency: contingencyRounded,
     total,
     snapshot: {
       distanceFactor: input.distanceFactor,

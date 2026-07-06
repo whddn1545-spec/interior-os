@@ -102,3 +102,25 @@ describe("formatKRW", () => {
     expect(formatKRW(0)).toBe("0원");
   });
 });
+
+describe("표시 정합성", () => {
+  test("총액 = 반올림된 구성요소(adjusted+reserve+contingency)의 합", () => {
+    // 홀수 단가·계수로 반올림 어긋남이 생기기 쉬운 조합
+    const result = calcQuote({
+      items: [
+        {
+          tradeId: "t1",
+          description: "도배",
+          quantity: 7,
+          unit: "pyeong",
+          price: { materialUnitPrice: 33333, laborDayRate: 177777, defaultDaysPerUnit: 0.13 },
+        },
+      ],
+      distanceFactor: 1.15,
+      difficultyFactor: 1.25,
+      reserveRate: 0.17,
+      contingencyRate: 0.07,
+    });
+    expect(result.total).toBe(result.adjusted + result.reserve + result.contingency);
+  });
+});

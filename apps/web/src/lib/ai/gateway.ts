@@ -1,6 +1,7 @@
 import "server-only";
 import OpenAI from "openai";
 import { createAdminClient } from "@/lib/supabase/admin";
+import { AI_MONTHLY_COST_CAP_USD } from "@/lib/plan";
 
 let _client: OpenAI | null = null;
 
@@ -79,9 +80,47 @@ function sleep(ms: number): Promise<void> {
   return new Promise((resolve) => setTimeout(resolve, ms));
 }
 
+/**
+ * 테넌트별 월 AI 비용 캡 검사 — 초과 시 throw.
+ * 폭주(루프·남용)로 인한 비용 사고를 막는 안전장치.
+ * 조회 실패 시에는 본 기능을 막지 않는다 (캡은 보호장치일 뿐 게이트가 아님).
+ */
+async function assertUnderMonthlyCap(tenantId: string): Promise<void> {
+  try {
+    const admin = createAdminClient();
+    const [{ data: tenant }, { data: logs }] = await Promise.all([
+      admin.from("tenants").select("plan").eq("id", tenantId).maybeSingle(),
+      admin
+        .from("ai_invocations")
+        .select("cost_usd")
+        .eq("tenant_id", tenantId)
+        .gte("created_at", new Date(new Date().getUTCFullYear(), new Date().getUTCMonth(), 1).toISOString()),
+    ]);
+
+    const plan = ((tenant as { plan?: string } | null)?.plan ?? "basic") as keyof typeof AI_MONTHLY_COST_CAP_USD;
+    const cap = AI_MONTHLY_COST_CAP_USD[plan] ?? AI_MONTHLY_COST_CAP_USD.basic;
+    const spent = ((logs ?? []) as { cost_usd: number | null }[]).reduce(
+      (sum, l) => sum + Number(l.cost_usd ?? 0),
+      0
+    );
+
+    if (spent >= cap) {
+      throw new Error("이번 달 AI 사용량을 모두 사용했어요. 다음 달에 다시 이용하거나 플랜을 업그레이드해주세요.");
+    }
+  } catch (e) {
+    // 캡 초과 에러만 전파, 조회 실패는 무시
+    if (e instanceof Error && e.message.includes("AI 사용량")) throw e;
+  }
+}
+
 export async function invokeAI(input: GatewayInput): Promise<GatewayOutput> {
   const client = getClient();
   const maxRetries = 2;
+
+  // 테넌트가 특정된 호출은 월 비용 캡을 먼저 검사
+  if (input.tenantId) {
+    await assertUnderMonthlyCap(input.tenantId);
+  }
 
   const messages: OpenAI.Chat.ChatCompletionMessageParam[] =
     typeof input.userMessage === "string"
