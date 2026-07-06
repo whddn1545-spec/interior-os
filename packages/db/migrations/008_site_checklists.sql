@@ -16,6 +16,4 @@ create index idx_site_checklist_site on site_checklist_items (site_id);
 alter table site_checklist_items enable row level security;
 
 create policy "tenant_isolation" on site_checklist_items
-  using (tenant_id = (
-    select tenant_id from profiles where id = auth.uid()
-  ));
+  using (tenant_id = current_tenant());

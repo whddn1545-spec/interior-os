@@ -21,6 +21,4 @@ create index idx_consultation_notes_tenant   on consultation_notes (tenant_id, c
 alter table consultation_notes enable row level security;
 
 create policy "tenant_isolation" on consultation_notes
-  using (tenant_id = (
-    select tenant_id from profiles where id = auth.uid()
-  ));
+  using (tenant_id = current_tenant());

@@ -553,6 +553,13 @@ export function QuoteActions({ quoteId, status, siteId, customerId, totalAmount 
               </div>
             </div>
 
+            {/* 에러는 다이얼로그 안에 표시 — 밖의 배너는 오버레이에 가려 안 보인다 */}
+            {error && (
+              <div className="bg-loss/10 border border-loss/30 rounded-xl px-4 py-3 mb-4 text-loss text-base">
+                {error}
+              </div>
+            )}
+
             <div className="space-y-3">
               <button
                 onClick={handleCreateContract}

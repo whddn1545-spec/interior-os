@@ -242,7 +242,9 @@ export async function createContractFromQuote(
     .single();
 
   if (!quote) return { ok: false, error: "견적을 찾을 수 없습니다" };
-  if ((quote.status as string) !== "confirmed")
+  // 확정 이후 단계(보냄·고객 수락 포함)면 계약서 작성 가능.
+  // 기존에 confirmed만 허용해 고객이 '수락한' 견적으로 계약서를 못 만들던 버그.
+  if (!["confirmed", "sent", "accepted"].includes(quote.status as string))
     return { ok: false, error: "확정된 견적만 계약서를 만들 수 있습니다" };
 
   const { data: contract, error } = await supabase

@@ -25,6 +25,4 @@ create trigger as_requests_updated_at before update on as_requests
 alter table as_requests enable row level security;
 
 create policy "tenant_isolation" on as_requests
-  using (tenant_id = (
-    select tenant_id from profiles where id = auth.uid()
-  ));
+  using (tenant_id = current_tenant());
