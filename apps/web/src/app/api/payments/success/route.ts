@@ -39,6 +39,19 @@ export async function GET(req: NextRequest) {
       return NextResponse.redirect(new URL("/pricing?error=amount_mismatch", req.url));
     }
 
+    // 1.5) 동시 중복 콜백 방어 — payment_key(초기 NULL)를 원자적으로 선점.
+    //      영향 행 0 = 다른 요청이 이미 선점 → 멱등 종료(이중 승인·이중 플랜업 차단).
+    const { data: claimed } = await admin
+      .from("payment_records")
+      .update({ payment_key: paymentKey })
+      .eq("id", record.id)
+      .is("payment_key", null)
+      .select("id");
+
+    if (!claimed || claimed.length === 0) {
+      return NextResponse.redirect(new URL("/settings?payment=success", req.url));
+    }
+
     // 2) 토스 결제 승인 (서버 검증 완료 후)
     const confirmRes = await fetch("https://api.tosspayments.com/v1/payments/confirm", {
       method: "POST",
@@ -53,7 +66,7 @@ export async function GET(req: NextRequest) {
       const err = (await confirmRes.json()) as { message?: string };
       await admin
         .from("payment_records")
-        .update({ status: "failed" })
+        .update({ status: "failed", payment_key: null })
         .eq("id", record.id);
       throw new Error(err.message ?? "결제 승인 실패");
     }
@@ -66,7 +79,7 @@ export async function GET(req: NextRequest) {
         .eq("id", record.tenant_id),
       admin
         .from("payment_records")
-        .update({ status: "confirmed", payment_key: paymentKey })
+        .update({ status: "confirmed" })
         .eq("id", record.id),
     ]);
 
