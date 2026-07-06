@@ -9,8 +9,9 @@ export const dynamic = "force-dynamic";
 // 모든 숫자는 DB 집계 + core 순수 함수(calcMonthlyReport)로 계산. LLM 미사용.
 
 function kstToday(): Date {
-  const kstNow = new Date(Date.now() + 9 * 60 * 60 * 1000);
-  return new Date(Date.UTC(kstNow.getUTCFullYear(), kstNow.getUTCMonth(), kstNow.getUTCDate()));
+  // Intl 기반 — 서버가 어느 시간대여도 정확히 Asia/Seoul 날짜
+  const kstStr = new Intl.DateTimeFormat("en-CA", { timeZone: "Asia/Seoul" }).format(new Date());
+  return new Date(`${kstStr}T00:00:00Z`);
 }
 
 /** "2026-07" → 해당 월 [시작일, 다음달 시작일) */

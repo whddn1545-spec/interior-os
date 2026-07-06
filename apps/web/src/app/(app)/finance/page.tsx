@@ -16,17 +16,20 @@ const CATEGORY_LABEL: Record<string, string> = {
 export default async function FinancePage() {
   const supabase = await createClient();
 
-  const now = new Date();
-  const startOfMonth = new Date(now.getFullYear(), now.getMonth(), 1).toISOString().split("T")[0];
-  const endOfMonth = new Date(now.getFullYear(), now.getMonth() + 1, 0).toISOString().split("T")[0];
+  // 월 경계는 KST 기준 (서버 UTC 계산 시 월초·월말 9시간 어긋남 방지)
+  const kstTodayStr = new Intl.DateTimeFormat("en-CA", { timeZone: "Asia/Seoul" }).format(new Date());
+  const [ky, km] = kstTodayStr.split("-").map(Number);
+  const now = new Date(Date.UTC(ky, km - 1, 1));
+  const startOfMonth = new Date(Date.UTC(ky, km - 1, 1)).toISOString().split("T")[0];
+  const endOfMonth = new Date(Date.UTC(ky, km, 0)).toISOString().split("T")[0];
 
   // 6개월 시작일 계산
-  const sixMonthsAgo = new Date(now.getFullYear(), now.getMonth() - 5, 1).toISOString().split("T")[0];
+  const sixMonthsAgo = new Date(Date.UTC(ky, km - 6, 1)).toISOString().split("T")[0];
 
   // 내보내기용 월 키 (이번 달 / 지난달)
-  const thisMonthKey = `${now.getFullYear()}-${String(now.getMonth() + 1).padStart(2, "0")}`;
-  const lastMonthDate = new Date(now.getFullYear(), now.getMonth() - 1, 1);
-  const lastMonthKey = `${lastMonthDate.getFullYear()}-${String(lastMonthDate.getMonth() + 1).padStart(2, "0")}`;
+  const thisMonthKey = `${ky}-${String(km).padStart(2, "0")}`;
+  const lastMonthDate = new Date(Date.UTC(ky, km - 2, 1));
+  const lastMonthKey = `${lastMonthDate.getUTCFullYear()}-${String(lastMonthDate.getUTCMonth() + 1).padStart(2, "0")}`;
 
   const [{ data: entries }, { data: sites }, { data: chartEntries }] = await Promise.all([
     supabase

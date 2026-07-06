@@ -107,10 +107,11 @@ export default async function HomePage() {
     payments = [];
   }
 
-  // 3. 이번달 KPI
-  const startOfMonth = new Date(now.getFullYear(), now.getMonth(), 1).toISOString().split("T")[0];
-  const startOfLastMonth = new Date(now.getFullYear(), now.getMonth() - 1, 1).toISOString().split("T")[0];
-  const endOfLastMonth = new Date(now.getFullYear(), now.getMonth(), 0).toISOString().split("T")[0];
+  // 3. 이번달 KPI — 월 경계도 KST 기준 (서버 UTC로 계산하면 월초·월말 9시간 구간이 어긋남)
+  const [kstYear, kstMonth] = today.split("-").map(Number);
+  const startOfMonth = new Date(Date.UTC(kstYear, kstMonth - 1, 1)).toISOString().split("T")[0];
+  const startOfLastMonth = new Date(Date.UTC(kstYear, kstMonth - 2, 1)).toISOString().split("T")[0];
+  const endOfLastMonth = new Date(Date.UTC(kstYear, kstMonth - 1, 0)).toISOString().split("T")[0];
   let monthIncome = 0;
   let lastMonthIncome = 0;
   let activeCount = 0;
