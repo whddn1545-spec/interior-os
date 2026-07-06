@@ -11,6 +11,7 @@ const PAGE_LINKS: Partial<Record<TutorialKey, string>> = {
   photos: "/photos",
   schedule: "/schedule",
   finance: "/finance",
+  report: "/report",
   contracts: "/quotes",
 };
 
@@ -23,6 +24,7 @@ const PAGE_LINK_LABEL: Partial<Record<TutorialKey, string>> = {
   photos: "사진 보기",
   schedule: "일정 보기",
   finance: "장부 보기",
+  report: "리포트 보기",
   contracts: "견적 목록 보기",
 };
 
