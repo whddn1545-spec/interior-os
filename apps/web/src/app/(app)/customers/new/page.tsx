@@ -5,6 +5,8 @@ import { useRouter } from "next/navigation";
 import { ArrowLeftIcon } from "lucide-react";
 import { formatPhone } from "@/lib/utils";
 import Link from "next/link";
+import { toast } from "sonner";
+import { ContactPickerButton } from "@/components/contact-picker-button";
 import { createCustomer } from "./actions";
 
 const SOURCE_OPTIONS = [
@@ -50,6 +52,15 @@ export default function CustomerNewPage() {
       </div>
 
       <div className="space-y-5">
+        <ContactPickerButton
+          onPick={(c) => {
+            setError(null);
+            setName(c.name);
+            if (c.phone) setPhone(formatPhone(c.phone));
+            toast.success("연락처에서 가져왔어요");
+          }}
+        />
+
         <div>
           <label className="block text-base font-semibold text-foreground/90 mb-2">이름 *</label>
           <input

@@ -4,6 +4,7 @@ import { useState, useRef, useEffect, useTransition } from "react";
 import { SearchIcon, PlusIcon, UserIcon } from "lucide-react";
 import { searchCustomers, createCustomer } from "../actions";
 import { formatPhone } from "@/lib/utils";
+import { ContactPickerButton } from "@/components/contact-picker-button";
 
 interface CustomerOption {
   id: string;
@@ -169,6 +170,13 @@ export function Step1Customer({ onNext, initialCustomer }: Props) {
       {showNewForm && (
         <div className="bg-card border border-border rounded-xl p-4 space-y-3">
           <h3 className="text-lg font-semibold text-foreground">새 고객 정보</h3>
+          <ContactPickerButton
+            onPick={(c) => {
+              setError(null);
+              setNewName(c.name);
+              if (c.phone) setNewPhone(formatPhone(c.phone));
+            }}
+          />
           <div>
             <label className="block text-base font-medium text-foreground/90 mb-1">이름</label>
             <input

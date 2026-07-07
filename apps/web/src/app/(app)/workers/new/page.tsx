@@ -6,6 +6,8 @@ import { ArrowLeftIcon } from "lucide-react";
 import Link from "next/link";
 import { formatPhone } from "@/lib/utils";
 import { toast } from "sonner";
+import { parseContactName } from "@interior-os/core/contacts";
+import { ContactPickerButton } from "@/components/contact-picker-button";
 import { createWorker } from "./actions";
 
 const TRADE_OPTIONS = [
@@ -33,6 +35,29 @@ export default function WorkerNewPage() {
   const [phone, setPhone] = useState("");
   const [company, setCompany] = useState("");
   const [selectedTrades, setSelectedTrades] = useState<string[]>([]);
+
+  /** 연락처에서 가져오기 — "도배 곽상연" 식 이름이면 공종까지 자동 선택 */
+  function handleContactPick(contact: { name: string; phone: string }) {
+    setError(null);
+    const parsed = parseContactName(contact.name);
+    setName(parsed.name);
+    if (contact.phone) setPhone(formatPhone(contact.phone));
+
+    const knownCodes = TRADE_OPTIONS.map((t) => t.code);
+    const matched = parsed.tradeCodes.filter((c) => knownCodes.includes(c));
+    if (matched.length > 0) {
+      setSelectedTrades((prev) => [...new Set([...prev, ...matched])]);
+      const labels = matched
+        .map((c) => TRADE_OPTIONS.find((t) => t.code === c)?.label)
+        .filter(Boolean)
+        .join(", ");
+      toast.success(`연락처 이름을 보고 '${labels}' 공종을 자동 선택했어요`, {
+        description: "아니면 아래에서 바꿔주세요",
+      });
+    } else {
+      toast.success("연락처에서 가져왔어요");
+    }
+  }
 
   function toggleTrade(code: string) {
     setAllowNoTrade(false);
@@ -81,6 +106,8 @@ export default function WorkerNewPage() {
       </div>
 
       <div className="space-y-5">
+        <ContactPickerButton onPick={handleContactPick} />
+
         <div>
           <label className="block text-base font-semibold text-foreground/90 mb-2">이름 *</label>
           <input

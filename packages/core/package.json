@@ -7,7 +7,8 @@
     "./state": "./src/state/index.ts",
     "./validation": "./src/validation/index.ts",
     "./briefing": "./src/briefing/index.ts",
-    "./report": "./src/report/index.ts"
+    "./report": "./src/report/index.ts",
+    "./contacts": "./src/contacts/index.ts"
   },
   "scripts": {
     "typecheck": "tsc --noEmit",
