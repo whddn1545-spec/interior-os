@@ -65,221 +65,158 @@ function mapHref(address: string | null | undefined, name: string): string {
 }
 
 export default async function HomePage() {
+  // 인증은 미들웨어(proxy)가 이미 보장 — 결과를 쓰지 않는 getUser() 왕복 1회 제거
   const supabase = await createClient();
-  await supabase.auth.getUser();
 
   const now = new Date();
   const today = kstDateStr(now);
   const soon = kstDateStr(new Date(now.getTime() + 3 * 24 * 60 * 60 * 1000));
 
-  // 1. 오늘 진행 현장
-  let todayTasks: TodayTask[] = [];
-  try {
-    const { data } = await supabase
-      .from("schedule_tasks")
-      .select(
-        "id, title, site_id, start_date, end_date, sites(name, address), assignments(workers(name, phone))"
-      )
-      .lte("start_date", today)
-      .gte("end_date", today)
-      .neq("status", "canceled")
-      .order("start_date", { ascending: true })
-      .limit(20);
-    todayTasks = (data as unknown as TodayTask[]) ?? [];
-  } catch {
-    todayTasks = [];
-  }
-
-  // 2. 긴급 미수금 — payment_schedules는 Database 타입에 보강되어 typed 클라이언트로 조회
-  let payments: PaymentRow[] = [];
-  try {
-    const { data, error } = await supabase
-      .from("payment_schedules")
-      .select(
-        "id, stage_label, amount, due_date, sites(name, customers(name, phone))"
-      )
-      .is("paid_at", null)
-      .lte("due_date", soon)
-      .order("due_date", { ascending: true })
-      .limit(10);
-    if (!error) payments = (data as unknown as PaymentRow[]) ?? [];
-  } catch {
-    payments = [];
-  }
-
-  // 3. 이번달 KPI — 월 경계도 KST 기준 (서버 UTC로 계산하면 월초·월말 9시간 구간이 어긋남)
+  // ── 홈 데이터 전체를 한 번에 병렬 조회 ──────────────────────────────
+  // 기존에는 12개 쿼리를 순차 await → DB 왕복 지연이 페이지 로드에 그대로 누적됐다.
+  // (함수 리전과 DB 리전이 다르면 왕복당 100ms+ × 12회 = 체감 수 초)
   const [kstYear, kstMonth] = today.split("-").map(Number);
   const startOfMonth = new Date(Date.UTC(kstYear, kstMonth - 1, 1)).toISOString().split("T")[0];
   const startOfLastMonth = new Date(Date.UTC(kstYear, kstMonth - 2, 1)).toISOString().split("T")[0];
   const endOfLastMonth = new Date(Date.UTC(kstYear, kstMonth - 1, 0)).toISOString().split("T")[0];
-  let monthIncome = 0;
-  let lastMonthIncome = 0;
-  let activeCount = 0;
-  try {
-    const [incomeRes, lastMonthRes, activeSitesRes] = await Promise.all([
-      supabase
-        .from("finance_entries")
-        .select("amount")
-        .eq("direction", "in")
-        .gte("paid_at", startOfMonth),
-      supabase
-        .from("finance_entries")
-        .select("amount")
-        .eq("direction", "in")
-        .gte("paid_at", startOfLastMonth)
-        .lte("paid_at", endOfLastMonth),
-      supabase
-        .from("sites")
-        .select("id", { count: "exact", head: true })
-        .in("status", ["contracted", "in_progress"]),
-    ]);
-    monthIncome = (incomeRes.data ?? []).reduce((s, e) => s + Number((e as { amount: number }).amount), 0);
-    lastMonthIncome = (lastMonthRes.data ?? []).reduce((s, e) => s + Number((e as { amount: number }).amount), 0);
-    activeCount = activeSitesRes.count ?? 0;
-  } catch {
-    monthIncome = 0;
-    lastMonthIncome = 0;
-    activeCount = 0;
-  }
-
-  // 전월 대비 성장률
-  const momGrowth = lastMonthIncome > 0
-    ? Math.round(((monthIncome - lastMonthIncome) / lastMonthIncome) * 100)
-    : null;
-
-  // 4. 고객이 수락한 미확인 견적 (최근 7일 이내 accepted 상태)
   const sevenDaysAgo = new Date(now.getTime() - 7 * 24 * 60 * 60 * 1000).toISOString();
-  type AcceptedQuote = { id: string; total_amount: number; sites: { name: string; id: string } | null };
-  let acceptedQuotes: AcceptedQuote[] = [];
-  try {
-    const { data } = await supabase
-      .from("quotes")
-      .select("id, total_amount, sites(id, name)")
-      .eq("status", "accepted")
-      .gte("updated_at", sevenDaysAgo)
-      .order("updated_at", { ascending: false })
-      .limit(5);
-    acceptedQuotes = (data as unknown as AcceptedQuote[]) ?? [];
-  } catch {
-    acceptedQuotes = [];
-  }
-
-  // 3b. 내일 공사 작업자 리마인드 (노쇼 방지)
-  let tomorrowReminders: TomorrowReminder[] = [];
-  try {
-    const res = await getTomorrowWorkerReminders();
-    if (res.ok) tomorrowReminders = res.data;
-  } catch {
-    tomorrowReminders = [];
-  }
-
-  // 4a. 무응답 견적 — 보낸 지 3일 넘게 수락/거절이 없는 견적 (팔로업 대상)
   const staleBefore = new Date(now.getTime() - 3 * 24 * 60 * 60 * 1000).toISOString();
+
+  type AcceptedQuote = { id: string; total_amount: number; sites: { name: string; id: string } | null };
   type StaleQuote = {
     id: string;
     total_amount: number;
     updated_at: string;
     sites: { name: string; customers: { name: string; phone: string | null } | { name: string; phone: string | null }[] | null } | null;
   };
-  let staleQuotes: StaleQuote[] = [];
-  try {
-    const { data } = await supabase
-      .from("quotes")
-      .select("id, total_amount, updated_at, sites(name, customers(name, phone))")
-      .eq("status", "sent")
-      .lt("updated_at", staleBefore)
-      .order("updated_at", { ascending: true })
-      .limit(5);
-    staleQuotes = (data as unknown as StaleQuote[]) ?? [];
-  } catch {
-    staleQuotes = [];
-  }
-
-  // 4b. 고객이 서명한 계약 (최근 7일)
   type SignedContract = { id: string; sites: { id: string; name: string } | null };
-  let signedContracts: SignedContract[] = [];
-  try {
-    const { data } = await supabase
-      .from("contracts")
-      .select("id, sites(id, name)")
-      .eq("status", "signed")
-      .gte("updated_at", sevenDaysAgo)
-      .order("updated_at", { ascending: false })
-      .limit(5);
-    signedContracts = (data as unknown as SignedContract[]) ?? [];
-  } catch {
-    signedContracts = [];
-  }
 
-  // 5. 미처리 A/S 건수
-  let openAsCount = 0;
-  try {
-    const { count } = await supabase
-      .from("as_requests")
-      .select("id", { count: "exact", head: true })
-      .neq("status", "closed");
-    openAsCount = count ?? 0;
-  } catch {
-    openAsCount = 0;
+  /** 실패해도 홈이 죽지 않도록 개별 쿼리를 안전하게 감싼다 */
+  function safe<T>(p: PromiseLike<T>, fallback: T): Promise<T> {
+    return Promise.resolve(p).catch(() => fallback);
   }
+  const empty = { data: null, count: null } as { data: unknown; count: number | null };
 
-  // 4. 최근 현장 (오늘 현장이 없을 때 fallback)
-  let recentSites: RecentSite[] = [];
-  if (todayTasks.length === 0) {
-    try {
-      const { data } = await supabase
+  const [
+    todayTasksRes,
+    paymentsRes,
+    incomeRes,
+    lastMonthRes,
+    activeSitesRes,
+    acceptedRes,
+    remindersRes,
+    staleRes,
+    signedRes,
+    asCountRes,
+    recentSitesRes,
+    priceBookRes,
+    customerRes,
+    quoteCountRes,
+    tenantRes,
+  ] = await Promise.all([
+    safe(
+      supabase
+        .from("schedule_tasks")
+        .select("id, title, site_id, start_date, end_date, sites(name, address), assignments(workers(name, phone))")
+        .lte("start_date", today)
+        .gte("end_date", today)
+        .neq("status", "canceled")
+        .order("start_date", { ascending: true })
+        .limit(20),
+      empty
+    ),
+    safe(
+      supabase
+        .from("payment_schedules")
+        .select("id, stage_label, amount, due_date, sites(name, customers(name, phone))")
+        .is("paid_at", null)
+        .lte("due_date", soon)
+        .order("due_date", { ascending: true })
+        .limit(10),
+      empty
+    ),
+    safe(supabase.from("finance_entries").select("amount").eq("direction", "in").gte("paid_at", startOfMonth), empty),
+    safe(
+      supabase
+        .from("finance_entries")
+        .select("amount")
+        .eq("direction", "in")
+        .gte("paid_at", startOfLastMonth)
+        .lte("paid_at", endOfLastMonth),
+      empty
+    ),
+    safe(supabase.from("sites").select("id", { count: "exact", head: true }).in("status", ["contracted", "in_progress"]), empty),
+    safe(
+      supabase
+        .from("quotes")
+        .select("id, total_amount, sites(id, name)")
+        .eq("status", "accepted")
+        .gte("updated_at", sevenDaysAgo)
+        .order("updated_at", { ascending: false })
+        .limit(5),
+      empty
+    ),
+    getTomorrowWorkerReminders().catch(() => ({ ok: false as const, error: "" })),
+    safe(
+      supabase
+        .from("quotes")
+        .select("id, total_amount, updated_at, sites(name, customers(name, phone))")
+        .eq("status", "sent")
+        .lt("updated_at", staleBefore)
+        .order("updated_at", { ascending: true })
+        .limit(5),
+      empty
+    ),
+    safe(
+      supabase
+        .from("contracts")
+        .select("id, sites(id, name)")
+        .eq("status", "signed")
+        .gte("updated_at", sevenDaysAgo)
+        .order("updated_at", { ascending: false })
+        .limit(5),
+      empty
+    ),
+    safe(supabase.from("as_requests").select("id", { count: "exact", head: true }).neq("status", "closed"), empty),
+    safe(
+      supabase
         .from("sites")
         .select("id, name, address, status")
         .in("status", ["in_progress", "contracted"])
         .order("start_date", { ascending: true })
-        .limit(3);
-      recentSites = (data as unknown as RecentSite[]) ?? [];
-    } catch {
-      recentSites = [];
-    }
-  }
+        .limit(3),
+      empty
+    ),
+    safe(supabase.from("trade_prices").select("id", { count: "exact", head: true }).eq("is_active", true), empty),
+    safe(supabase.from("customers").select("id", { count: "exact", head: true }), empty),
+    safe(supabase.from("quotes").select("id", { count: "exact", head: true }), empty),
+    safe(supabase.from("tenants").select("owner_phone").limit(1).maybeSingle(), { data: null, error: null } as { data: unknown; error: unknown }),
+  ]);
 
-  // 설정 완성도 확인 (count only, head:true — 행 본문을 가져오지 않아 가벼움)
-  // 단가표(trade_prices)와 고객·견적이 준비됐는지로 신규 여부를 판단한다.
-  let hasPriceBook = false;
-  try {
-    const { count } = await supabase
-      .from("trade_prices")
-      .select("id", { count: "exact", head: true })
-      .eq("is_active", true);
-    hasPriceBook = (count ?? 0) > 0;
-  } catch {
-    hasPriceBook = false;
-  }
+  const todayTasks = ((todayTasksRes.data as unknown as TodayTask[] | null) ?? []);
+  const payments = ((paymentsRes.data as unknown as PaymentRow[] | null) ?? []);
+  const monthIncome = (((incomeRes.data as { amount: number }[] | null) ?? [])).reduce((s, e) => s + Number(e.amount), 0);
+  const lastMonthIncome = (((lastMonthRes.data as { amount: number }[] | null) ?? [])).reduce((s, e) => s + Number(e.amount), 0);
+  const activeCount = activeSitesRes.count ?? 0;
+  const acceptedQuotes = ((acceptedRes.data as unknown as AcceptedQuote[] | null) ?? []);
+  const tomorrowReminders: TomorrowReminder[] = remindersRes.ok ? remindersRes.data : [];
+  const staleQuotes = ((staleRes.data as unknown as StaleQuote[] | null) ?? []);
+  const signedContracts = ((signedRes.data as unknown as SignedContract[] | null) ?? []);
+  const openAsCount = asCountRes.count ?? 0;
+  // 최근 현장은 오늘 현장이 없을 때만 표시 (조회는 병렬로 미리)
+  const recentSites = todayTasks.length === 0 ? ((recentSitesRes.data as unknown as RecentSite[] | null) ?? []) : [];
+  const hasPriceBook = (priceBookRes.count ?? 0) > 0;
+  const hasCustomer = (customerRes.count ?? 0) > 0;
+  const hasQuote = (quoteCountRes.count ?? 0) > 0;
+  // 조회 실패(예: 마이그레이션 전 컬럼 미존재) 시엔 배너로 귀찮게 하지 않음
+  const briefingConfigured = (tenantRes as { error?: unknown }).error
+    ? true
+    : Boolean((tenantRes.data as { owner_phone?: string | null } | null)?.owner_phone);
 
-  let hasCustomer = false;
-  try {
-    const { count } = await supabase
-      .from("customers")
-      .select("id", { count: "exact", head: true });
-    hasCustomer = (count ?? 0) > 0;
-  } catch {
-    hasCustomer = false;
-  }
-
-  let hasQuote = false;
-  try {
-    const { count } = await supabase
-      .from("quotes")
-      .select("id", { count: "exact", head: true });
-    hasQuote = (count ?? 0) > 0;
-  } catch {
-    hasQuote = false;
-  }
-
-  // 아침 브리핑 설정 여부 — 번호가 없으면 유도 배너 노출
-  let briefingConfigured = true;
-  try {
-    const { data } = await supabase.from("tenants").select("owner_phone").limit(1).maybeSingle();
-    briefingConfigured = Boolean((data as { owner_phone?: string | null } | null)?.owner_phone);
-  } catch {
-    briefingConfigured = true; // 조회 실패 시 배너로 귀찮게 하지 않음
-  }
+  // 전월 대비 성장률
+  const momGrowth = lastMonthIncome > 0
+    ? Math.round(((monthIncome - lastMonthIncome) / lastMonthIncome) * 100)
+    : null;
 
   // 신규(가이드 노출) 판단: 데이터 0건 기준이 아니라 '설정 완성도' 기준.
   // 단가표·견적 중 하나라도 준비되지 않았으면, 현장을 막 만든 초보도 가이드를 계속 본다.

@@ -62,9 +62,14 @@ export default async function PublicQuotePage({ params }: { params: Promise<{ id
   const { id } = await params;
   const admin = createAdminClient();
 
+  // 견적+현장+고객+업체를 중첩 셀렉트 1회로 — 기존 3체인 쿼리 대비 DB 왕복 2회 절약
+  // 주의: 없는 컬럼을 select하면 PostgREST 에러 → 모든 링크가 404가 된다
   const [{ data: quote }, { data: items }] = await Promise.all([
-    // 주의: quotes에 없는 컬럼을 select하면 PostgREST 에러 → 모든 링크가 404가 된다
-    admin.from("quotes").select("id, version, status, total_amount, created_at, site_id").eq("id", id).single(),
+    admin
+      .from("quotes")
+      .select("id, version, status, total_amount, created_at, site_id, sites(name, address, tenant_id, customers(name), tenants(business_name, owner_name, owner_phone))")
+      .eq("id", id)
+      .single(),
     admin.from("quote_items").select("id, description, quantity, unit, line_total, trades(name_ko)").eq("quote_id", id).order("created_at"),
   ]);
 
@@ -75,23 +80,11 @@ export default async function PublicQuotePage({ params }: { params: Promise<{ id
   // draft 상태는 공개 접근 불가
   if (q.status === "draft") notFound();
 
-  const { data: site } = await admin
-    .from("sites")
-    .select("name, address, tenant_id, customers(name)")
-    .eq("id", q.site_id)
-    .single();
-
-  if (!site) notFound();
-
-  const s = site as unknown as SiteData;
-
-  const { data: tenant } = await admin
-    .from("tenants")
-    .select("business_name, owner_name, owner_phone")
-    .eq("id", s.tenant_id)
-    .single();
-
-  const t = tenant as unknown as TenantData | null;
+  const rawSite = (quote as unknown as { sites: (SiteData & { tenants: TenantData | TenantData[] | null }) | null }).sites;
+  if (!rawSite) notFound();
+  const s = rawSite as SiteData;
+  const rawTenant = rawSite.tenants;
+  const t: TenantData | null = Array.isArray(rawTenant) ? (rawTenant[0] ?? null) : rawTenant;
   const quoteItems = (items as unknown as QuoteItem[]) ?? [];
 
   // 공종별로 그룹핑
