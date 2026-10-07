@@ -2,7 +2,7 @@
 
 > **"60대 인테리어 사장님을 위한 3클릭 AI 업무 자동화 플랫폼"**
 
-InteriorOS는 수기 장부와 엑셀에 의존하는 파편화된 영세 인테리어 시공 업계를 타겟으로 한 **B2B Vertical SaaS**입니다. 태블릿과 스마트폰 환경에 극한으로 최적화된 UX(대형 폰트, 직관적 UI)와, 안정적인 결정론적 로직 위에 AI의 편의성(문서 분석, 사진 태깅, 문구 작성)을 우아하게 결합했습니다.
+InteriorOS는 수기 장부와 엑셀에 의존하는 파편화된 영세 인테리어 시공 업계를 타겟으로 한 **B2B Vertical SaaS**입니다. 태블릿과 스마트폰에서 쓰기 쉬운 UX(큰 글씨, 단순한 화면)를 목표로 하고, 금액·일정 같은 숫자는 결정론적 로직이 계산하며 AI는 문서 분석·사진 태깅·문구 작성 같은 보조 역할만 맡습니다.
 
 > 개발 방향과 원칙, 사이클별 진행 기록은 **[METAPROMPT.md](./METAPROMPT.md)**, 작업 시 함정·규칙은 **[CLAUDE.md](./CLAUDE.md)** 참고.
 
@@ -27,13 +27,13 @@ InteriorOS는 수기 장부와 엑셀에 의존하는 파편화된 영세 인테
 
 * **Framework**: Next.js 16 (App Router, Turbopack)
 * **Language**: TypeScript
-* **Styling**: Tailwind CSS v4, oklch 기반 Premium Glassmorphism UI
+* **Styling**: Tailwind CSS v4
 * **Database & Auth**: Supabase (PostgreSQL, RLS)
 * **AI Models**: 
-  * `gpt-4o`, `gpt-4o-mini` (단가표 스캔 및 견적 검토)
-  * `claude-3-5-sonnet`, `claude-3-opus` (현장 사진 태깅, 메시지 생성)
-  * `dall-e-3`, `dall-e-2` (무드보드 시각화 생성)
-* **Architecture**: Monorepo (Turborepo), Edge Runtime 기반 AI Gateway
+  * `gpt-4o`, `gpt-4o-mini` (단가표 스캔, 견적 검토, 사진 태깅, 메시지 생성)
+  * `whisper-1` (통화 상담 음성 → 텍스트)
+  * `dall-e-3`, `dall-e-2` (무드보드 시각화 생성·편집)
+* **Architecture**: Monorepo (Turborepo), 계산 엔진은 `packages/core`(순수함수 + vitest)
 * **Deployment**: Vercel (PWA 지원)
 
 ## 🚀 빠른 시작 (Getting Started)
@@ -54,6 +54,6 @@ pnpm dev
 InteriorOS는 Vercel 배포에 최적화되어 있습니다. Vercel 대시보드에 GitHub 레포지토리를 연결하고 환경 변수만 세팅하면 클릭 한 번으로 배포됩니다. iOS/Android 태블릿 사용자들은 Safari/Chrome에서 "홈 화면에 추가"를 통해 Native App처럼 사용할 수 있습니다 (PWA).
 
 ## 🔒 보안 및 아키텍처 원칙
-* **Multi-tenant RLS 강제**: 모든 쿼리는 \`tenant_id\`를 기준으로 강력하게 격리되어 다른 업체의 데이터 누출을 원천 차단합니다.
-* **비용 로깅**: 모든 AI 호출은 \`ai_invocations\` 테이블에 입력 토큰, 출력 토큰, 응답 시간(Latency), 그리고 비용(USD)이 기록되어 완벽한 Unit Economics 트래킹이 가능합니다.
-* **단기 서명 URL (Signed URLs)**: AI 분석을 위한 모든 이미지 전송은 5분 만료 서명 URL을 사용하여 보안을 극대화했습니다.
+* **Multi-tenant RLS 강제**: 모든 쿼리는 \`tenant_id\`를 기준으로 강력하게 격리되어 다른 업체의 데이터가 섞이지 않게 합니다.
+* **비용 로깅**: 모든 AI 호출은 \`ai_invocations\` 테이블에 입력 토큰, 출력 토큰, 응답 시간(Latency), 그리고 비용(USD)을 기록해 업체별 AI 비용을 추적합니다.
+* **단기 서명 URL (Signed URLs)**: AI 분석을 위한 모든 이미지 전송은 5분 만료 서명 URL을 사용합니다.
